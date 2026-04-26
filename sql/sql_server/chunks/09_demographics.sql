@@ -64,13 +64,14 @@ FROM (
     GROUP BY anchor_event
 ) agg
 JOIN (
-    SELECT DISTINCT
+    SELECT
         anchor_event,
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY age_years) OVER (PARTITION BY anchor_event) AS age_lq_years,
-        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY age_years) OVER (PARTITION BY anchor_event) AS age_median_years,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY age_years) OVER (PARTITION BY anchor_event) AS age_uq_years
+        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY age_years) AS age_lq_years,
+        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY age_years) AS age_median_years,
+        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY age_years) AS age_uq_years
     FROM ages
     WHERE age_years IS NOT NULL
+    GROUP BY anchor_event
 ) p
   ON agg.anchor_event = p.anchor_event
 ORDER BY CASE WHEN agg.anchor_event = 'INDEX' THEN 0 ELSE 1 END

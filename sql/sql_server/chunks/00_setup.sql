@@ -859,44 +859,27 @@ SELECT
     k.median_days_closest,
     k.uq_days_closest
 FROM (
-    SELECT DISTINCT
+    SELECT
         anchor_event,
         event_family,
         concept_id,
-        n_patients_with_code_timing,
-        lq_days AS lq_days_first,
-        median_days AS median_days_first,
-        uq_days AS uq_days_first
-    FROM (
-        SELECT
-            anchor_event,
-            event_family,
-            concept_id,
-            COUNT(*) OVER (PARTITION BY anchor_event, event_family, concept_id) AS n_patients_with_code_timing,
-            PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY anchor_event, event_family, concept_id) AS lq_days,
-            PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY anchor_event, event_family, concept_id) AS median_days,
-            PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY anchor_event, event_family, concept_id) AS uq_days
-        FROM #event_code_patient_chosen_first
-    ) qf
+        COUNT(*) AS n_patients_with_code_timing,
+        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS lq_days_first,
+        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS median_days_first,
+        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS uq_days_first
+    FROM #event_code_patient_chosen_first
+    GROUP BY anchor_event, event_family, concept_id
 ) f
 INNER JOIN (
-    SELECT DISTINCT
+    SELECT
         anchor_event,
         event_family,
         concept_id,
-        lq_days AS lq_days_closest,
-        median_days AS median_days_closest,
-        uq_days AS uq_days_closest
-    FROM (
-        SELECT
-            anchor_event,
-            event_family,
-            concept_id,
-            PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY anchor_event, event_family, concept_id) AS lq_days,
-            PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY anchor_event, event_family, concept_id) AS median_days,
-            PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY anchor_event, event_family, concept_id) AS uq_days
-        FROM #event_code_patient_chosen_closest
-    ) qc
+        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS lq_days_closest,
+        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS median_days_closest,
+        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS uq_days_closest
+    FROM #event_code_patient_chosen_closest
+    GROUP BY anchor_event, event_family, concept_id
 ) k
   ON f.anchor_event = k.anchor_event
  AND f.event_family = k.event_family
@@ -1031,48 +1014,29 @@ SELECT
     k.median_days_closest,
     k.uq_days_closest
 FROM (
-    SELECT DISTINCT
+    SELECT
         anchor_event,
         event_family,
         time_relative,
         concept_id,
-        n_patients_with_code_timing,
-        lq_days AS lq_days_first,
-        median_days AS median_days_first,
-        uq_days AS uq_days_first
-    FROM (
-        SELECT
-            anchor_event,
-            event_family,
-            time_relative,
-            concept_id,
-            COUNT(*) OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id) AS n_patients_with_code_timing,
-            PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id) AS lq_days,
-            PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id) AS median_days,
-            PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id) AS uq_days
-        FROM #event_code_patient_chosen_before_after_first
-    ) qf
+        COUNT(*) AS n_patients_with_code_timing,
+        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS lq_days_first,
+        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS median_days_first,
+        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS uq_days_first
+    FROM #event_code_patient_chosen_before_after_first
+    GROUP BY anchor_event, event_family, time_relative, concept_id
 ) f
 INNER JOIN (
-    SELECT DISTINCT
+    SELECT
         anchor_event,
         event_family,
         time_relative,
         concept_id,
-        lq_days AS lq_days_closest,
-        median_days AS median_days_closest,
-        uq_days AS uq_days_closest
-    FROM (
-        SELECT
-            anchor_event,
-            event_family,
-            time_relative,
-            concept_id,
-            PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id) AS lq_days,
-            PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id) AS median_days,
-            PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id) AS uq_days
-        FROM #event_code_patient_chosen_before_after_closest
-    ) qc
+        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS lq_days_closest,
+        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS median_days_closest,
+        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS uq_days_closest
+    FROM #event_code_patient_chosen_before_after_closest
+    GROUP BY anchor_event, event_family, time_relative, concept_id
 ) k
   ON f.anchor_event = k.anchor_event
  AND f.event_family = k.event_family
@@ -1236,43 +1200,25 @@ INSERT INTO #timing_pair_summary (
     p90_days,
     p95_days
 )
-SELECT DISTINCT
+SELECT
     from_event,
     to_event,
-    n_patients_with_pair,
-    p05_days,
-    p10_days,
-    p20_days,
-    p25_days,
-    p30_days,
-    p40_days,
-    p50_days,
-    p60_days,
-    p70_days,
-    p75_days,
-    p80_days,
-    p90_days,
-    p95_days
-FROM (
-    SELECT
-        from_event,
-        to_event,
-        COUNT(*) OVER (PARTITION BY from_event, to_event) AS n_patients_with_pair,
-        PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p05_days,
-        PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p10_days,
-        PERCENTILE_CONT(0.20) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p20_days,
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p25_days,
-        PERCENTILE_CONT(0.30) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p30_days,
-        PERCENTILE_CONT(0.40) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p40_days,
-        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p50_days,
-        PERCENTILE_CONT(0.60) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p60_days,
-        PERCENTILE_CONT(0.70) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p70_days,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p75_days,
-        PERCENTILE_CONT(0.80) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p80_days,
-        PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p90_days,
-        PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p95_days
-    FROM #patient_timing_pairs
-) q
+    COUNT(*) AS n_patients_with_pair,
+    PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY days_diff) AS p05_days,
+    PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY days_diff) AS p10_days,
+    PERCENTILE_CONT(0.20) WITHIN GROUP (ORDER BY days_diff) AS p20_days,
+    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS p25_days,
+    PERCENTILE_CONT(0.30) WITHIN GROUP (ORDER BY days_diff) AS p30_days,
+    PERCENTILE_CONT(0.40) WITHIN GROUP (ORDER BY days_diff) AS p40_days,
+    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS p50_days,
+    PERCENTILE_CONT(0.60) WITHIN GROUP (ORDER BY days_diff) AS p60_days,
+    PERCENTILE_CONT(0.70) WITHIN GROUP (ORDER BY days_diff) AS p70_days,
+    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS p75_days,
+    PERCENTILE_CONT(0.80) WITHIN GROUP (ORDER BY days_diff) AS p80_days,
+    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY days_diff) AS p90_days,
+    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY days_diff) AS p95_days
+FROM #patient_timing_pairs
+GROUP BY from_event, to_event
 ;
 
 DROP TABLE IF EXISTS #all_events_for_pairs;
@@ -1384,43 +1330,25 @@ INSERT INTO #timing_pair_summary_first_to_closest (
     p90_days,
     p95_days
 )
-SELECT DISTINCT
+SELECT
     from_event,
     to_event,
-    n_patients_with_pair,
-    p05_days,
-    p10_days,
-    p20_days,
-    p25_days,
-    p30_days,
-    p40_days,
-    p50_days,
-    p60_days,
-    p70_days,
-    p75_days,
-    p80_days,
-    p90_days,
-    p95_days
-FROM (
-    SELECT
-        from_event,
-        to_event,
-        COUNT(*) OVER (PARTITION BY from_event, to_event) AS n_patients_with_pair,
-        PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p05_days,
-        PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p10_days,
-        PERCENTILE_CONT(0.20) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p20_days,
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p25_days,
-        PERCENTILE_CONT(0.30) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p30_days,
-        PERCENTILE_CONT(0.40) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p40_days,
-        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p50_days,
-        PERCENTILE_CONT(0.60) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p60_days,
-        PERCENTILE_CONT(0.70) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p70_days,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p75_days,
-        PERCENTILE_CONT(0.80) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p80_days,
-        PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p90_days,
-        PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p95_days
-    FROM #patient_timing_pairs_first_to_closest
-) q
+    COUNT(*) AS n_patients_with_pair,
+    PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY days_diff) AS p05_days,
+    PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY days_diff) AS p10_days,
+    PERCENTILE_CONT(0.20) WITHIN GROUP (ORDER BY days_diff) AS p20_days,
+    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS p25_days,
+    PERCENTILE_CONT(0.30) WITHIN GROUP (ORDER BY days_diff) AS p30_days,
+    PERCENTILE_CONT(0.40) WITHIN GROUP (ORDER BY days_diff) AS p40_days,
+    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS p50_days,
+    PERCENTILE_CONT(0.60) WITHIN GROUP (ORDER BY days_diff) AS p60_days,
+    PERCENTILE_CONT(0.70) WITHIN GROUP (ORDER BY days_diff) AS p70_days,
+    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS p75_days,
+    PERCENTILE_CONT(0.80) WITHIN GROUP (ORDER BY days_diff) AS p80_days,
+    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY days_diff) AS p90_days,
+    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY days_diff) AS p95_days
+FROM #patient_timing_pairs_first_to_closest
+GROUP BY from_event, to_event
 ;
 
 DROP TABLE IF EXISTS #patient_timing_pairs_first_to_closest_before;
@@ -1495,43 +1423,25 @@ INSERT INTO #timing_pair_summary_first_to_closest_before (
     p90_days,
     p95_days
 )
-SELECT DISTINCT
+SELECT
     from_event,
     to_event,
-    n_patients_with_pair,
-    p05_days,
-    p10_days,
-    p20_days,
-    p25_days,
-    p30_days,
-    p40_days,
-    p50_days,
-    p60_days,
-    p70_days,
-    p75_days,
-    p80_days,
-    p90_days,
-    p95_days
-FROM (
-    SELECT
-        from_event,
-        to_event,
-        COUNT(*) OVER (PARTITION BY from_event, to_event) AS n_patients_with_pair,
-        PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p05_days,
-        PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p10_days,
-        PERCENTILE_CONT(0.20) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p20_days,
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p25_days,
-        PERCENTILE_CONT(0.30) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p30_days,
-        PERCENTILE_CONT(0.40) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p40_days,
-        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p50_days,
-        PERCENTILE_CONT(0.60) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p60_days,
-        PERCENTILE_CONT(0.70) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p70_days,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p75_days,
-        PERCENTILE_CONT(0.80) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p80_days,
-        PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p90_days,
-        PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p95_days
-    FROM #patient_timing_pairs_first_to_closest_before
-) q
+    COUNT(*) AS n_patients_with_pair,
+    PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY days_diff) AS p05_days,
+    PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY days_diff) AS p10_days,
+    PERCENTILE_CONT(0.20) WITHIN GROUP (ORDER BY days_diff) AS p20_days,
+    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS p25_days,
+    PERCENTILE_CONT(0.30) WITHIN GROUP (ORDER BY days_diff) AS p30_days,
+    PERCENTILE_CONT(0.40) WITHIN GROUP (ORDER BY days_diff) AS p40_days,
+    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS p50_days,
+    PERCENTILE_CONT(0.60) WITHIN GROUP (ORDER BY days_diff) AS p60_days,
+    PERCENTILE_CONT(0.70) WITHIN GROUP (ORDER BY days_diff) AS p70_days,
+    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS p75_days,
+    PERCENTILE_CONT(0.80) WITHIN GROUP (ORDER BY days_diff) AS p80_days,
+    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY days_diff) AS p90_days,
+    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY days_diff) AS p95_days
+FROM #patient_timing_pairs_first_to_closest_before
+GROUP BY from_event, to_event
 ;
 
 DROP TABLE IF EXISTS #patient_timing_pairs_first_to_closest_after;
@@ -1606,43 +1516,25 @@ INSERT INTO #timing_pair_summary_first_to_closest_after (
     p90_days,
     p95_days
 )
-SELECT DISTINCT
+SELECT
     from_event,
     to_event,
-    n_patients_with_pair,
-    p05_days,
-    p10_days,
-    p20_days,
-    p25_days,
-    p30_days,
-    p40_days,
-    p50_days,
-    p60_days,
-    p70_days,
-    p75_days,
-    p80_days,
-    p90_days,
-    p95_days
-FROM (
-    SELECT
-        from_event,
-        to_event,
-        COUNT(*) OVER (PARTITION BY from_event, to_event) AS n_patients_with_pair,
-        PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p05_days,
-        PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p10_days,
-        PERCENTILE_CONT(0.20) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p20_days,
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p25_days,
-        PERCENTILE_CONT(0.30) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p30_days,
-        PERCENTILE_CONT(0.40) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p40_days,
-        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p50_days,
-        PERCENTILE_CONT(0.60) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p60_days,
-        PERCENTILE_CONT(0.70) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p70_days,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p75_days,
-        PERCENTILE_CONT(0.80) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p80_days,
-        PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p90_days,
-        PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY days_diff) OVER (PARTITION BY from_event, to_event) AS p95_days
-    FROM #patient_timing_pairs_first_to_closest_after
-) q
+    COUNT(*) AS n_patients_with_pair,
+    PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY days_diff) AS p05_days,
+    PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY days_diff) AS p10_days,
+    PERCENTILE_CONT(0.20) WITHIN GROUP (ORDER BY days_diff) AS p20_days,
+    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS p25_days,
+    PERCENTILE_CONT(0.30) WITHIN GROUP (ORDER BY days_diff) AS p30_days,
+    PERCENTILE_CONT(0.40) WITHIN GROUP (ORDER BY days_diff) AS p40_days,
+    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS p50_days,
+    PERCENTILE_CONT(0.60) WITHIN GROUP (ORDER BY days_diff) AS p60_days,
+    PERCENTILE_CONT(0.70) WITHIN GROUP (ORDER BY days_diff) AS p70_days,
+    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS p75_days,
+    PERCENTILE_CONT(0.80) WITHIN GROUP (ORDER BY days_diff) AS p80_days,
+    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY days_diff) AS p90_days,
+    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY days_diff) AS p95_days
+FROM #patient_timing_pairs_first_to_closest_after
+GROUP BY from_event, to_event
 ;
 
 DROP TABLE IF EXISTS #event_presence;
@@ -1810,31 +1702,19 @@ INSERT INTO #death_timing_quantiles (
     p90_days,
     p95_days
 )
-SELECT DISTINCT
+SELECT
     prevalence_year,
     anchor_event,
-    n_deaths_in_dist,
-    p05_days,
-    p10_days,
-    lq_days,
-    median_days,
-    uq_days,
-    p90_days,
-    p95_days
-FROM (
-    SELECT
-        prevalence_year,
-        anchor_event,
-        COUNT(*) OVER (PARTITION BY prevalence_year, anchor_event) AS n_deaths_in_dist,
-        PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY days_to_death) OVER (PARTITION BY prevalence_year, anchor_event) AS p05_days,
-        PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY days_to_death) OVER (PARTITION BY prevalence_year, anchor_event) AS p10_days,
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_to_death) OVER (PARTITION BY prevalence_year, anchor_event) AS lq_days,
-        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_to_death) OVER (PARTITION BY prevalence_year, anchor_event) AS median_days,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_to_death) OVER (PARTITION BY prevalence_year, anchor_event) AS uq_days,
-        PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY days_to_death) OVER (PARTITION BY prevalence_year, anchor_event) AS p90_days,
-        PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY days_to_death) OVER (PARTITION BY prevalence_year, anchor_event) AS p95_days
-    FROM #death_timing_long
-) q
+    COUNT(*) AS n_deaths_in_dist,
+    PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY days_to_death) AS p05_days,
+    PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY days_to_death) AS p10_days,
+    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_to_death) AS lq_days,
+    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_to_death) AS median_days,
+    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_to_death) AS uq_days,
+    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY days_to_death) AS p90_days,
+    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY days_to_death) AS p95_days
+FROM #death_timing_long
+GROUP BY prevalence_year, anchor_event
 ;
 
 
