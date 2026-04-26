@@ -1,0 +1,629 @@
+---
+title: "Data characterization summary"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+output:
+  html_document:
+    theme: flatly
+    toc: true
+    toc_float: true
+    self_contained: true
+params:
+  results_dir: "outputs"
+  min_cell_count: 5
+  anchor_dx_counts_top_n: 10
+  event_code_counts_top_n: 5
+  event_code_timing_uses_closest: FALSE
+  focus_timing_plots: !r list()
+  connection_details: NULL
+  cdm_database_schema: ""
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+suppressPackageStartupMessages({
+  library(readr)
+  library(dplyr)
+  library(tidyr)
+  library(ggplot2)
+  library(knitr)
+  library(kableExtra)
+  library(scales)
+})
+
+rd       <- params$results_dir
+min_cell <- as.integer(params$min_cell_count)
+
+# ── Helpers ──────────────────────────────────────────────────────────────────
+
+read_csv_safe <- function(path) {
+  if (!file.exists(path)) return(tibble())
+  suppressMessages(read_csv(path, show_col_types = FALSE))
+}
+
+col_ci <- function(df, name) {
+  # Case-insensitive column lookup; returns the actual column name or NA.
+  hit <- names(df)[tolower(names(df)) == tolower(name)]
+  if (length(hit)) hit[[1]] else NA_character_
+}
+
+pct_of <- function(num, denom, min_cell) {
+  # Vectorised: NA when either is negative or denom <= threshold.
+  num   <- suppressWarnings(as.numeric(num))
+  denom <- suppressWarnings(as.numeric(denom))
+  ifelse(
+    is.na(num) | is.na(denom) | num < 0 | denom < 0 | denom <= min_cell,
+    NA_real_,
+    ifelse(num == 0, 0, 100 * num / denom)
+  )
+}
+
+fmt_n_pct <- function(n, pct) {
+  n   <- suppressWarnings(as.numeric(n))
+  pct <- suppressWarnings(as.numeric(pct))
+  dplyr::case_when(
+    is.na(n) | n < 0          ~ "—",
+    is.na(pct)                ~ format(round(n), big.mark = ",", scientific = FALSE),
+    TRUE                      ~ sprintf("%s (%.1f%%)", format(round(n), big.mark = ",", scientific = FALSE), pct)
+  )
+}
+
+fmt_n <- function(n) {
+  n <- suppressWarnings(as.numeric(n))
+  ifelse(is.na(n) | n < 0, "—", format(round(n), big.mark = ",", scientific = FALSE))
+}
+
+# Null-coalescing for NA: returns b when a is NA (col_ci returns NA_character_ when missing).
+`%||%` <- function(a, b) if (length(a) == 1L && !is.na(a)) a else b
+
+display_table <- function(df, ...) {
+  kable(df, ..., escape = FALSE) |>
+    kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                  full_width = TRUE, font_size = 13)
+}
+
+anchor_for_event <- function(from_ev) {
+  if (toupper(from_ev) == "DX") "INDEX" else "FIRST_MET"
+}
+
+timing_file <- function(vkey) {
+  switch(vkey,
+    first_to_first           = "final_timing_pair_summary_first_to_first.csv",
+    first_to_closest         = "final_timing_pair_summary_first_to_closest.csv",
+    first_to_closest_before  = "final_timing_pair_summary_first_to_closest_before.csv",
+    first_to_closest_after   = "final_timing_pair_summary_first_to_closest_after.csv",
+    NA_character_
+  )
+}
+
+timing_title <- function(vkey) {
+  switch(vkey,
+    first_to_first           = "First occurrence → first occurrence",
+    first_to_closest         = "First occurrence → closest occurrence",
+    first_to_closest_before  = "First → closest (strictly before anchor)",
+    first_to_closest_after   = "First → closest (on/after anchor)",
+    vkey
+  )
+}
+
+# Column family for event-code timing (FIRST vs CLOSEST).
+ecc_col_family <- function(vkey) {
+  if (vkey == "first_to_first") "FIRST" else "CLOSEST"
+}
+
+# TIME_RELATIVE filter for before/after variants (NA = no filter).
+ecc_time_relative <- function(vkey) {
+  switch(vkey,
+    first_to_closest_before = "BEFORE",
+    first_to_closest_after  = "AFTER",
+    NA_character_
+  )
+}
+
+# ── Concept name lookup ───────────────────────────────────────────────────────
+
+fetch_concept_names <- function(concept_ids, connection_details, cdm_schema) {
+  if (is.null(connection_details) || length(concept_ids) == 0) {
+    return(setNames(character(0), character(0)))
+  }
+  ids <- paste(unique(as.integer(concept_ids)), collapse = ", ")
+  sql <- SqlRender::render(
+    "SELECT concept_id, concept_name
+       FROM @cdm_schema.concept
+      WHERE concept_id IN (@ids)",
+    cdm_schema = cdm_schema,
+    ids        = ids
+  )
+  sql <- SqlRender::translate(sql, targetDialect = connection_details$dbms)
+  conn <- DatabaseConnector::connect(connection_details)
+  on.exit(DatabaseConnector::disconnect(conn), add = TRUE)
+  res <- DatabaseConnector::querySql(conn, sql, snakeCaseToCamelCase = FALSE)
+  setNames(as.character(res$CONCEPT_NAME), as.character(res$CONCEPT_ID))
+}
+
+# Gather all concept IDs across event-code CSVs so we can look them up once.
+ecc_single   <- read_csv_safe(file.path(rd, "final_event_code_counts.csv"))
+ecc_ba       <- read_csv_safe(file.path(rd, "final_event_code_counts_before_after.csv"))
+all_concept_ids <- unique(c(
+  if (nrow(ecc_single) && !is.na(col_ci(ecc_single, "concept_id"))) ecc_single[[col_ci(ecc_single, "concept_id")]] else integer(0),
+  if (nrow(ecc_ba)     && !is.na(col_ci(ecc_ba,     "concept_id"))) ecc_ba[[col_ci(ecc_ba,     "concept_id")]] else integer(0)
+))
+
+concept_names <- fetch_concept_names(all_concept_ids, params$connection_details, params$cdm_database_schema)
+```
+
+## Legend
+
+Abbreviations used throughout this report.
+
+```{r legend}
+legend_df <- tibble::tribble(
+  ~Abbreviation,          ~Meaning,
+  "DX",                   "Main cancer diagnosis concepts (target cancer dx cohort).",
+  "GDX",                  "Generalised cancer diagnoses: ancestors of DX, constrained to descendants of concept 443392 (Malignant neoplastic disease).",
+  "ODX",                  "Other cancer diagnoses: malignancies excluding DX and GDX.",
+  "MET",                  "Metastasis / Stage IV occurrence.",
+  "L01",                  "Antineoplastic agent exposure (ATC L01 descendants; from drug_exposure).",
+  "ANCHOR = INDEX",       "Anchored to first DX date.",
+  "ANCHOR = FIRST_MET",   "Anchored to first MET date.",
+  "TIME_RELATIVE = BEFORE","Event date occurs before the anchor date.",
+  "TIME_RELATIVE = AFTER", "Event date occurs on or after the anchor date."
+)
+display_table(legend_df)
+```
+
+## Population prevalence
+
+Denominator for percentages is N\_DX (target cancer diagnosis cohort). Values at or below the small-cell threshold (`r min_cell`) are suppressed.
+
+```{r prevalence}
+prev <- read_csv_safe(file.path(rd, "final_population_prevalence.csv"))
+
+if (nrow(prev) == 0) {
+  cat("_`final_population_prevalence.csv` not found._\n")
+} else {
+  yc <- col_ci(prev, "prevalence_year")
+  if (is.na(yc)) {
+    cat("_No `prevalence_year` column found._\n")
+  } else {
+    is_overall  <- toupper(as.character(prev[[yc]])) == "OVERALL"
+    overall_df  <- prev[is_overall, ]
+    yearly_df   <- prev[!is_overall, ]
+  }
+}
+```
+
+### Overall
+
+```{r prevalence-overall}
+if (exists("overall_df") && nrow(overall_df) > 0) {
+  row <- overall_df[1, ]
+  ndx <- suppressWarnings(as.numeric(row[[col_ci(overall_df, "n_dx")]]))
+
+  make_cell <- function(n_col) {
+    nc  <- col_ci(overall_df, n_col)
+    if (is.na(nc)) return("—")
+    n   <- suppressWarnings(as.numeric(row[[nc]]))
+    fmt_n_pct(n, pct_of(n, ndx, min_cell))
+  }
+
+  summary_row <- tibble(
+    "N diagnosed (DX)"           = fmt_n(ndx),
+    "Metastasis (MET)"           = make_cell("n_met"),
+    "Antineoplastic (L01)"       = make_cell("n_l01"),
+    "Other malignancy (ODX)"     = make_cell("n_odx"),
+    "Generalised Dx (GDX)"      = make_cell("n_gdx")
+  )
+  display_table(summary_row)
+} else {
+  cat("_No OVERALL row._\n")
+}
+```
+
+### By year
+
+```{r prevalence-yearly, fig.width=10, fig.height=4}
+if (exists("yearly_df") && nrow(yearly_df) > 0) {
+  ndx_col  <- col_ci(yearly_df, "n_dx")
+  nmet_col <- col_ci(yearly_df, "n_met")
+  nl01_col <- col_ci(yearly_df, "n_l01")
+
+  yd <- yearly_df |>
+    mutate(
+      year  = suppressWarnings(as.integer(as.numeric(as.character(.data[[yc]])))),
+      N_DX  = suppressWarnings(as.numeric(.data[[ndx_col]])),
+      N_DX  = ifelse(N_DX < 0 | N_DX <= min_cell, NA_real_, N_DX),
+      PCT_MET = pct_of(.data[[nmet_col]], N_DX, min_cell),
+      PCT_L01 = pct_of(.data[[nl01_col]], N_DX, min_cell)
+    ) |>
+    filter(!is.na(year)) |>
+    arrange(year)
+
+  scale_f <- max(yd$N_DX, na.rm = TRUE) / 100
+
+  long_pct <- yd |>
+    select(year, PCT_MET, PCT_L01) |>
+    pivot_longer(cols = c(PCT_MET, PCT_L01), names_to = "series", values_to = "pct") |>
+    mutate(
+      series = recode(series, PCT_MET = "MET %", PCT_L01 = "L01 %"),
+      y_scaled = pct * scale_f
+    )
+
+  ggplot() +
+    geom_col(data = yd, aes(x = year, y = N_DX), fill = "#bfdbfe", alpha = 0.85, width = 0.7) +
+    geom_line(data = long_pct, aes(x = year, y = y_scaled, color = series), linewidth = 1) +
+    geom_point(data = long_pct, aes(x = year, y = y_scaled, color = series), size = 2) +
+    scale_y_continuous(
+      name     = "N diagnosed (DX)",
+      labels   = comma,
+      sec.axis = sec_axis(~ . / scale_f, name = "% of DX cohort", labels = function(x) paste0(x, "%"))
+    ) +
+    scale_x_continuous(breaks = scales::breaks_pretty()) +
+    scale_color_manual(values = c("MET %" = "#ef4444", "L01 %" = "#3b82f6")) +
+    labs(x = NULL, color = NULL) +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "bottom")
+} else {
+  cat("_No by-year rows._\n")
+}
+```
+
+_DX = bars (left axis). MET % and L01 % = lines (right axis, % of DX cohort). Suppressed cells omitted._
+
+## Demographics
+
+By anchor cohort: patient count, age at anchor (median and IQR, years), and sex.
+`INDEX` = DX index date; `FIRST_MET` = first metastasis / stage IV.
+
+```{r demographics}
+demo <- read_csv_safe(file.path(rd, "final_demographics_from_anchors.csv"))
+
+if (nrow(demo) == 0) {
+  cat("_`final_demographics_from_anchors.csv` not found._\n")
+} else {
+  anchor_c <- col_ci(demo, "anchor_event")
+  n_c      <- col_ci(demo, "n_patients")
+  nm_c     <- col_ci(demo, "n_male")
+  nf_c     <- col_ci(demo, "n_female")
+  alq_c    <- col_ci(demo, "age_lq_years")
+  amed_c   <- col_ci(demo, "age_median_years")
+  auq_c    <- col_ci(demo, "age_uq_years")
+
+  if (any(is.na(c(anchor_c, n_c, alq_c, amed_c, auq_c)))) {
+    cat("_Demographics file missing required columns._\n")
+  } else {
+
+  anchor_labels <- c(INDEX = "DX index (INDEX)", FIRST_MET = "First MET (FIRST_MET)")
+
+  rows <- lapply(names(anchor_labels), function(anchor_key) {
+    sel <- demo[toupper(as.character(demo[[anchor_c]])) == anchor_key, ]
+    if (nrow(sel) == 0) return(NULL)
+    r <- sel[1, ]
+
+    n    <- suppressWarnings(as.numeric(r[[n_c]]))
+    nm   <- suppressWarnings(as.numeric(r[[nm_c]]))
+    nf   <- suppressWarnings(as.numeric(r[[nf_c]]))
+    lq   <- suppressWarnings(as.numeric(r[[alq_c]]))
+    med  <- suppressWarnings(as.numeric(r[[amed_c]]))
+    uq   <- suppressWarnings(as.numeric(r[[auq_c]]))
+
+    age_str <- if (all(!is.na(c(med, lq, uq)))) {
+      sprintf("%d (%d–%d)", round(med), round(lq), round(uq))
+    } else "—"
+
+    tot <- sum(c(nm, nf), na.rm = TRUE)
+    pct_m_str <- if (!is.na(nm) && tot > 0) sprintf("%.1f%%", 100 * nm / tot) else "—"
+    pct_f_str <- if (!is.na(nf) && tot > 0) sprintf("%.1f%%", 100 * nf / tot) else "—"
+
+    tibble(
+      "Anchor"          = anchor_labels[[anchor_key]],
+      "N patients"      = fmt_n(n),
+      "Age median (IQR)" = age_str,
+      "% male"          = pct_m_str,
+      "% female"        = pct_f_str
+    )
+  })
+
+  rows <- Filter(Negate(is.null), rows)
+  if (length(rows)) display_table(bind_rows(rows)) else cat("_No matching anchor rows._\n")
+  }  # end column-check else
+}
+```
+
+## Anchor DX concepts
+
+Top `r params$anchor_dx_counts_top_n` most frequent diagnosis concepts in the anchor cohort,
+from `final_anchor_dx_concept_counts.csv`.
+
+```{r anchor-dx-counts}
+adx <- read_csv_safe(file.path(rd, "final_anchor_dx_concept_counts.csv"))
+
+if (nrow(adx) == 0) {
+  cat("_`final_anchor_dx_concept_counts.csv` not found._\n")
+} else {
+  cid_c  <- col_ci(adx, "concept_id")
+  npat_c <- col_ci(adx, "n_distinct_patients")
+
+  top <- adx |>
+    mutate(across(all_of(c(npat_c)), as.numeric)) |>
+    filter(!is.na(.data[[npat_c]]), .data[[npat_c]] > min_cell) |>
+    arrange(desc(.data[[npat_c]])) |>
+    slice_head(n = params$anchor_dx_counts_top_n) |>
+    mutate(
+      concept_name = dplyr::coalesce(
+        concept_names[as.character(.data[[cid_c]])],
+        NA_character_
+      ),
+      concept_name = ifelse(is.na(concept_name), as.character(.data[[cid_c]]), concept_name)
+    )
+
+  ndays_c <- col_ci(adx, "n_distinct_patient_days")
+  out <- top |>
+    select(
+      "Concept ID"   = all_of(cid_c),
+      "Concept name" = concept_name,
+      "N patients"   = all_of(npat_c),
+      if (!is.na(ndays_c)) c("N patient-days" = ndays_c) else character(0)
+    ) |>
+    mutate(across(where(is.numeric), ~ format(round(.), big.mark = ",", scientific = FALSE)))
+
+  display_table(out)
+}
+```
+
+## Deaths
+
+Percentage of patients with a recorded death, by anchor cohort and year.
+
+```{r deaths, fig.width=10, fig.height=4}
+deaths <- read_csv_safe(file.path(rd, "final_death_from_anchors.csv"))
+
+if (nrow(deaths) == 0) {
+  cat("_`final_death_from_anchors.csv` not found._\n")
+} else {
+  yc_d      <- col_ci(deaths, "prevalence_year")
+  anchor_c  <- col_ci(deaths, "anchor_event")
+  npat_c    <- col_ci(deaths, "n_patients")
+  ndeath_c  <- col_ci(deaths, "n_deaths")
+
+  if (any(is.na(c(yc_d, anchor_c, npat_c, ndeath_c)))) {
+    cat("_Deaths file missing required columns._\n")
+  } else {
+    by_year <- deaths |>
+      filter(toupper(as.character(.data[[yc_d]])) != "OVERALL") |>
+      mutate(
+        year     = suppressWarnings(as.integer(as.numeric(as.character(.data[[yc_d]])))),
+        n_pat    = suppressWarnings(as.numeric(.data[[npat_c]])),
+        n_deaths = suppressWarnings(as.numeric(.data[[ndeath_c]])),
+        pct      = pct_of(n_deaths, n_pat, min_cell),
+        anchor   = toupper(as.character(.data[[anchor_c]]))
+      ) |>
+      filter(!is.na(year), !is.na(pct))
+
+    if (nrow(by_year) == 0) {
+      cat("_No by-year death rows after suppression._\n")
+    } else {
+      anchor_labels <- c(INDEX = "DX index (INDEX)", FIRST_MET = "First MET (FIRST_MET)")
+      by_year <- by_year |>
+        mutate(anchor_label = dplyr::recode(anchor, !!!anchor_labels, .default = anchor))
+
+      ggplot(by_year, aes(x = year, y = pct, color = anchor_label, group = anchor_label)) +
+        geom_line(linewidth = 1) +
+        geom_point(size = 2) +
+        scale_y_continuous(labels = function(x) paste0(x, "%"), limits = c(0, NA)) +
+        scale_x_continuous(breaks = scales::breaks_pretty()) +
+        scale_color_manual(values = c("DX index (INDEX)" = "#3b82f6", "First MET (FIRST_MET)" = "#ef4444")) +
+        labs(x = NULL, y = "% deaths", color = NULL) +
+        theme_minimal(base_size = 12) +
+        theme(legend.position = "bottom")
+    }
+  }
+}
+```
+
+## Timing pair focus
+
+Selected from–to pairs with quantile boxplots. Whiskers span P05–P95; box spans Q1–Q3; centre line is median. P10 and P90 shown as crosshair markers. Negative days = event occurred before the anchor.
+
+```{r timing-focus, results="asis"}
+# Pre-load overall denominators (N patients per event family) from prevalence CSV.
+prev_denom <- read_csv_safe(file.path(rd, "final_population_prevalence.csv"))
+get_denom <- function(event_key) {
+  if (nrow(prev_denom) == 0) return(NA_integer_)
+  yc    <- col_ci(prev_denom, "prevalence_year")
+  nc    <- col_ci(prev_denom, paste0("n_", tolower(event_key)))
+  if (is.na(yc) || is.na(nc)) return(NA_integer_)
+  ov <- prev_denom[toupper(as.character(prev_denom[[yc]])) == "OVERALL", nc, drop = TRUE]
+  if (length(ov) == 0) return(NA_integer_)
+  v <- suppressWarnings(as.integer(ov[[1]]))
+  if (is.na(v) || v < 0) NA_integer_ else v
+}
+
+ecc_blocks <- list()  # collect for appendix
+
+# Group pairs by FROM event.
+grouped <- list()
+for (pair in params$focus_timing_plots) {
+  key <- toupper(trimws(pair$from))
+  grouped[[key]] <- c(grouped[[key]], list(pair))
+}
+
+for (from_key in names(grouped)) {
+  cat(sprintf("\n\n### Timings from first %s\n\n", from_key))
+
+  for (pair in grouped[[from_key]]) {
+    from_ev <- toupper(trimws(pair$from))
+    to_ev   <- toupper(trimws(pair$to))
+    vkey    <- trimws(pair$timing)
+
+    cat(sprintf("\n\n#### %s → %s  <small>(%s)</small>\n\n",
+                from_ev, to_ev, timing_title(vkey)))
+
+    if (!is.null(pair$commentary) && nzchar(pair$commentary)) {
+      cat(sprintf("\n_%s_\n\n", pair$commentary))
+    }
+
+    tfile <- timing_file(vkey)
+    if (is.na(tfile) || !file.exists(file.path(rd, tfile))) {
+      cat(sprintf("_File not found: `%s`_\n\n", tfile))
+      next
+    }
+
+    tdf <- suppressMessages(read_csv(file.path(rd, tfile), show_col_types = FALSE))
+    fc  <- col_ci(tdf, "from_event")
+    tc  <- col_ci(tdf, "to_event")
+    if (is.na(fc) || is.na(tc)) { cat("_Missing FROM/TO columns._\n\n"); next }
+
+    sel <- tdf[toupper(as.character(tdf[[fc]])) == from_ev &
+               toupper(as.character(tdf[[tc]])) == to_ev, ]
+    if (nrow(sel) == 0) { cat("_No matching row in timing CSV._\n\n"); next }
+
+    r <- sel[1, ]
+    npair_c <- col_ci(tdf, "n_patients_with_pair")
+    med_c   <- col_ci(tdf, "p50_days")  %||% col_ci(tdf, "median_days")
+    lq_c    <- col_ci(tdf, "p25_days")  %||% col_ci(tdf, "lq_days")
+    uq_c    <- col_ci(tdf, "p75_days")  %||% col_ci(tdf, "uq_days")
+    p05_c   <- col_ci(tdf, "p05_days")
+    p10_c   <- col_ci(tdf, "p10_days")
+    p90_c   <- col_ci(tdf, "p90_days")
+    p95_c   <- col_ci(tdf, "p95_days")
+
+    n_pair  <- if (!is.na(npair_c)) suppressWarnings(as.integer(r[[npair_c]])) else NA_integer_
+    n_from  <- get_denom(from_ev)
+    pct_str <- if (!is.na(n_pair) && !is.na(n_from) && n_from > min_cell) {
+      sprintf("%.1f%%", 100 * n_pair / n_from)
+    } else "—"
+
+    num_col <- function(cn) if (!is.na(cn)) suppressWarnings(as.numeric(r[[cn]])) else NA_real_
+    med <- num_col(med_c)
+    lq  <- num_col(lq_c)
+    uq  <- num_col(uq_c)
+    iqr_str <- if (all(!is.na(c(med, lq, uq)))) {
+      sprintf("%d (%d–%d) days", round(med), round(lq), round(uq))
+    } else "—"
+
+    summary_row <- tibble(
+      "From" = from_ev, "To" = to_ev,
+      "N patients with pair" = fmt_n(n_pair),
+      "% of FROM cohort"     = pct_str,
+      "Median (IQR)"         = iqr_str
+    )
+    print(display_table(summary_row))
+    cat("\n\n")
+
+    # Boxplot from precomputed quantiles.
+    p05 <- num_col(p05_c)
+    p10 <- num_col(p10_c)
+    p90 <- num_col(p90_c)
+    p95 <- num_col(p95_c)
+
+    if (all(!is.na(c(p05, lq, med, uq, p95)))) {
+      box_df <- tibble(
+        pair   = sprintf("%s → %s", from_ev, to_ev),
+        ymin   = p05, lower = lq, middle = med, upper = uq, ymax = p95,
+        p10    = p10, p90   = p90
+      )
+      p <- ggplot(box_df, aes(x = pair, ymin = ymin, lower = lower,
+                              middle = middle, upper = upper, ymax = ymax)) +
+        geom_boxplot(stat = "identity", fill = "#e0f2fe", color = "#1e40af", width = 0.35) +
+        geom_point(aes(y = p10), shape = 3, size = 3, color = "#6b7280") +
+        geom_point(aes(y = p90), shape = 3, size = 3, color = "#6b7280") +
+        geom_hline(yintercept = 0, linetype = "dashed", color = "#9ca3af") +
+        coord_flip() +
+        labs(x = NULL, y = "Days relative to anchor") +
+        theme_minimal(base_size = 12)
+      print(p)
+      cat("\n\n")
+    }
+
+    # Collect event-code block for appendix.
+    ecc_id  <- paste0("ecc-", tolower(from_ev), "-", tolower(to_ev), "-", vkey)
+    ecc_blocks[[length(ecc_blocks) + 1]] <- list(
+      id      = ecc_id,
+      from_ev = from_ev,
+      to_ev   = to_ev,
+      vkey    = vkey,
+      n_pair  = n_pair
+    )
+    cat(sprintf("[Event code counts →](#%s)\n\n", ecc_id))
+  }
+}
+```
+
+## Event code counts {#event-code-counts}
+
+Top `r params$event_code_counts_top_n` concepts per linked timing pair. % is N\_PATIENTS / N(pair).
+
+```{r ecc-appendix, results="asis"}
+for (blk in ecc_blocks) {
+  cat(sprintf('\n\n### %s → %s  <small>(%s)</small> {#%s}\n\n',
+              blk$from_ev, blk$to_ev, timing_title(blk$vkey), blk$id))
+
+  use_ba  <- blk$vkey %in% c("first_to_closest_before", "first_to_closest_after")
+  tr      <- ecc_time_relative(blk$vkey)
+  cfam    <- ecc_col_family(blk$vkey)
+  anchor  <- anchor_for_event(blk$from_ev)
+  ecc_src <- if (use_ba) ecc_ba else ecc_single
+
+  if (nrow(ecc_src) == 0) { cat("_Event code counts file not found._\n\n"); next }
+
+  cid_c    <- col_ci(ecc_src, "concept_id")
+  fam_c    <- col_ci(ecc_src, "event_family")
+  anch_c   <- col_ci(ecc_src, "anchor_event")
+  npat_c   <- col_ci(ecc_src, "n_patients")
+  tr_c     <- col_ci(ecc_src, "time_relative")
+
+  lq_col  <- if (cfam == "FIRST") col_ci(ecc_src, "lq_days_first")   %||% col_ci(ecc_src, "lq_days")   else col_ci(ecc_src, "lq_days_closest")   %||% col_ci(ecc_src, "lq_days")
+  med_col <- if (cfam == "FIRST") col_ci(ecc_src, "median_days_first") %||% col_ci(ecc_src, "median_days") else col_ci(ecc_src, "median_days_closest") %||% col_ci(ecc_src, "median_days")
+  uq_col  <- if (cfam == "FIRST") col_ci(ecc_src, "uq_days_first")   %||% col_ci(ecc_src, "uq_days")   else col_ci(ecc_src, "uq_days_closest")   %||% col_ci(ecc_src, "uq_days")
+
+  sub <- ecc_src |>
+    filter(
+      toupper(as.character(.data[[fam_c]]))  == blk$to_ev,
+      toupper(as.character(.data[[anch_c]])) == anchor
+    )
+
+  if (!is.na(tr_c) && !is.na(tr)) {
+    sub <- sub |> filter(toupper(as.character(.data[[tr_c]])) == tr)
+  }
+
+  if (nrow(sub) == 0) { cat("_No matching rows._\n\n"); next }
+
+  denom <- if (!is.na(blk$n_pair) && blk$n_pair > min_cell) blk$n_pair else NA_real_
+
+  top <- sub |>
+    mutate(n_patients = suppressWarnings(as.numeric(.data[[npat_c]]))) |>
+    filter(!is.na(n_patients), n_patients > min_cell) |>
+    arrange(desc(n_patients)) |>
+    slice_head(n = params$event_code_counts_top_n) |>
+    mutate(
+      concept_name = dplyr::coalesce(
+        concept_names[as.character(.data[[cid_c]])],
+        NA_character_
+      ),
+      concept_name = ifelse(is.na(concept_name), as.character(.data[[cid_c]]), concept_name),
+      pct_str      = ifelse(!is.na(denom), sprintf("%.1f%%", 100 * n_patients / denom), "—"),
+      med_days     = suppressWarnings(as.numeric(.data[[med_col]])),
+      lq_days      = suppressWarnings(as.numeric(.data[[lq_col]])),
+      uq_days      = suppressWarnings(as.numeric(.data[[uq_col]])),
+      timing_str   = ifelse(
+        all(!is.na(c(med_days, lq_days, uq_days))),
+        sprintf("%d (%d–%d)", round(med_days), round(lq_days), round(uq_days)),
+        "—"
+      )
+    )
+
+  out <- top |>
+    select(
+      "Concept ID"       = all_of(cid_c),
+      "Concept name"     = concept_name,
+      "N patients"       = n_patients,
+      "% of pair"        = pct_str,
+      "Median days (IQR)" = timing_str
+    ) |>
+    mutate(`N patients` = format(round(`N patients`), big.mark = ",", scientific = FALSE))
+
+  print(display_table(out))
+  cat("\n\n")
+}
+```

@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Generated report outputs (keep sample CSVs, ignore generated HTML)
+outputs/*.html
+
+# macOS
+.DS_Store

@@ -1,0 +1,102 @@
+# =============================================================================
+# execute_characterization.R
+# Render, translate, and execute sql/sql_server characterization chunks
+# against any DatabaseConnector-supported dialect; write results to outputs/.
+# =============================================================================
+# Required packages: DatabaseConnector, SqlRender, readr, here
+#
+# Usage:
+#   Rscript scripts/execute_characterization.R
+#   or source("scripts/execute_characterization.R")
+
+library(DatabaseConnector)
+library(SqlRender)
+
+# ── Configuration ─────────────────────────────────────────────────────────────
+
+# Target SQL dialect passed to SqlRender::translate().
+# Supported values: "sql server", "postgresql", "redshift", "snowflake",
+#                   "bigquery", "oracle", "spark", "sqlite", "synapse"
+target_dialect <- "sql server"
+
+cdm_database_schema <- Sys.getenv("CDM_DATABASE_SCHEMA", unset = "cdm")
+
+# Required for dialects that don't support native temp tables (Oracle, BigQuery).
+# Set the TEMP_EMULATION_SCHEMA env var or assign directly; leave NULL to skip.
+temp_emulation_schema <- {
+  v <- Sys.getenv("TEMP_EMULATION_SCHEMA", unset = "")
+  if (nzchar(v)) v else NULL
+}
+
+min_cell_count <- 5L
+output_dir     <- here::here("outputs")
+sql_dir        <- here::here("sql", "sql_server", "chunks")
+
+connection_details <- DatabaseConnector::createConnectionDetails(
+  dbms     = target_dialect,
+  server   = Sys.getenv("DB_SERVER"),
+  user     = Sys.getenv("DB_USER"),
+  password = Sys.getenv("DB_PASSWORD"),
+  port     = as.integer(Sys.getenv("DB_PORT", unset = "1433"))
+)
+
+# ── Chunk → output-file mapping ───────────────────────────────────────────────
+
+result_chunks <- list(
+  list(file = "01_population_prevalence.sql",           output = "final_population_prevalence.csv"),
+  list(file = "02_event_code_counts.sql",               output = "final_event_code_counts.csv"),
+  list(file = "03_suppression_audit.sql",               output = "final_event_code_counts_suppression_audit.csv"),
+  list(file = "03b_event_code_counts_before_after.sql", output = "final_event_code_counts_before_after.csv"),
+  list(file = "04_timing_first_to_first.sql",           output = "final_timing_pair_summary_first_to_first.csv"),
+  list(file = "05_timing_first_to_closest.sql",         output = "final_timing_pair_summary_first_to_closest.csv"),
+  list(file = "06_timing_first_to_closest_before.sql",  output = "final_timing_pair_summary_first_to_closest_before.csv"),
+  list(file = "07_timing_first_to_closest_after.sql",   output = "final_timing_pair_summary_first_to_closest_after.csv"),
+  list(file = "08_death_timing.sql",                    output = "final_death_from_anchors.csv"),
+  list(file = "09_demographics.sql",                    output = "final_demographics_from_anchors.csv"),
+  list(file = "10_anchor_dx_codes.sql",                 output = "final_anchor_dx_concept_counts.csv")
+)
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+
+render_and_translate <- function(sql_path) {
+  sql      <- SqlRender::readSql(sql_path)
+  rendered <- SqlRender::render(
+    sql,
+    cdm_database_schema = cdm_database_schema,
+    min_cell_count      = min_cell_count
+  )
+  SqlRender::translate(
+    rendered,
+    targetDialect        = target_dialect,
+    tempEmulationSchema  = temp_emulation_schema
+  )
+}
+
+# ── Execute ───────────────────────────────────────────────────────────────────
+
+connection <- DatabaseConnector::connect(connection_details)
+on.exit(DatabaseConnector::disconnect(connection), add = TRUE)
+
+# Setup: DDL + temp table population (no result set)
+message("Executing setup (00_setup.sql) ...")
+setup_sql <- render_and_translate(file.path(sql_dir, "00_setup.sql"))
+DatabaseConnector::executeSql(connection, setup_sql)
+message("Setup complete.\n")
+
+# Result chunks: translate, query, save
+dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+
+for (chunk in result_chunks) {
+  sql_path <- file.path(sql_dir, chunk$file)
+  out_path <- file.path(output_dir, chunk$output)
+
+  message(sprintf("Running %-47s -> %s", chunk$file, basename(out_path)))
+
+  translated <- render_and_translate(sql_path)
+  result     <- DatabaseConnector::querySql(connection, translated, snakeCaseToCamelCase = FALSE)
+
+  readr::write_csv(result, out_path)
+  message(sprintf("  %d rows, %d cols\n", nrow(result), ncol(result)))
+}
+
+message("Done. Results written to: ", output_dir)
