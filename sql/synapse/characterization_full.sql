@@ -1,26 +1,32 @@
+-- ============================================================
+-- AUTO-TRANSLATED by SqlRender
+-- Source dialect : sql server
+-- Target dialect : synapse
+-- Translated     : 2026-04-26 18:36:22 BST
+-- Source file    : sql/sql_server/characterization_full.sql
+-- DO NOT EDIT — edit the sql_server source and re-run
+--   scripts/translate_sql_dialects.R
+-- ============================================================
+
 /*
 ============================================================
  OMOP Characterization - SQL Server Base (SqlRender-ready)
   v2: dual concept-level event-code timing (FIRST + CLOSEST)
 ============================================================
-
 UC ANCHOR VARIANT
 -----------------
 DX anchor follows cohort_definitions/UC.json concept set id 7
 ("UC - Malignant neoplasm"), built from #dx_anchor_include / #dx_anchor_exclude
 and @cdm_database_schema.concept_ancestor.
-
 Purpose
 -------
 Same cohort and pairwise timing as `v1_sqlserver_base_uc_malignant_neoplasm.sql`, but **concept-level**
 event code timing exports **both** rules in one run (no `@event_code_timing_uses_closest`):
   - **FIRST:** earliest `event_date` per (anchor, family, concept, patient) [within TIME_RELATIVE stratum when applicable].
   - **CLOSEST:** minimum |days_diff| to anchor, tie-break `event_date`.
-
 Final CSV columns include `lq_days_first` / `median_days_first` / `uq_days_first` and
 `lq_days_closest` / `median_days_closest` / `uq_days_closest`. Legacy `lq_days` / `median_days` / `uq_days`
 duplicate the **FIRST** triple for backward compatibility with older report code.
-
 How to use
 ----------
 1) Set @cdm_database_schema (or render via SqlRender).
@@ -28,39 +34,34 @@ How to use
 3) Edit concept-set INSERT blocks at top.
 4) Run in SQL Server (or render+translate with SqlRender for target DB).
 5) Export result sets from final SELECT statements (10 in this file, including per-concept anchor DX patient / patient-day counts).
-
 Cross-dialect / SqlRender
 -------------------------
 - **Parameters (render):** `@cdm_database_schema`, `@min_cell_count` only.
 - **Portable patterns:** same as v1 (SMALLINT, ordered-set percentiles + DISTINCT, etc.).
 - **Validate:** `Rscript scripts/validate_characterization_sqlrender.R data_characterization/sql_versions/v2_sqlserver_base_uc_malignant_neoplasm_dual_event_code_timing.sql`
 */
-
 ------------------------------------------------------------
 -- PARAMETERS (SqlRender style)
 ------------------------------------------------------------
 -- Example:
 -- DECLARE @cdm_database_schema VARCHAR(100) = 'cdm';
-
 ------------------------------------------------------------
 -- PRIVACY CONTROLS
 ------------------------------------------------------------
 -- Suppress small cells <= this threshold in final outputs.
 -- SqlRender parameter (set during render, e.g. min_cell_count = 0).
 -- Do not declare @min_cell_count here because SqlRender inlines @tokens.
-
 ------------------------------------------------------------
 -- A) ANCHOR DIAGNOSIS CONCEPTS (DX)
 -- Anchor cohort = patients with any of these condition_concept_id values
 -- Source: cohort_definitions/UC.json — ConceptSets id 7 "UC - Malignant neoplasm"
 -- Expanded with concept_ancestor (includeDescendants / isExcluded match Atlas).
 ------------------------------------------------------------
-DROP TABLE IF EXISTS #dx_anchor_include;
+IF OBJECT_ID('tempdb..#dx_anchor_include', 'U') IS NOT NULL DROP TABLE #dx_anchor_include;
 CREATE TABLE #dx_anchor_include (
     concept_id BIGINT NOT NULL,
     include_descendants SMALLINT NOT NULL
 );
-
 INSERT INTO #dx_anchor_include (concept_id, include_descendants) VALUES
     (197508, 1),      -- Malignant neoplasm of urinary bladder
     (4181357, 1),     -- Malignant tumor of renal pelvis
@@ -71,13 +72,11 @@ INSERT INTO #dx_anchor_include (concept_id, include_descendants) VALUES
     (44501785, 0),    -- Transitional cell carcinoma, NOS, of urinary system, NOS (ICDO3)
     (37110270, 1)     -- Primary urothelial carcinoma of overlapping sites of urinary organs
 ;
-
-DROP TABLE IF EXISTS #dx_anchor_exclude;
+IF OBJECT_ID('tempdb..#dx_anchor_exclude', 'U') IS NOT NULL DROP TABLE #dx_anchor_exclude;
 CREATE TABLE #dx_anchor_exclude (
     concept_id BIGINT NOT NULL,
     include_descendants SMALLINT NOT NULL
 );
-
 INSERT INTO #dx_anchor_exclude (concept_id, include_descendants) VALUES
     (4280899, 1),
     (4289374, 1),
@@ -88,19 +87,16 @@ INSERT INTO #dx_anchor_exclude (concept_id, include_descendants) VALUES
     (4289376, 1),
     (4280897, 1),
     (4200889, 1);
-
-DROP TABLE IF EXISTS #dx_anchor_concepts;
+IF OBJECT_ID('tempdb..#dx_anchor_concepts', 'U') IS NOT NULL DROP TABLE #dx_anchor_concepts;
 CREATE TABLE #dx_anchor_concepts (
     concept_id BIGINT
 );
-
 INSERT INTO #dx_anchor_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
 FROM #dx_anchor_include i
 JOIN @cdm_database_schema.concept_ancestor ca
   ON ca.ancestor_concept_id = i.concept_id
  AND (i.include_descendants = 1 OR ca.descendant_concept_id = i.concept_id);
-
 DELETE FROM #dx_anchor_concepts
 WHERE EXISTS (
     SELECT 1
@@ -110,20 +106,16 @@ WHERE EXISTS (
      AND #dx_anchor_concepts.concept_id = ca.descendant_concept_id
      AND (e.include_descendants = 1 OR ca.descendant_concept_id = e.concept_id)
 );
-
-
-
 ------------------------------------------------------------
 -- B) OTHER GENERALIZED CANCER DX CONCEPTS (GDX)
 -- Default: distinct ancestors of DX anchor concepts, excluding anchor DX concepts themselves,
 -- but constrained to descendants of 443392 (Malignant neoplastic disease) to avoid overly-broad ancestors.
 -- (concept_ancestor includes self-links; we only want broader/generalized codes).
 ------------------------------------------------------------
-DROP TABLE IF EXISTS #gen_cancer_concepts;
+IF OBJECT_ID('tempdb..#gen_cancer_concepts', 'U') IS NOT NULL DROP TABLE #gen_cancer_concepts;
 CREATE TABLE #gen_cancer_concepts (
     concept_id BIGINT
 );
-
 INSERT INTO #gen_cancer_concepts (concept_id)
 SELECT DISTINCT ca.ancestor_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
@@ -138,28 +130,23 @@ WHERE NOT EXISTS (
     WHERE dx.concept_id = ca.ancestor_concept_id
 )
 ;
-
-
 ------------------------------------------------------------
 -- C) OTHER CANCER DIAGNOSIS CONCEPTS (ODX)
 -- Default: descendants of 443392 excluding DX + GDX sets.
 ------------------------------------------------------------
-DROP TABLE IF EXISTS #other_dx_ancestor_concepts;
+IF OBJECT_ID('tempdb..#other_dx_ancestor_concepts', 'U') IS NOT NULL DROP TABLE #other_dx_ancestor_concepts;
 CREATE TABLE #other_dx_ancestor_concepts (
     ancestor_concept_id BIGINT
 );
-
 -- EDIT THIS LIST
 INSERT INTO #other_dx_ancestor_concepts (ancestor_concept_id)
 VALUES
     (443392) -- Malignant neoplastic disease
 ;
-
-DROP TABLE IF EXISTS #other_dx_concepts;
+IF OBJECT_ID('tempdb..#other_dx_concepts', 'U') IS NOT NULL DROP TABLE #other_dx_concepts;
 CREATE TABLE #other_dx_concepts (
     concept_id BIGINT
 );
-
 INSERT INTO #other_dx_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
@@ -172,17 +159,14 @@ LEFT JOIN #gen_cancer_concepts gdx
 WHERE dx.concept_id IS NULL
   AND gdx.concept_id IS NULL
 ;
-
-
 ------------------------------------------------------------
 -- D) METASTASIS CONCEPTS (MEASUREMENT)
 -- Define via ancestor IDs (descendants pulled from concept_ancestor)
 ------------------------------------------------------------
-DROP TABLE IF EXISTS #met_ancestor_concepts;
+IF OBJECT_ID('tempdb..#met_ancestor_concepts', 'U') IS NOT NULL DROP TABLE #met_ancestor_concepts;
 CREATE TABLE #met_ancestor_concepts (
     ancestor_concept_id BIGINT
 );
-
 -- Default: concept set "Secondary malignancy" from cohort_definitions/Target_Cohort_2B.json
 INSERT INTO #met_ancestor_concepts (ancestor_concept_id)
 VALUES
@@ -190,57 +174,47 @@ VALUES
     (1635142),  -- AJCC/UICC M1 Category
     (36769180)  -- Metastasis
 ;
-
-DROP TABLE IF EXISTS #met_concepts;
+IF OBJECT_ID('tempdb..#met_concepts', 'U') IS NOT NULL DROP TABLE #met_concepts;
 CREATE TABLE #met_concepts (
     concept_id BIGINT
 );
-
 INSERT INTO #met_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
 JOIN #met_ancestor_concepts a
   ON ca.ancestor_concept_id = a.ancestor_concept_id
 ;
-
-
 ------------------------------------------------------------
 -- E) L01 TREATMENT CONCEPTS (DRUG_EXPOSURE)
 ------------------------------------------------------------
-DROP TABLE IF EXISTS #l01_ancestor_concepts;
+IF OBJECT_ID('tempdb..#l01_ancestor_concepts', 'U') IS NOT NULL DROP TABLE #l01_ancestor_concepts;
 CREATE TABLE #l01_ancestor_concepts (
     ancestor_concept_id BIGINT
 );
-
 -- EDIT THIS LIST
 INSERT INTO #l01_ancestor_concepts (ancestor_concept_id)
 VALUES
     (21601387)
 ;
-
-DROP TABLE IF EXISTS #l01_concepts;
+IF OBJECT_ID('tempdb..#l01_concepts', 'U') IS NOT NULL DROP TABLE #l01_concepts;
 CREATE TABLE #l01_concepts (
     concept_id BIGINT
 );
-
 INSERT INTO #l01_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
 JOIN #l01_ancestor_concepts a
   ON ca.ancestor_concept_id = a.ancestor_concept_id
 ;
-
-
 ------------------------------------------------------------
 -- F) EVENT TABLES
 ------------------------------------------------------------
-DROP TABLE IF EXISTS #dx_events;
+IF OBJECT_ID('tempdb..#dx_events', 'U') IS NOT NULL DROP TABLE #dx_events;
 CREATE TABLE #dx_events (
     person_id BIGINT,
     event_date DATE,
     concept_id BIGINT
 );
-
 INSERT INTO #dx_events (person_id, event_date, concept_id)
 SELECT
     co.person_id,
@@ -250,25 +224,21 @@ FROM @cdm_database_schema.condition_occurrence co
 JOIN #dx_anchor_concepts d
   ON co.condition_concept_id = d.concept_id
 ;
-
 -- Distinct anchor cohort persons; limits later F) pulls to rows that downstream joins to #cohort use anyway.
-DROP TABLE IF EXISTS #anchor_person;
+IF OBJECT_ID('tempdb..#anchor_person', 'U') IS NOT NULL DROP TABLE #anchor_person;
 CREATE TABLE #anchor_person (
     person_id BIGINT
 );
-
 INSERT INTO #anchor_person (person_id)
 SELECT DISTINCT person_id
 FROM #dx_events
 ;
-
-DROP TABLE IF EXISTS #other_dx_events;
+IF OBJECT_ID('tempdb..#other_dx_events', 'U') IS NOT NULL DROP TABLE #other_dx_events;
 CREATE TABLE #other_dx_events (
     person_id BIGINT,
     event_date DATE,
     concept_id BIGINT
 );
-
 INSERT INTO #other_dx_events (person_id, event_date, concept_id)
 SELECT
     co.person_id,
@@ -280,14 +250,12 @@ JOIN #anchor_person ap
 JOIN #other_dx_concepts d
   ON co.condition_concept_id = d.concept_id
 ;
-
-DROP TABLE IF EXISTS #gen_cancer_events;
+IF OBJECT_ID('tempdb..#gen_cancer_events', 'U') IS NOT NULL DROP TABLE #gen_cancer_events;
 CREATE TABLE #gen_cancer_events (
     person_id BIGINT,
     event_date DATE,
     concept_id BIGINT
 );
-
 INSERT INTO #gen_cancer_events (person_id, event_date, concept_id)
 SELECT
     co.person_id,
@@ -299,14 +267,12 @@ JOIN #anchor_person ap
 JOIN #gen_cancer_concepts g
   ON co.condition_concept_id = g.concept_id
 ;
-
-DROP TABLE IF EXISTS #met_events;
+IF OBJECT_ID('tempdb..#met_events', 'U') IS NOT NULL DROP TABLE #met_events;
 CREATE TABLE #met_events (
     person_id BIGINT,
     event_date DATE,
     concept_id BIGINT
 );
-
 INSERT INTO #met_events (person_id, event_date, concept_id)
 SELECT
     m.person_id,
@@ -318,14 +284,12 @@ JOIN #anchor_person ap
 JOIN #met_concepts mc
   ON m.measurement_concept_id = mc.concept_id
 ;
-
-DROP TABLE IF EXISTS #l01_events;
+IF OBJECT_ID('tempdb..#l01_events', 'U') IS NOT NULL DROP TABLE #l01_events;
 CREATE TABLE #l01_events (
     person_id BIGINT,
     event_date DATE,
     concept_id BIGINT
 );
-
 INSERT INTO #l01_events (person_id, event_date, concept_id)
 SELECT
     de.person_id,
@@ -337,15 +301,13 @@ JOIN #anchor_person ap
 JOIN #l01_concepts l
   ON de.drug_concept_id = l.concept_id
 ;
-
 -- Ingredient-level L01 events used for concept-level code counts/timing.
-DROP TABLE IF EXISTS #l01_ingredient_events;
+IF OBJECT_ID('tempdb..#l01_ingredient_events', 'U') IS NOT NULL DROP TABLE #l01_ingredient_events;
 CREATE TABLE #l01_ingredient_events (
     person_id BIGINT,
     event_date DATE,
     concept_id BIGINT
 );
-
 INSERT INTO #l01_ingredient_events (person_id, event_date, concept_id)
 SELECT DISTINCT
     de.person_id,
@@ -362,17 +324,14 @@ JOIN @cdm_database_schema.concept ing
   ON ing.concept_id = ca.ancestor_concept_id
  AND ing.concept_class_id = 'Ingredient'
 ;
-
-
 ------------------------------------------------------------
 -- G) COHORT ANCHOR + SUMMARIES
 ------------------------------------------------------------
-DROP TABLE IF EXISTS #cohort;
+IF OBJECT_ID('tempdb..#cohort', 'U') IS NOT NULL DROP TABLE #cohort;
 CREATE TABLE #cohort (
     person_id BIGINT,
     index_date DATE
 );
-
 INSERT INTO #cohort (person_id, index_date)
 SELECT
     person_id,
@@ -380,14 +339,12 @@ SELECT
 FROM #dx_events
 GROUP BY person_id
 ;
-
-DROP TABLE IF EXISTS #dx_summary;
+IF OBJECT_ID('tempdb..#dx_summary', 'U') IS NOT NULL DROP TABLE #dx_summary;
 CREATE TABLE #dx_summary (
     person_id BIGINT,
     n_dx_records INT,
     n_dx_codes INT
 );
-
 INSERT INTO #dx_summary (person_id, n_dx_records, n_dx_codes)
 SELECT
     e.person_id,
@@ -398,15 +355,13 @@ JOIN #cohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
 ;
-
-DROP TABLE IF EXISTS #other_dx_summary;
+IF OBJECT_ID('tempdb..#other_dx_summary', 'U') IS NOT NULL DROP TABLE #other_dx_summary;
 CREATE TABLE #other_dx_summary (
     person_id BIGINT,
     first_other_dx_date DATE,
     n_other_dx_records INT,
     n_other_dx_codes INT
 );
-
 INSERT INTO #other_dx_summary (person_id, first_other_dx_date, n_other_dx_records, n_other_dx_codes)
 SELECT
     e.person_id,
@@ -418,15 +373,13 @@ JOIN #cohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
 ;
-
-DROP TABLE IF EXISTS #gen_cancer_summary;
+IF OBJECT_ID('tempdb..#gen_cancer_summary', 'U') IS NOT NULL DROP TABLE #gen_cancer_summary;
 CREATE TABLE #gen_cancer_summary (
     person_id BIGINT,
     first_gen_cancer_date DATE,
     n_gen_cancer_records INT,
     n_gen_cancer_codes INT
 );
-
 INSERT INTO #gen_cancer_summary (person_id, first_gen_cancer_date, n_gen_cancer_records, n_gen_cancer_codes)
 SELECT
     e.person_id,
@@ -438,14 +391,12 @@ JOIN #cohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
 ;
-
-DROP TABLE IF EXISTS #met_summary;
+IF OBJECT_ID('tempdb..#met_summary', 'U') IS NOT NULL DROP TABLE #met_summary;
 CREATE TABLE #met_summary (
     person_id BIGINT,
     first_met_date DATE,
     n_met_records INT
 );
-
 INSERT INTO #met_summary (person_id, first_met_date, n_met_records)
 SELECT
     e.person_id,
@@ -456,14 +407,12 @@ JOIN #cohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
 ;
-
-DROP TABLE IF EXISTS #l01_summary;
+IF OBJECT_ID('tempdb..#l01_summary', 'U') IS NOT NULL DROP TABLE #l01_summary;
 CREATE TABLE #l01_summary (
     person_id BIGINT,
     first_l01_date DATE,
     n_l01_exposures INT
 );
-
 INSERT INTO #l01_summary (person_id, first_l01_date, n_l01_exposures)
 SELECT
     e.person_id,
@@ -474,11 +423,9 @@ JOIN #cohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
 ;
-
-
 -- H) EVENT CODE COUNTS (single table across event families)
 ------------------------------------------------------------
-DROP TABLE IF EXISTS #event_code_counts;
+IF OBJECT_ID('tempdb..#event_code_counts', 'U') IS NOT NULL DROP TABLE #event_code_counts;
 CREATE TABLE #event_code_counts (
     anchor_event VARCHAR(20), -- INDEX or FIRST_MET
     event_family VARCHAR(20),
@@ -486,7 +433,6 @@ CREATE TABLE #event_code_counts (
     n_records INT,
     n_patients INT
 );
-
 INSERT INTO #event_code_counts (anchor_event, event_family, concept_id, n_records, n_patients)
 SELECT 'INDEX', 'DX', concept_id, COUNT(*), COUNT(DISTINCT person_id)
 FROM #dx_events
@@ -548,8 +494,7 @@ JOIN #met_summary ms
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
 ;
-
-DROP TABLE IF EXISTS #event_code_counts_before_after;
+IF OBJECT_ID('tempdb..#event_code_counts_before_after', 'U') IS NOT NULL DROP TABLE #event_code_counts_before_after;
 CREATE TABLE #event_code_counts_before_after (
     anchor_event VARCHAR(20), -- INDEX
     event_family VARCHAR(20),
@@ -558,7 +503,6 @@ CREATE TABLE #event_code_counts_before_after (
     n_records INT,
     n_patients INT
 );
-
 INSERT INTO #event_code_counts_before_after (anchor_event, event_family, time_relative, concept_id, n_records, n_patients)
 SELECT 'INDEX',
        'DX',
@@ -625,8 +569,7 @@ GROUP BY
     CASE WHEN DATEDIFF(DAY, c.index_date, e.event_date) < 0 THEN 'BEFORE' ELSE 'AFTER' END,
     e.concept_id
 ;
-
-DROP TABLE IF EXISTS #event_code_counts_before_after_first_met;
+IF OBJECT_ID('tempdb..#event_code_counts_before_after_first_met', 'U') IS NOT NULL DROP TABLE #event_code_counts_before_after_first_met;
 CREATE TABLE #event_code_counts_before_after_first_met (
     anchor_event VARCHAR(20), -- FIRST_MET
     event_family VARCHAR(20),
@@ -635,7 +578,6 @@ CREATE TABLE #event_code_counts_before_after_first_met (
     n_records INT,
     n_patients INT
 );
-
 INSERT INTO #event_code_counts_before_after_first_met (anchor_event, event_family, time_relative, concept_id, n_records, n_patients)
 SELECT 'FIRST_MET',
        'DX',
@@ -707,8 +649,7 @@ GROUP BY
     CASE WHEN DATEDIFF(DAY, ms.first_met_date, e.event_date) < 0 THEN 'BEFORE' ELSE 'AFTER' END,
     e.concept_id
 ;
-
-DROP TABLE IF EXISTS #event_code_all_events;
+IF OBJECT_ID('tempdb..#event_code_all_events', 'U') IS NOT NULL DROP TABLE #event_code_all_events;
 CREATE TABLE #event_code_all_events (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
@@ -717,7 +658,6 @@ CREATE TABLE #event_code_all_events (
     days_diff INT,
     event_date DATE
 );
-
 INSERT INTO #event_code_all_events (
     anchor_event, event_family, concept_id, person_id, days_diff, event_date
 )
@@ -766,8 +706,7 @@ FROM #l01_ingredient_events e
 JOIN #met_summary ms ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 ;
-
-DROP TABLE IF EXISTS #event_code_patient_chosen_first;
+IF OBJECT_ID('tempdb..#event_code_patient_chosen_first', 'U') IS NOT NULL DROP TABLE #event_code_patient_chosen_first;
 CREATE TABLE #event_code_patient_chosen_first (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
@@ -775,7 +714,6 @@ CREATE TABLE #event_code_patient_chosen_first (
     person_id BIGINT,
     days_diff INT
 );
-
 INSERT INTO #event_code_patient_chosen_first (anchor_event, event_family, concept_id, person_id, days_diff)
 SELECT anchor_event, event_family, concept_id, person_id, days_diff
 FROM (
@@ -793,8 +731,7 @@ FROM (
 ) x
 WHERE rn = 1
 ;
-
-DROP TABLE IF EXISTS #event_code_patient_chosen_closest;
+IF OBJECT_ID('tempdb..#event_code_patient_chosen_closest', 'U') IS NOT NULL DROP TABLE #event_code_patient_chosen_closest;
 CREATE TABLE #event_code_patient_chosen_closest (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
@@ -802,7 +739,6 @@ CREATE TABLE #event_code_patient_chosen_closest (
     person_id BIGINT,
     days_diff INT
 );
-
 INSERT INTO #event_code_patient_chosen_closest (anchor_event, event_family, concept_id, person_id, days_diff)
 SELECT anchor_event, event_family, concept_id, person_id, days_diff
 FROM (
@@ -820,8 +756,7 @@ FROM (
 ) x
 WHERE rn = 1
 ;
-
-DROP TABLE IF EXISTS #event_code_timing_summary;
+IF OBJECT_ID('tempdb..#event_code_timing_summary', 'U') IS NOT NULL DROP TABLE #event_code_timing_summary;
 CREATE TABLE #event_code_timing_summary (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
@@ -834,7 +769,6 @@ CREATE TABLE #event_code_timing_summary (
     median_days_closest FLOAT,
     uq_days_closest FLOAT
 );
-
 INSERT INTO #event_code_timing_summary (
     anchor_event,
     event_family,
@@ -885,8 +819,7 @@ INNER JOIN (
  AND f.event_family = k.event_family
  AND f.concept_id = k.concept_id
 ;
-
-DROP TABLE IF EXISTS #event_code_ba_events;
+IF OBJECT_ID('tempdb..#event_code_ba_events', 'U') IS NOT NULL DROP TABLE #event_code_ba_events;
 CREATE TABLE #event_code_ba_events (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
@@ -896,7 +829,6 @@ CREATE TABLE #event_code_ba_events (
     days_diff INT,
     event_date DATE
 );
-
 INSERT INTO #event_code_ba_events (
     anchor_event, event_family, time_relative, concept_id, person_id, days_diff, event_date
 )
@@ -910,8 +842,7 @@ SELECT
     event_date
 FROM #event_code_all_events
 ;
-
-DROP TABLE IF EXISTS #event_code_patient_chosen_before_after_first;
+IF OBJECT_ID('tempdb..#event_code_patient_chosen_before_after_first', 'U') IS NOT NULL DROP TABLE #event_code_patient_chosen_before_after_first;
 CREATE TABLE #event_code_patient_chosen_before_after_first (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
@@ -920,7 +851,6 @@ CREATE TABLE #event_code_patient_chosen_before_after_first (
     person_id BIGINT,
     days_diff INT
 );
-
 INSERT INTO #event_code_patient_chosen_before_after_first (
     anchor_event, event_family, time_relative, concept_id, person_id, days_diff
 )
@@ -941,8 +871,7 @@ FROM (
 ) x
 WHERE rn = 1
 ;
-
-DROP TABLE IF EXISTS #event_code_patient_chosen_before_after_closest;
+IF OBJECT_ID('tempdb..#event_code_patient_chosen_before_after_closest', 'U') IS NOT NULL DROP TABLE #event_code_patient_chosen_before_after_closest;
 CREATE TABLE #event_code_patient_chosen_before_after_closest (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
@@ -951,7 +880,6 @@ CREATE TABLE #event_code_patient_chosen_before_after_closest (
     person_id BIGINT,
     days_diff INT
 );
-
 INSERT INTO #event_code_patient_chosen_before_after_closest (
     anchor_event, event_family, time_relative, concept_id, person_id, days_diff
 )
@@ -972,8 +900,7 @@ FROM (
 ) x
 WHERE rn = 1
 ;
-
-DROP TABLE IF EXISTS #event_code_timing_before_after_summary;
+IF OBJECT_ID('tempdb..#event_code_timing_before_after_summary', 'U') IS NOT NULL DROP TABLE #event_code_timing_before_after_summary;
 CREATE TABLE #event_code_timing_before_after_summary (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
@@ -987,7 +914,6 @@ CREATE TABLE #event_code_timing_before_after_summary (
     median_days_closest FLOAT,
     uq_days_closest FLOAT
 );
-
 INSERT INTO #event_code_timing_before_after_summary (
     anchor_event,
     event_family,
@@ -1043,12 +969,10 @@ INNER JOIN (
  AND f.time_relative = k.time_relative
  AND f.concept_id = k.concept_id
 ;
-
-
 ------------------------------------------------------------
 -- I) PATIENT-LEVEL TABLE
 ------------------------------------------------------------
-DROP TABLE IF EXISTS #patient_char;
+IF OBJECT_ID('tempdb..#patient_char', 'U') IS NOT NULL DROP TABLE #patient_char;
 CREATE TABLE #patient_char (
     person_id BIGINT,
     index_date DATE,
@@ -1070,7 +994,6 @@ CREATE TABLE #patient_char (
     days_dx_to_gen_cancer INT,
     days_met_to_l01 INT
 );
-
 INSERT INTO #patient_char (
     person_id,
     index_date,
@@ -1124,19 +1047,16 @@ LEFT JOIN #met_summary mt
 LEFT JOIN #l01_summary l01
        ON c.person_id = l01.person_id
 ;
-
-
 ------------------------------------------------------------
 -- J) FULL CROSSWISE TIMING PAIRS
 ------------------------------------------------------------
-DROP TABLE IF EXISTS #patient_timing_pairs;
+IF OBJECT_ID('tempdb..#patient_timing_pairs', 'U') IS NOT NULL DROP TABLE #patient_timing_pairs;
 CREATE TABLE #patient_timing_pairs (
     person_id BIGINT,
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     days_diff INT
 );
-
 WITH events AS (
     SELECT person_id, 'DX' AS event_name, index_date AS event_date FROM #patient_char
     UNION ALL
@@ -1161,8 +1081,7 @@ JOIN events e2
 WHERE e1.event_date IS NOT NULL
   AND e2.event_date IS NOT NULL
 ;
-
-DROP TABLE IF EXISTS #timing_pair_summary;
+IF OBJECT_ID('tempdb..#timing_pair_summary', 'U') IS NOT NULL DROP TABLE #timing_pair_summary;
 CREATE TABLE #timing_pair_summary (
     from_event VARCHAR(10),
     to_event VARCHAR(10),
@@ -1181,7 +1100,6 @@ CREATE TABLE #timing_pair_summary (
     p90_days FLOAT,
     p95_days FLOAT
 );
-
 INSERT INTO #timing_pair_summary (
     from_event,
     to_event,
@@ -1220,14 +1138,12 @@ SELECT
 FROM #patient_timing_pairs
 GROUP BY from_event, to_event
 ;
-
-DROP TABLE IF EXISTS #all_events_for_pairs;
+IF OBJECT_ID('tempdb..#all_events_for_pairs', 'U') IS NOT NULL DROP TABLE #all_events_for_pairs;
 CREATE TABLE #all_events_for_pairs (
     person_id BIGINT,
     event_family VARCHAR(10),
     event_date DATE
 );
-
 INSERT INTO #all_events_for_pairs (person_id, event_family, event_date)
 SELECT person_id, 'DX', event_date FROM #dx_events
 UNION ALL
@@ -1239,14 +1155,12 @@ SELECT person_id, 'MET', event_date FROM #met_events
 UNION ALL
 SELECT person_id, 'L01', event_date FROM #l01_events
 ;
-
-DROP TABLE IF EXISTS #first_event_dates;
+IF OBJECT_ID('tempdb..#first_event_dates', 'U') IS NOT NULL DROP TABLE #first_event_dates;
 CREATE TABLE #first_event_dates (
     person_id BIGINT,
     from_event VARCHAR(10),
     from_first_date DATE
 );
-
 INSERT INTO #first_event_dates (person_id, from_event, from_first_date)
 SELECT person_id, 'DX', index_date FROM #patient_char
 UNION ALL
@@ -1258,15 +1172,13 @@ SELECT person_id, 'MET', first_met_date FROM #patient_char WHERE first_met_date 
 UNION ALL
 SELECT person_id, 'L01', first_l01_date FROM #patient_char WHERE first_l01_date IS NOT NULL
 ;
-
-DROP TABLE IF EXISTS #patient_timing_pairs_first_to_closest;
+IF OBJECT_ID('tempdb..#patient_timing_pairs_first_to_closest', 'U') IS NOT NULL DROP TABLE #patient_timing_pairs_first_to_closest;
 CREATE TABLE #patient_timing_pairs_first_to_closest (
     person_id BIGINT,
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     days_diff INT
 );
-
 WITH ranked AS (
     SELECT
         f.person_id,
@@ -1291,8 +1203,7 @@ SELECT
 FROM ranked
 WHERE rn = 1
 ;
-
-DROP TABLE IF EXISTS #timing_pair_summary_first_to_closest;
+IF OBJECT_ID('tempdb..#timing_pair_summary_first_to_closest', 'U') IS NOT NULL DROP TABLE #timing_pair_summary_first_to_closest;
 CREATE TABLE #timing_pair_summary_first_to_closest (
     from_event VARCHAR(10),
     to_event VARCHAR(10),
@@ -1311,7 +1222,6 @@ CREATE TABLE #timing_pair_summary_first_to_closest (
     p90_days FLOAT,
     p95_days FLOAT
 );
-
 INSERT INTO #timing_pair_summary_first_to_closest (
     from_event,
     to_event,
@@ -1350,15 +1260,13 @@ SELECT
 FROM #patient_timing_pairs_first_to_closest
 GROUP BY from_event, to_event
 ;
-
-DROP TABLE IF EXISTS #patient_timing_pairs_first_to_closest_before;
+IF OBJECT_ID('tempdb..#patient_timing_pairs_first_to_closest_before', 'U') IS NOT NULL DROP TABLE #patient_timing_pairs_first_to_closest_before;
 CREATE TABLE #patient_timing_pairs_first_to_closest_before (
     person_id BIGINT,
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     days_diff INT
 );
-
 WITH ranked_before AS (
     SELECT
         f.person_id,
@@ -1384,8 +1292,7 @@ SELECT
 FROM ranked_before
 WHERE rn = 1
 ;
-
-DROP TABLE IF EXISTS #timing_pair_summary_first_to_closest_before;
+IF OBJECT_ID('tempdb..#timing_pair_summary_first_to_closest_before', 'U') IS NOT NULL DROP TABLE #timing_pair_summary_first_to_closest_before;
 CREATE TABLE #timing_pair_summary_first_to_closest_before (
     from_event VARCHAR(10),
     to_event VARCHAR(10),
@@ -1404,7 +1311,6 @@ CREATE TABLE #timing_pair_summary_first_to_closest_before (
     p90_days FLOAT,
     p95_days FLOAT
 );
-
 INSERT INTO #timing_pair_summary_first_to_closest_before (
     from_event,
     to_event,
@@ -1443,15 +1349,13 @@ SELECT
 FROM #patient_timing_pairs_first_to_closest_before
 GROUP BY from_event, to_event
 ;
-
-DROP TABLE IF EXISTS #patient_timing_pairs_first_to_closest_after;
+IF OBJECT_ID('tempdb..#patient_timing_pairs_first_to_closest_after', 'U') IS NOT NULL DROP TABLE #patient_timing_pairs_first_to_closest_after;
 CREATE TABLE #patient_timing_pairs_first_to_closest_after (
     person_id BIGINT,
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     days_diff INT
 );
-
 WITH ranked_after AS (
     SELECT
         f.person_id,
@@ -1477,8 +1381,7 @@ SELECT
 FROM ranked_after
 WHERE rn = 1
 ;
-
-DROP TABLE IF EXISTS #timing_pair_summary_first_to_closest_after;
+IF OBJECT_ID('tempdb..#timing_pair_summary_first_to_closest_after', 'U') IS NOT NULL DROP TABLE #timing_pair_summary_first_to_closest_after;
 CREATE TABLE #timing_pair_summary_first_to_closest_after (
     from_event VARCHAR(10),
     to_event VARCHAR(10),
@@ -1497,7 +1400,6 @@ CREATE TABLE #timing_pair_summary_first_to_closest_after (
     p90_days FLOAT,
     p95_days FLOAT
 );
-
 INSERT INTO #timing_pair_summary_first_to_closest_after (
     from_event,
     to_event,
@@ -1536,8 +1438,7 @@ SELECT
 FROM #patient_timing_pairs_first_to_closest_after
 GROUP BY from_event, to_event
 ;
-
-DROP TABLE IF EXISTS #event_presence;
+IF OBJECT_ID('tempdb..#event_presence', 'U') IS NOT NULL DROP TABLE #event_presence;
 CREATE TABLE #event_presence (
     person_id BIGINT,
     has_dx INT,
@@ -1546,7 +1447,6 @@ CREATE TABLE #event_presence (
     has_met INT,
     has_l01 INT
 );
-
 INSERT INTO #event_presence (
     person_id, has_dx, has_odx, has_gdx, has_met, has_l01
 )
@@ -1559,17 +1459,14 @@ SELECT
     CASE WHEN first_l01_date IS NOT NULL THEN 1 ELSE 0 END
 FROM #patient_char
 ;
-
-
 ------------------------------------------------------------
 -- J-bis) DEATH TIMING FROM INDEX AND FIRST_MET ANCHORS
 ------------------------------------------------------------
-DROP TABLE IF EXISTS #death_index_long;
+IF OBJECT_ID('tempdb..#death_index_long', 'U') IS NOT NULL DROP TABLE #death_index_long;
 CREATE TABLE #death_index_long (
     prevalence_year VARCHAR(20),
     days_to_death INT
 );
-
 INSERT INTO #death_index_long (prevalence_year, days_to_death)
 SELECT 'OVERALL', DATEDIFF(DAY, c.index_date, d.death_date)
 FROM #cohort c
@@ -1589,13 +1486,11 @@ INNER JOIN (
 ) d ON d.person_id = c.person_id
 WHERE d.death_date >= c.index_date
 ;
-
-DROP TABLE IF EXISTS #death_first_met_long;
+IF OBJECT_ID('tempdb..#death_first_met_long', 'U') IS NOT NULL DROP TABLE #death_first_met_long;
 CREATE TABLE #death_first_met_long (
     prevalence_year VARCHAR(20),
     days_to_death INT
 );
-
 INSERT INTO #death_first_met_long (prevalence_year, days_to_death)
 SELECT 'OVERALL', DATEDIFF(DAY, ms.first_met_date, d.death_date)
 FROM #cohort c
@@ -1617,15 +1512,13 @@ INNER JOIN (
 ) d ON d.person_id = c.person_id
 WHERE d.death_date >= ms.first_met_date
 ;
-
-DROP TABLE IF EXISTS #death_stratum_counts;
+IF OBJECT_ID('tempdb..#death_stratum_counts', 'U') IS NOT NULL DROP TABLE #death_stratum_counts;
 CREATE TABLE #death_stratum_counts (
     prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     n_patients INT,
     n_deaths INT
 );
-
 INSERT INTO #death_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths)
 SELECT
     CASE
@@ -1643,7 +1536,6 @@ LEFT JOIN (
 ) d ON d.person_id = c.person_id
 GROUP BY GROUPING SETS ((), (YEAR(c.index_date)))
 ;
-
 INSERT INTO #death_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths)
 SELECT
     CASE
@@ -1662,21 +1554,18 @@ LEFT JOIN (
 ) d ON d.person_id = c.person_id
 GROUP BY GROUPING SETS ((), (YEAR(c.index_date)))
 ;
-
-DROP TABLE IF EXISTS #death_timing_long;
+IF OBJECT_ID('tempdb..#death_timing_long', 'U') IS NOT NULL DROP TABLE #death_timing_long;
 CREATE TABLE #death_timing_long (
     prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     days_to_death INT
 );
-
 INSERT INTO #death_timing_long (prevalence_year, anchor_event, days_to_death)
 SELECT prevalence_year, 'INDEX', days_to_death FROM #death_index_long
 UNION ALL
 SELECT prevalence_year, 'FIRST_MET', days_to_death FROM #death_first_met_long
 ;
-
-DROP TABLE IF EXISTS #death_timing_quantiles;
+IF OBJECT_ID('tempdb..#death_timing_quantiles', 'U') IS NOT NULL DROP TABLE #death_timing_quantiles;
 CREATE TABLE #death_timing_quantiles (
     prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
@@ -1689,7 +1578,6 @@ CREATE TABLE #death_timing_quantiles (
     p90_days FLOAT,
     p95_days FLOAT
 );
-
 INSERT INTO #death_timing_quantiles (
     prevalence_year,
     anchor_event,
@@ -1716,12 +1604,9 @@ SELECT
 FROM #death_timing_long
 GROUP BY prevalence_year, anchor_event
 ;
-
-
 ------------------------------------------------------------
 -- K) FINAL SELECTS (export to CSV from SQL client)
 ------------------------------------------------------------
-
 -- 1) Population prevalence
 WITH base AS (
     SELECT
@@ -1768,7 +1653,6 @@ ORDER BY
     CASE WHEN prevalence_year = 'OVERALL' THEN 0 ELSE 1 END,
     TRY_CAST(prevalence_year AS INT)
 ;
-
 -- 2) Event code counts by family+concept_id (small-cell suppressed)
 --    Concept-level timing: FIRST (earliest) and CLOSEST (min |days|) per person/concept; lq/median/uq = FIRST for legacy.
 SELECT
@@ -1794,7 +1678,6 @@ LEFT JOIN #event_code_timing_summary t
  AND c.concept_id = t.concept_id
 ORDER BY c.anchor_event, c.event_family, c.n_patients DESC, c.n_records DESC, c.concept_id
 ;
-
 -- 3) Suppressed-row audit for event_code_counts
 SELECT
     event_family,
@@ -1810,7 +1693,6 @@ FROM #event_code_counts
 GROUP BY event_family
 ORDER BY event_family
 ;
-
 -- 3b) Event code counts by family+concept_id split BEFORE/AFTER
 --     around both INDEX and FIRST_MET anchors (small-cell sentinel)
 SELECT
@@ -1844,7 +1726,6 @@ LEFT JOIN #event_code_timing_before_after_summary t
  AND x.concept_id = t.concept_id
 ORDER BY x.anchor_event, x.event_family, x.time_relative, x.n_patients DESC, x.n_records DESC, x.concept_id
 ;
-
 -- 4) Full pairwise timing summary (counts/min/max censored for small cells)
 SELECT
     from_event,
@@ -1866,7 +1747,6 @@ SELECT
 FROM #timing_pair_summary
 ORDER BY from_event, to_event
 ;
-
 -- 5) Pairwise timing summary: FROM first -> TO closest (counts/min/max censored for small cells)
 SELECT
     from_event,
@@ -1888,7 +1768,6 @@ SELECT
 FROM #timing_pair_summary_first_to_closest
 ORDER BY from_event, to_event
 ;
-
 -- 6) Pairwise timing summary: FROM first -> TO closest BEFORE (<0)
 SELECT
     from_event,
@@ -1910,7 +1789,6 @@ SELECT
 FROM #timing_pair_summary_first_to_closest_before
 ORDER BY from_event, to_event
 ;
-
 -- 7) Pairwise timing summary: FROM first -> TO closest AFTER (>=0)
 SELECT
     from_event,
@@ -1932,7 +1810,6 @@ SELECT
 FROM #timing_pair_summary_first_to_closest_after
 ORDER BY from_event, to_event
 ;
-
 -- 8) Death timing from INDEX and FIRST_MET (stratified by calendar year of index date and OVERALL)
 SELECT
     s.prevalence_year,
@@ -1959,7 +1836,6 @@ ORDER BY
     TRY_CAST(s.prevalence_year AS INT),
     CASE WHEN s.anchor_event = 'INDEX' THEN 0 ELSE 1 END
 ;
-
 -- 9) Demographics at anchor dates (INDEX = first DX, FIRST_MET = first MET)
 -- Gender concept IDs (OMOP): 8507=Male, 8532=Female. Others treated as unknown.
 WITH anchor_persons AS (
@@ -2038,7 +1914,6 @@ JOIN (
   ON agg.anchor_event = p.anchor_event
 ORDER BY CASE WHEN agg.anchor_event = 'INDEX' THEN 0 ELSE 1 END
 ;
-
 -- 10) Anchor DX (main cohort) codes: distinct patients and distinct patient-days per condition_concept_id
 --     Patient-day = one calendar day per person (multiple DX rows on the same day collapse to one).
 WITH dx_days AS (

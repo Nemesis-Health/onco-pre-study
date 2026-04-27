@@ -1,18 +1,26 @@
+-- ============================================================
+-- AUTO-TRANSLATED by SqlRender
+-- Source dialect : sql server
+-- Target dialect : sqlite extended
+-- Translated     : 2026-04-26 18:36:21 BST
+-- Source file    : sql/sql_server/chunks/09_demographics.sql
+-- DO NOT EDIT — edit the sql_server source and re-run
+--   scripts/translate_sql_dialects.R
+-- ============================================================
+
 -- 9) Demographics at anchor dates (INDEX = first DX, FIRST_MET = first MET)
 -- Gender concept IDs (OMOP): 8507=Male, 8532=Female. Others treated as unknown.
-WITH anchor_persons AS (
-    SELECT
-        'INDEX' AS anchor_event,
+WITH anchor_persons  AS (SELECT  CAST('INDEX' as TEXT) AS anchor_event,
         c.person_id,
         c.index_date AS anchor_date
-    FROM #patient_char c
+    FROM temp.patient_char c
     WHERE c.index_date IS NOT NULL
     UNION ALL
     SELECT
         'FIRST_MET' AS anchor_event,
         c.person_id,
         c.first_met_date AS anchor_date
-    FROM #patient_char c
+    FROM temp.patient_char c
     WHERE c.first_met_date IS NOT NULL
 ),
 base AS (
@@ -57,8 +65,8 @@ FROM (
         COUNT(*) AS n_patients,
         SUM(CASE WHEN gender_concept_id = 8507 THEN 1 ELSE 0 END) AS n_male,
         SUM(CASE WHEN gender_concept_id = 8532 THEN 1 ELSE 0 END) AS n_female,
-        CAST(100.0 * SUM(CASE WHEN gender_concept_id = 8507 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS FLOAT) AS pct_male,
-        CAST(100.0 * SUM(CASE WHEN gender_concept_id = 8532 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS FLOAT) AS pct_female
+        CAST(100.0 * SUM(CASE WHEN gender_concept_id = 8507 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS REAL) AS pct_male,
+        CAST(100.0 * SUM(CASE WHEN gender_concept_id = 8532 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS REAL) AS pct_female
     FROM ages
     WHERE age_years IS NOT NULL
     GROUP BY anchor_event

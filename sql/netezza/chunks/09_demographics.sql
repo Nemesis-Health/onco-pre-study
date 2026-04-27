@@ -1,3 +1,18 @@
+-- ============================================================
+-- AUTO-TRANSLATED by SqlRender
+-- Source dialect : sql server
+-- Target dialect : netezza
+-- Translated     : 2026-04-26 18:36:16 BST
+-- Source file    : sql/sql_server/chunks/09_demographics.sql
+-- DO NOT EDIT — edit the sql_server source and re-run
+--   scripts/translate_sql_dialects.R
+-- ============================================================
+-- WARNING: This dialect (netezza) does not support native session
+--   temp tables.  Supply a tempEmulationSchema when calling
+--   SqlRender::translate() / DatabaseConnector::executeSql().
+--   Without it, #temp table references become permanent tables and
+--   may cause permission errors or name collisions.
+
 -- 9) Demographics at anchor dates (INDEX = first DX, FIRST_MET = first MET)
 -- Gender concept IDs (OMOP): 8507=Male, 8532=Female. Others treated as unknown.
 WITH anchor_persons AS (
@@ -5,14 +20,14 @@ WITH anchor_persons AS (
         'INDEX' AS anchor_event,
         c.person_id,
         c.index_date AS anchor_date
-    FROM #patient_char c
+    FROM patient_char c
     WHERE c.index_date IS NOT NULL
     UNION ALL
     SELECT
         'FIRST_MET' AS anchor_event,
         c.person_id,
         c.first_met_date AS anchor_date
-    FROM #patient_char c
+    FROM patient_char c
     WHERE c.first_met_date IS NOT NULL
 ),
 base AS (
@@ -34,9 +49,9 @@ ages AS (
         gender_concept_id,
         CASE
             WHEN birth_datetime IS NOT NULL
-                THEN DATEDIFF(DAY, CAST(birth_datetime AS DATE), anchor_date) / 365.25
+                THEN (CAST(anchor_date AS DATE) - CAST(CAST(birth_datetime AS DATE) AS DATE)) / 365.25
             WHEN year_of_birth IS NOT NULL
-                THEN DATEDIFF(DAY, DATEFROMPARTS(year_of_birth, 7, 1), anchor_date) / 365.25
+                THEN (CAST(anchor_date AS DATE) - CAST(TO_DATE(TO_CHAR(year_of_birth,'0000')||'-'||TO_CHAR(7,'00')||'-'||TO_CHAR(1,'00'), 'YYYY-MM-DD') AS DATE)) / 365.25
             ELSE NULL
         END AS age_years
     FROM base
@@ -57,8 +72,8 @@ FROM (
         COUNT(*) AS n_patients,
         SUM(CASE WHEN gender_concept_id = 8507 THEN 1 ELSE 0 END) AS n_male,
         SUM(CASE WHEN gender_concept_id = 8532 THEN 1 ELSE 0 END) AS n_female,
-        CAST(100.0 * SUM(CASE WHEN gender_concept_id = 8507 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS FLOAT) AS pct_male,
-        CAST(100.0 * SUM(CASE WHEN gender_concept_id = 8532 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS FLOAT) AS pct_female
+        CAST(100.0 * SUM(CASE WHEN gender_concept_id = 8507 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS FLOAT(6)) AS pct_male,
+        CAST(100.0 * SUM(CASE WHEN gender_concept_id = 8532 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS FLOAT(6)) AS pct_female
     FROM ages
     WHERE age_years IS NOT NULL
     GROUP BY anchor_event

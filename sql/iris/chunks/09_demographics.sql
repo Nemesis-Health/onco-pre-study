@@ -1,3 +1,13 @@
+-- ============================================================
+-- AUTO-TRANSLATED by SqlRender
+-- Source dialect : sql server
+-- Target dialect : iris
+-- Translated     : 2026-04-26 18:36:23 BST
+-- Source file    : sql/sql_server/chunks/09_demographics.sql
+-- DO NOT EDIT — edit the sql_server source and re-run
+--   scripts/translate_sql_dialects.R
+-- ============================================================
+
 -- 9) Demographics at anchor dates (INDEX = first DX, FIRST_MET = first MET)
 -- Gender concept IDs (OMOP): 8507=Male, 8532=Female. Others treated as unknown.
 WITH anchor_persons AS (
@@ -5,14 +15,14 @@ WITH anchor_persons AS (
         'INDEX' AS anchor_event,
         c.person_id,
         c.index_date AS anchor_date
-    FROM #patient_char c
+    FROM x0brquscpatient_char c
     WHERE c.index_date IS NOT NULL
     UNION ALL
     SELECT
         'FIRST_MET' AS anchor_event,
         c.person_id,
         c.first_met_date AS anchor_date
-    FROM #patient_char c
+    FROM x0brquscpatient_char c
     WHERE c.first_met_date IS NOT NULL
 ),
 base AS (
@@ -36,7 +46,7 @@ ages AS (
             WHEN birth_datetime IS NOT NULL
                 THEN DATEDIFF(DAY, CAST(birth_datetime AS DATE), anchor_date) / 365.25
             WHEN year_of_birth IS NOT NULL
-                THEN DATEDIFF(DAY, DATEFROMPARTS(year_of_birth, 7, 1), anchor_date) / 365.25
+                THEN DATEDIFF(DAY, TO_DATE(TO_CHAR(year_of_birth,'FM0000')||'-'||TO_CHAR(7,'FM00')||'-'||TO_CHAR(1,'FM00'), 'YYYY-MM-DD'), anchor_date) / 365.25
             ELSE NULL
         END AS age_years
     FROM base

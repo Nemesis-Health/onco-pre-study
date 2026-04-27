@@ -1,3 +1,13 @@
+-- ============================================================
+-- AUTO-TRANSLATED by SqlRender
+-- Source dialect : sql server
+-- Target dialect : synapse
+-- Translated     : 2026-04-26 18:36:22 BST
+-- Source file    : sql/sql_server/chunks/09_demographics.sql
+-- DO NOT EDIT — edit the sql_server source and re-run
+--   scripts/translate_sql_dialects.R
+-- ============================================================
+
 -- 9) Demographics at anchor dates (INDEX = first DX, FIRST_MET = first MET)
 -- Gender concept IDs (OMOP): 8507=Male, 8532=Female. Others treated as unknown.
 WITH anchor_persons AS (
