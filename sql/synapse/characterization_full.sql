@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : synapse
--- Translated     : 2026-04-26 18:36:22 BST
+-- Translated     : 2026-04-27 15:05:10 BST
 -- Source file    : sql/sql_server/characterization_full.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -1653,162 +1653,80 @@ ORDER BY
     CASE WHEN prevalence_year = 'OVERALL' THEN 0 ELSE 1 END,
     TRY_CAST(prevalence_year AS INT)
 ;
--- 2) Event code counts by family+concept_id (small-cell suppressed)
---    Concept-level timing: FIRST (earliest) and CLOSEST (min |days|) per person/concept; lq/median/uq = FIRST for legacy.
+-- 2) Code-count summary: all three time windows combined (small-cell sentinel)
+--    time_window: all | before | after
 SELECT
-    c.anchor_event,
-    c.event_family,
-    c.concept_id,
-    CASE WHEN c.n_patients <= @min_cell_count THEN -@min_cell_count ELSE c.n_records END AS n_records,
-    CASE WHEN c.n_patients <= @min_cell_count THEN -@min_cell_count ELSE c.n_patients END AS n_patients,
-    CASE WHEN c.n_patients <= @min_cell_count THEN -@min_cell_count ELSE t.n_patients_with_code_timing END AS n_patients_with_code_timing,
-    CASE WHEN c.n_patients <= @min_cell_count THEN NULL ELSE t.lq_days_first END AS lq_days_first,
-    CASE WHEN c.n_patients <= @min_cell_count THEN NULL ELSE t.median_days_first END AS median_days_first,
-    CASE WHEN c.n_patients <= @min_cell_count THEN NULL ELSE t.uq_days_first END AS uq_days_first,
-    CASE WHEN c.n_patients <= @min_cell_count THEN NULL ELSE t.lq_days_closest END AS lq_days_closest,
-    CASE WHEN c.n_patients <= @min_cell_count THEN NULL ELSE t.median_days_closest END AS median_days_closest,
-    CASE WHEN c.n_patients <= @min_cell_count THEN NULL ELSE t.uq_days_closest END AS uq_days_closest,
-    CASE WHEN c.n_patients <= @min_cell_count THEN NULL ELSE t.lq_days_first END AS lq_days,
-    CASE WHEN c.n_patients <= @min_cell_count THEN NULL ELSE t.median_days_first END AS median_days,
-    CASE WHEN c.n_patients <= @min_cell_count THEN NULL ELSE t.uq_days_first END AS uq_days
-FROM #event_code_counts c
-LEFT JOIN #event_code_timing_summary t
-  ON c.anchor_event = t.anchor_event
- AND c.event_family = t.event_family
- AND c.concept_id = t.concept_id
-ORDER BY c.anchor_event, c.event_family, c.n_patients DESC, c.n_records DESC, c.concept_id
-;
--- 3) Suppressed-row audit for event_code_counts
-SELECT
-    event_family,
-    CASE
-        WHEN COUNT(*) BETWEEN 1 AND @min_cell_count THEN -@min_cell_count
-        ELSE COUNT(*)
-    END AS n_concepts_total,
-    CASE
-        WHEN SUM(CASE WHEN n_patients <= @min_cell_count THEN 1 ELSE 0 END) BETWEEN 1 AND @min_cell_count THEN -@min_cell_count
-        ELSE SUM(CASE WHEN n_patients <= @min_cell_count THEN 1 ELSE 0 END)
-    END AS n_concepts_suppressed
-FROM #event_code_counts
-GROUP BY event_family
-ORDER BY event_family
-;
--- 3b) Event code counts by family+concept_id split BEFORE/AFTER
---     around both INDEX and FIRST_MET anchors (small-cell sentinel)
-SELECT
+    x.time_window,
     x.anchor_event,
     x.event_family,
-    x.time_relative,
     x.concept_id,
     CASE WHEN x.n_patients <= @min_cell_count THEN -@min_cell_count ELSE x.n_records END AS n_records,
     CASE WHEN x.n_patients <= @min_cell_count THEN -@min_cell_count ELSE x.n_patients END AS n_patients,
-    CASE WHEN x.n_patients <= @min_cell_count THEN -@min_cell_count ELSE t.n_patients_with_code_timing END AS n_patients_with_code_timing,
-    CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE t.lq_days_first END AS lq_days_first,
-    CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE t.median_days_first END AS median_days_first,
-    CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE t.uq_days_first END AS uq_days_first,
-    CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE t.lq_days_closest END AS lq_days_closest,
-    CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE t.median_days_closest END AS median_days_closest,
-    CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE t.uq_days_closest END AS uq_days_closest,
-    CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE t.lq_days_first END AS lq_days,
-    CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE t.median_days_first END AS median_days,
-    CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE t.uq_days_first END AS uq_days
+    CASE WHEN x.n_patients <= @min_cell_count THEN -@min_cell_count ELSE COALESCE(ts.n_patients_with_code_timing, tba.n_patients_with_code_timing) END AS n_patients_with_code_timing,
+    CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE COALESCE(ts.lq_days_first,       tba.lq_days_first)       END AS lq_days_first,
+    CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE COALESCE(ts.median_days_first,   tba.median_days_first)   END AS median_days_first,
+    CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE COALESCE(ts.uq_days_first,       tba.uq_days_first)       END AS uq_days_first,
+    CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE COALESCE(ts.lq_days_closest,     tba.lq_days_closest)     END AS lq_days_closest,
+    CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE COALESCE(ts.median_days_closest, tba.median_days_closest) END AS median_days_closest,
+    CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE COALESCE(ts.uq_days_closest,     tba.uq_days_closest)     END AS uq_days_closest,
+    CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE COALESCE(ts.lq_days_first,       tba.lq_days_first)       END AS lq_days,
+    CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE COALESCE(ts.median_days_first,   tba.median_days_first)   END AS median_days,
+    CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE COALESCE(ts.uq_days_first,       tba.uq_days_first)       END AS uq_days
 FROM (
-    SELECT anchor_event, event_family, time_relative, concept_id, n_records, n_patients
-    FROM #event_code_counts_before_after
+    SELECT 'all'    AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM #event_code_counts
     UNION ALL
-    SELECT anchor_event, event_family, time_relative, concept_id, n_records, n_patients
-    FROM #event_code_counts_before_after_first_met
+    SELECT 'before' AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM #event_code_counts_before_after         WHERE time_relative = 'BEFORE'
+    UNION ALL
+    SELECT 'after'  AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM #event_code_counts_before_after         WHERE time_relative = 'AFTER'
+    UNION ALL
+    SELECT 'before' AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM #event_code_counts_before_after_first_met WHERE time_relative = 'BEFORE'
+    UNION ALL
+    SELECT 'after'  AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM #event_code_counts_before_after_first_met WHERE time_relative = 'AFTER'
 ) x
-LEFT JOIN #event_code_timing_before_after_summary t
-  ON x.anchor_event = t.anchor_event
- AND x.event_family = t.event_family
- AND x.time_relative = t.time_relative
- AND x.concept_id = t.concept_id
-ORDER BY x.anchor_event, x.event_family, x.time_relative, x.n_patients DESC, x.n_records DESC, x.concept_id
+LEFT JOIN #event_code_timing_summary ts
+  ON x.time_window = 'all'
+ AND x.anchor_event = ts.anchor_event
+ AND x.event_family = ts.event_family
+ AND x.concept_id   = ts.concept_id
+LEFT JOIN #event_code_timing_before_after_summary tba
+  ON x.time_window != 'all'
+ AND x.anchor_event = tba.anchor_event
+ AND x.event_family = tba.event_family
+ AND x.concept_id   = tba.concept_id
+ AND ((x.time_window = 'before' AND tba.time_relative = 'BEFORE')
+  OR  (x.time_window = 'after'  AND tba.time_relative = 'AFTER'))
+ORDER BY x.time_window, x.anchor_event, x.event_family, x.n_patients DESC, x.n_records DESC, x.concept_id
 ;
--- 4) Full pairwise timing summary (counts/min/max censored for small cells)
+-- 4) Pairwise timing summary: all four timing types combined (small-cell sentinel)
+--    timing_type: first_to_first | first_to_closest | first_to_closest_before | first_to_closest_after
 SELECT
-    from_event,
-    to_event,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN -@min_cell_count ELSE n_patients_with_pair END AS n_patients_with_pair,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p05_days END AS p05_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p10_days END AS p10_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p20_days END AS p20_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p25_days END AS p25_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p30_days END AS p30_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p40_days END AS p40_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p50_days END AS p50_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p60_days END AS p60_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p70_days END AS p70_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p75_days END AS p75_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p80_days END AS p80_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p90_days END AS p90_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p95_days END AS p95_days
-FROM #timing_pair_summary
-ORDER BY from_event, to_event
-;
--- 5) Pairwise timing summary: FROM first -> TO closest (counts/min/max censored for small cells)
-SELECT
-    from_event,
-    to_event,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN -@min_cell_count ELSE n_patients_with_pair END AS n_patients_with_pair,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p05_days END AS p05_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p10_days END AS p10_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p20_days END AS p20_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p25_days END AS p25_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p30_days END AS p30_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p40_days END AS p40_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p50_days END AS p50_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p60_days END AS p60_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p70_days END AS p70_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p75_days END AS p75_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p80_days END AS p80_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p90_days END AS p90_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p95_days END AS p95_days
-FROM #timing_pair_summary_first_to_closest
-ORDER BY from_event, to_event
-;
--- 6) Pairwise timing summary: FROM first -> TO closest BEFORE (<0)
-SELECT
-    from_event,
-    to_event,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN -@min_cell_count ELSE n_patients_with_pair END AS n_patients_with_pair,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p05_days END AS p05_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p10_days END AS p10_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p20_days END AS p20_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p25_days END AS p25_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p30_days END AS p30_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p40_days END AS p40_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p50_days END AS p50_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p60_days END AS p60_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p70_days END AS p70_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p75_days END AS p75_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p80_days END AS p80_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p90_days END AS p90_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p95_days END AS p95_days
-FROM #timing_pair_summary_first_to_closest_before
-ORDER BY from_event, to_event
-;
--- 7) Pairwise timing summary: FROM first -> TO closest AFTER (>=0)
-SELECT
-    from_event,
-    to_event,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN -@min_cell_count ELSE n_patients_with_pair END AS n_patients_with_pair,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p05_days END AS p05_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p10_days END AS p10_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p20_days END AS p20_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p25_days END AS p25_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p30_days END AS p30_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p40_days END AS p40_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p50_days END AS p50_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p60_days END AS p60_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p70_days END AS p70_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p75_days END AS p75_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p80_days END AS p80_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p90_days END AS p90_days,
-    CASE WHEN n_patients_with_pair <= @min_cell_count THEN NULL ELSE p95_days END AS p95_days
-FROM #timing_pair_summary_first_to_closest_after
-ORDER BY from_event, to_event
+    x.timing_type,
+    x.from_event,
+    x.to_event,
+    CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN -@min_cell_count ELSE x.n_patients_with_pair END AS n_patients_with_pair,
+    CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p05_days END AS p05_days,
+    CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p10_days END AS p10_days,
+    CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p20_days END AS p20_days,
+    CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p25_days END AS p25_days,
+    CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p30_days END AS p30_days,
+    CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p40_days END AS p40_days,
+    CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p50_days END AS p50_days,
+    CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p60_days END AS p60_days,
+    CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p70_days END AS p70_days,
+    CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p75_days END AS p75_days,
+    CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p80_days END AS p80_days,
+    CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p90_days END AS p90_days,
+    CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p95_days END AS p95_days
+FROM (
+    SELECT 'first_to_first'          AS timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM #timing_pair_summary
+    UNION ALL
+    SELECT 'first_to_closest'        AS timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM #timing_pair_summary_first_to_closest
+    UNION ALL
+    SELECT 'first_to_closest_before' AS timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM #timing_pair_summary_first_to_closest_before
+    UNION ALL
+    SELECT 'first_to_closest_after'  AS timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM #timing_pair_summary_first_to_closest_after
+) x
+ORDER BY x.timing_type, x.from_event, x.to_event
 ;
 -- 8) Death timing from INDEX and FIRST_MET (stratified by calendar year of index date and OVERALL)
 SELECT

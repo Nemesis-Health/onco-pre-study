@@ -43,17 +43,12 @@ connection_details <- DatabaseConnector::createConnectionDetails(
 # ── Chunk → output-file mapping ───────────────────────────────────────────────
 
 result_chunks <- list(
-  list(file = "01_population_prevalence.sql",           output = "final_population_prevalence.csv"),
-  list(file = "02_event_code_counts.sql",               output = "final_event_code_counts.csv"),
-  list(file = "03_suppression_audit.sql",               output = "final_event_code_counts_suppression_audit.csv"),
-  list(file = "03b_event_code_counts_before_after.sql", output = "final_event_code_counts_before_after.csv"),
-  list(file = "04_timing_first_to_first.sql",           output = "final_timing_pair_summary_first_to_first.csv"),
-  list(file = "05_timing_first_to_closest.sql",         output = "final_timing_pair_summary_first_to_closest.csv"),
-  list(file = "06_timing_first_to_closest_before.sql",  output = "final_timing_pair_summary_first_to_closest_before.csv"),
-  list(file = "07_timing_first_to_closest_after.sql",   output = "final_timing_pair_summary_first_to_closest_after.csv"),
-  list(file = "08_death_timing.sql",                    output = "final_death_from_anchors.csv"),
-  list(file = "09_demographics.sql",                    output = "final_demographics_from_anchors.csv"),
-  list(file = "10_anchor_dx_codes.sql",                 output = "final_anchor_dx_concept_counts.csv")
+  list(file = "01_population_prevalence.sql", output = "final_population_prevalence.csv"),
+  list(file = "02_code_counts.sql",           output = "final_code_counts.csv"),
+  list(file = "04_timing_pairwise.sql",       output = "final_timing_pairwise.csv"),
+  list(file = "08_death_timing.sql",          output = "final_death_from_anchors.csv"),
+  list(file = "09_demographics.sql",          output = "final_demographics_from_anchors.csv"),
+  list(file = "10_anchor_dx_codes.sql",       output = "final_anchor_dx_concept_counts.csv")
 )
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

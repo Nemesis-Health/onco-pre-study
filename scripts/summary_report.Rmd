@@ -86,15 +86,7 @@ anchor_for_event <- function(from_ev) {
   if (toupper(from_ev) == "DX") "INDEX" else "FIRST_MET"
 }
 
-timing_file <- function(vkey) {
-  switch(vkey,
-    first_to_first           = "final_timing_pair_summary_first_to_first.csv",
-    first_to_closest         = "final_timing_pair_summary_first_to_closest.csv",
-    first_to_closest_before  = "final_timing_pair_summary_first_to_closest_before.csv",
-    first_to_closest_after   = "final_timing_pair_summary_first_to_closest_after.csv",
-    NA_character_
-  )
-}
+timing_file <- function(vkey) "final_timing_pairwise.csv"
 
 timing_title <- function(vkey) {
   switch(vkey,
@@ -111,12 +103,12 @@ ecc_col_family <- function(vkey) {
   if (vkey == "first_to_first") "FIRST" else "CLOSEST"
 }
 
-# TIME_RELATIVE filter for before/after variants (NA = no filter).
-ecc_time_relative <- function(vkey) {
+# time_window value for event-code filter: 'all', 'before', or 'after'.
+ecc_time_window <- function(vkey) {
   switch(vkey,
-    first_to_closest_before = "BEFORE",
-    first_to_closest_after  = "AFTER",
-    NA_character_
+    first_to_closest_before = "before",
+    first_to_closest_after  = "after",
+    "all"
   )
 }
 
@@ -142,12 +134,12 @@ fetch_concept_names <- function(concept_ids, connection_details, cdm_schema) {
 }
 
 # Gather all concept IDs across event-code CSVs so we can look them up once.
-ecc_single   <- read_csv_safe(file.path(rd, "final_event_code_counts.csv"))
-ecc_ba       <- read_csv_safe(file.path(rd, "final_event_code_counts_before_after.csv"))
-all_concept_ids <- unique(c(
-  if (nrow(ecc_single) && !is.na(col_ci(ecc_single, "concept_id"))) ecc_single[[col_ci(ecc_single, "concept_id")]] else integer(0),
-  if (nrow(ecc_ba)     && !is.na(col_ci(ecc_ba,     "concept_id"))) ecc_ba[[col_ci(ecc_ba,     "concept_id")]] else integer(0)
-))
+ecc_all      <- read_csv_safe(file.path(rd, "final_code_counts.csv"))
+all_concept_ids <- unique(
+  if (nrow(ecc_all) > 0 && !is.na(col_ci(ecc_all, "concept_id")))
+    ecc_all[[col_ci(ecc_all, "concept_id")]]
+  else integer(0)
+)
 
 concept_names <- fetch_concept_names(all_concept_ids, params$connection_details, params$cdm_database_schema)
 ```
@@ -469,7 +461,11 @@ for (from_key in names(grouped)) {
       next
     }
 
-    tdf <- suppressMessages(read_csv(file.path(rd, tfile), show_col_types = FALSE))
+    tdf_all <- suppressMessages(read_csv(file.path(rd, tfile), show_col_types = FALSE))
+    ttype_c <- col_ci(tdf_all, "timing_type")
+    tdf <- if (!is.na(ttype_c))
+      filter(tdf_all, tolower(as.character(.data[[ttype_c]])) == vkey)
+    else tdf_all
     fc  <- col_ci(tdf, "from_event")
     tc  <- col_ci(tdf, "to_event")
     if (is.na(fc) || is.na(tc)) { cat("_Missing FROM/TO columns._\n\n"); next }
@@ -559,11 +555,10 @@ for (blk in ecc_blocks) {
   cat(sprintf('\n\n### %s → %s  <small>(%s)</small> {#%s}\n\n',
               blk$from_ev, blk$to_ev, timing_title(blk$vkey), blk$id))
 
-  use_ba  <- blk$vkey %in% c("first_to_closest_before", "first_to_closest_after")
-  tr      <- ecc_time_relative(blk$vkey)
+  tw      <- ecc_time_window(blk$vkey)
   cfam    <- ecc_col_family(blk$vkey)
   anchor  <- anchor_for_event(blk$from_ev)
-  ecc_src <- if (use_ba) ecc_ba else ecc_single
+  ecc_src <- ecc_all
 
   if (nrow(ecc_src) == 0) { cat("_Event code counts file not found._\n\n"); next }
 
@@ -571,7 +566,7 @@ for (blk in ecc_blocks) {
   fam_c    <- col_ci(ecc_src, "event_family")
   anch_c   <- col_ci(ecc_src, "anchor_event")
   npat_c   <- col_ci(ecc_src, "n_patients")
-  tr_c     <- col_ci(ecc_src, "time_relative")
+  tw_c     <- col_ci(ecc_src, "time_window")
 
   lq_col  <- if (cfam == "FIRST") col_ci(ecc_src, "lq_days_first")   %||% col_ci(ecc_src, "lq_days")   else col_ci(ecc_src, "lq_days_closest")   %||% col_ci(ecc_src, "lq_days")
   med_col <- if (cfam == "FIRST") col_ci(ecc_src, "median_days_first") %||% col_ci(ecc_src, "median_days") else col_ci(ecc_src, "median_days_closest") %||% col_ci(ecc_src, "median_days")
@@ -583,8 +578,8 @@ for (blk in ecc_blocks) {
       toupper(as.character(.data[[anch_c]])) == anchor
     )
 
-  if (!is.na(tr_c) && !is.na(tr)) {
-    sub <- sub |> filter(toupper(as.character(.data[[tr_c]])) == tr)
+  if (!is.na(tw_c)) {
+    sub <- sub |> filter(tolower(as.character(.data[[tw_c]])) == tw)
   }
 
   if (nrow(sub) == 0) { cat("_No matching rows._\n\n"); next }

@@ -114,10 +114,13 @@ checks <- list(
 
   # Bare #temp table references — should be gone after translation for dialects
   # that use temp emulation, but residual # prefixes mean translation was skipped.
+  # Skip pdw, redshift, and synapse: all are SQL Server-derived engines that
+  # support #temp natively, so SqlRender correctly leaves the # prefix intact.
   list(
-    id      = "RESIDUAL_HASH_TEMP",
-    pattern = "(?<!['\"])#[a-zA-Z]",
-    message = paste0(
+    id           = "RESIDUAL_HASH_TEMP",
+    pattern      = "(?<!['\"])#[a-zA-Z]",
+    skip_dialects = c("pdw", "redshift", "synapse"),
+    message      = paste0(
       "Residual #temp_table reference. SqlRender should have rewritten these. ",
       "If they remain, confirm SqlRender version >= 1.6 and that the source SQL ",
       "uses the standard #temp pattern."
@@ -128,6 +131,7 @@ checks <- list(
 run_checks <- function(sql, dialect, file_label) {
   warnings <- character(0)
   for (chk in checks) {
+    if (!is.null(chk$skip_dialects) && dialect %in% chk$skip_dialects) next
     if (grepl(chk$pattern, sql, perl = TRUE, ignore.case = TRUE)) {
       warnings <- c(warnings,
                     sprintf("[%s] %s: %s", file_label, chk$id, chk$message))
