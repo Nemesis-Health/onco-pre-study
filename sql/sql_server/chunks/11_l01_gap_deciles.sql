@@ -1,0 +1,23 @@
+-- 11) L01 consecutive record gap distribution — decile summary
+--     Intermediate tables #l01_event_days and #l01_consecutive_gaps are
+--     built in 00_setup.sql (section L).
+--
+--     Two subgroups:
+--       ALL_L01 : all DX cohort patients with any L01 record
+--       MET_L01 : patients who also have a first_met_date
+--
+--     Output: one row per subgroup with gap-day deciles.
+
+SELECT
+    subgroup,
+    COUNT(*)                                                   AS n_gaps,
+    COUNT(DISTINCT person_id)                                  AS n_patients_with_gaps,
+    PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY gap_days)    AS p10_days,
+    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY gap_days)    AS p25_days,
+    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY gap_days)    AS p50_days,
+    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY gap_days)    AS p75_days,
+    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY gap_days)    AS p90_days
+FROM #l01_consecutive_gaps
+GROUP BY subgroup
+ORDER BY subgroup
+;

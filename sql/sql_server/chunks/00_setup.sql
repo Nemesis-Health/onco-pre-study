@@ -1786,7 +1786,7 @@ GROUP BY prevalence_year, anchor_event
 
 
 ------------------------------------------------------------
--- L) L01 CONSECUTIVE GAP TABLES (used by chunk 11)
+-- L) L01 CONSECUTIVE GAP TABLES (used by chunks 11 and 12)
 ------------------------------------------------------------
 
 -- Deduplicated L01 event days per patient (one row per patient-day)

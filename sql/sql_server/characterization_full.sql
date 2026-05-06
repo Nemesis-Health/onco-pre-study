@@ -1786,7 +1786,7 @@ GROUP BY prevalence_year, anchor_event
 
 
 ------------------------------------------------------------
--- L) L01 CONSECUTIVE GAP TABLES (used by chunk 11)
+-- L) L01 CONSECUTIVE GAP TABLES (used by chunks 11 and 12)
 ------------------------------------------------------------
 
 -- Deduplicated L01 event days per patient (one row per patient-day)
@@ -1881,7 +1881,7 @@ SELECT
 FROM base
 ORDER BY
     CASE WHEN prevalence_year = 'OVERALL' THEN 0 ELSE 1 END,
-    TRY_CAST(prevalence_year AS INT)
+    CASE WHEN prevalence_year = 'OVERALL' THEN NULL ELSE CAST(prevalence_year AS INT) END
 ;
 
 -- 2) Code-count summary: all three time windows combined (small-cell sentinel)
@@ -2029,7 +2029,7 @@ FROM (
 ORDER BY
     x.pair,
     CASE WHEN x.index_year = 'OVERALL' THEN 0 ELSE 1 END,
-    TRY_CAST(x.index_year AS INT),
+    CASE WHEN x.index_year = 'OVERALL' THEN NULL ELSE CAST(x.index_year AS INT) END,
     CASE x.direction
         WHEN 'BEFORE_GT90'  THEN 1
         WHEN 'BEFORE_1_90'  THEN 2
@@ -2377,7 +2377,7 @@ LEFT JOIN #followup_quantiles f
  AND s.anchor_event = f.anchor_event
 ORDER BY
     CASE WHEN s.prevalence_year = 'OVERALL' THEN 0 ELSE 1 END,
-    TRY_CAST(s.prevalence_year AS INT),
+    CASE WHEN s.prevalence_year = 'OVERALL' THEN NULL ELSE CAST(s.prevalence_year AS INT) END,
     CASE WHEN s.anchor_event = 'INDEX' THEN 0 ELSE 1 END
 ;
 
@@ -2484,7 +2484,7 @@ FROM (
 ORDER BY s.n_distinct_patients DESC, s.concept_id
 ;
 
--- 11) L01 consecutive record gap distribution
+-- 11) L01 consecutive record gap distribution — decile summary
 --     Intermediate tables #l01_event_days and #l01_consecutive_gaps are
 --     built in 00_setup.sql (section L).
 --
@@ -2492,10 +2492,8 @@ ORDER BY s.n_distinct_patients DESC, s.concept_id
 --       ALL_L01 : all DX cohort patients with any L01 record
 --       MET_L01 : patients who also have a first_met_date
 --
---     Output 1: Decile summary — one row per subgroup
---     Output 2: Bucket distribution — one row per (subgroup, bucket)
+--     Output: one row per subgroup with gap-day deciles.
 
--- 11a) Decile summary
 SELECT
     subgroup,
     COUNT(*)                                                   AS n_gaps,
@@ -2510,7 +2508,12 @@ GROUP BY subgroup
 ORDER BY subgroup
 ;
 
--- 11b) Gap bucket distribution
+-- 12) L01 consecutive record gap distribution — bucketed histogram
+--     Intermediate table #l01_consecutive_gaps is built in 00_setup.sql
+--     (section L).  Same subgroups as chunk 11 (ALL_L01, MET_L01).
+--
+--     Output: one row per (subgroup, gap_bucket) for histogram rendering.
+
 SELECT
     subgroup,
     CASE
@@ -2545,21 +2548,19 @@ ORDER BY
     END
 ;
 
--- 12) Death date vs observation period alignment — gap distribution
---     For patients where death_date falls AFTER obs_period_end (already
---     flagged in the n_deaths_out_obs column of chunk 08), this query
---     exports the distribution of the gap: death_date - obs_period_end_date
---     (i.e. how many days after the last observation period did death occur).
---
---     Also reports:
---       - death_before_obs: patients where death_date < obs_period_start_date
---         (data quality error — rare but important to flag separately)
+-- 13) Death date vs observation period alignment — summary counts
+--     For patients in the DX cohort (and the FIRST_MET subgroup), reports:
+--       - n_death_before_obs : death_date < first observation_period_start
+--                              (data quality error — rare but important)
+--       - n_death_after_obs  : death_date > last  observation_period_end
+--                              (gap distribution summarized in chunk 14)
+--       - lq/median/uq/p90 percentiles of the post-obs gap (days).
 --
 --     Stratified by anchor (INDEX / FIRST_MET).
---     Small-cell suppression applied.
+--     Small-cell suppression intentionally NOT applied here — these are
+--     aggregate distribution statistics over (already small) flagged subsets.
 
 WITH patient_obs AS (
-    -- Latest observation period end and earliest observation period start per patient
     SELECT
         person_id,
         MIN(observation_period_start_date) AS first_obs_start,
@@ -2591,8 +2592,6 @@ death_obs_gaps AS (
     LEFT JOIN #met_summary ms ON ms.person_id = c.person_id
     LEFT JOIN patient_obs po  ON po.person_id  = c.person_id
 )
-
--- 1) Summary counts: death-before-obs and gap magnitude summary
 SELECT
     'INDEX' AS anchor_event,
     SUM(CASE WHEN death_before_obs = 1 THEN 1 ELSE 0 END) AS n_death_before_obs,
@@ -2619,8 +2618,36 @@ WHERE death_date IS NOT NULL
   AND first_met_date IS NOT NULL
 ;
 
--- 2) Raw gap distribution for histogram (death_after_obs patients only, INDEX anchor)
---    Binned at 30-day intervals up to 730 days, then a single ">730d" bucket.
+-- 14) Death date vs observation period — bucketed gap histogram
+--     Restricted to patients where death_date > obs_period_end_date (i.e.
+--     the n_death_after_obs subset summarized in chunk 13).  Binned at
+--     30-day intervals up to 730 days, then a single ">=730d" bucket.
+--
+--     Output: one row per gap_bucket (INDEX anchor; FIRST_MET subset is a
+--     proper subset whose distribution closely mirrors INDEX, so we only
+--     export the INDEX histogram for the report).
+
+WITH patient_obs AS (
+    SELECT
+        person_id,
+        MIN(observation_period_start_date) AS first_obs_start,
+        MAX(observation_period_end_date)   AS last_obs_end
+    FROM @cdm_database_schema.observation_period
+    WHERE person_id IN (SELECT person_id FROM #cohort)
+    GROUP BY person_id
+),
+death_obs_gaps AS (
+    SELECT
+        c.person_id,
+        CASE
+            WHEN dos.death_date > po.last_obs_end
+                THEN DATEDIFF(DAY, po.last_obs_end, dos.death_date)
+            ELSE NULL
+        END AS gap_death_after_obs
+    FROM #cohort c
+    INNER JOIN #death_obs_status dos ON dos.person_id = c.person_id
+    LEFT JOIN patient_obs po  ON po.person_id  = c.person_id
+)
 SELECT
     CASE
         WHEN gap_death_after_obs <   30 THEN 'lt30d'
