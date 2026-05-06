@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : postgresql
--- Translated     : 2026-05-06 18:53:53 BST
+-- Translated     : 2026-05-06 20:12:47 BST
 -- Source file    : sql/sql_server/chunks/13_death_gap_summary.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -10,10 +10,12 @@
 
 -- 13) Death date vs observation period alignment — summary counts
 --     For patients in the DX cohort (and the FIRST_MET subgroup), reports:
---       - n_death_before_obs : death_date < first observation_period_start
---                              (data quality error — rare but important)
---       - n_death_after_obs  : death_date > last  observation_period_end
---                              (gap distribution summarized in chunk 14)
+--       - n_death_before_obs    : death_date < first observation_period_start
+--                                 (data quality error — rare but important)
+--       - n_death_after_obs     : death_date > last  observation_period_end
+--                                 (gap distribution summarized in chunk 14)
+--       - n_death_no_obs_period : patient has a death record but no observation_period row
+--                                 (data quality orphan — excluded from gap histogram)
 --       - lq/median/uq/p90 percentiles of the post-obs gap (days).
 --
 --     Stratified by anchor (INDEX / FIRST_MET).
@@ -37,15 +39,16 @@ death_obs_gaps AS (
         po.first_obs_start,
         po.last_obs_end,
         CASE
-            WHEN dos.death_date > po.last_obs_end
-                THEN (CAST(dos.death_date AS DATE) - CAST(po.last_obs_end AS DATE))
+            WHEN po.last_obs_end IS NULL                THEN NULL
+            WHEN dos.death_date > po.last_obs_end       THEN (CAST(dos.death_date AS DATE) - CAST(po.last_obs_end AS DATE))
             ELSE NULL
         END AS gap_death_after_obs,
         CASE
-            WHEN dos.death_date < po.first_obs_start
-                THEN 1
+            WHEN po.first_obs_start IS NULL             THEN 0
+            WHEN dos.death_date < po.first_obs_start    THEN 1
             ELSE 0
-        END AS death_before_obs
+        END AS death_before_obs,
+        CASE WHEN po.last_obs_end IS NULL THEN 1 ELSE 0 END AS death_no_obs_period
     FROM cohort c
     INNER JOIN death_obs_status dos ON dos.person_id = c.person_id
     LEFT JOIN met_summary ms ON ms.person_id = c.person_id
@@ -53,14 +56,15 @@ death_obs_gaps AS (
 )
 SELECT
     'INDEX' AS anchor_event,
-    SUM(CASE WHEN death_before_obs = 1 THEN 1 ELSE 0 END) AS n_death_before_obs,
-    SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) AS n_death_after_obs,
+    SUM(CASE WHEN death_before_obs = 1 THEN 1 ELSE 0 END)                AS n_death_before_obs,
+    SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END)     AS n_death_after_obs,
+    SUM(CASE WHEN death_no_obs_period = 1 THEN 1 ELSE 0 END)             AS n_death_no_obs_period,
     MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  4.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS NUMERIC) END) AS lq_gap_days,
     MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  2.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS NUMERIC) END) AS median_gap_days,
     MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  4.0 * rn >= 3 * non_null_cnt THEN CAST(gap_death_after_obs AS NUMERIC) END) AS uq_gap_days,
     MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 10.0 * rn >= 9 * non_null_cnt THEN CAST(gap_death_after_obs AS NUMERIC) END) AS p90_gap_days
 FROM (
-    SELECT death_before_obs, gap_death_after_obs,
+    SELECT death_before_obs, death_no_obs_period, gap_death_after_obs,
         ROW_NUMBER() OVER (ORDER BY gap_death_after_obs) AS rn,
         SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) OVER () AS non_null_cnt
     FROM death_obs_gaps
@@ -69,14 +73,15 @@ FROM (
 UNION ALL
 SELECT
     'FIRST_MET' AS anchor_event,
-    SUM(CASE WHEN death_before_obs = 1 THEN 1 ELSE 0 END) AS n_death_before_obs,
-    SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) AS n_death_after_obs,
+    SUM(CASE WHEN death_before_obs = 1 THEN 1 ELSE 0 END)                AS n_death_before_obs,
+    SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END)     AS n_death_after_obs,
+    SUM(CASE WHEN death_no_obs_period = 1 THEN 1 ELSE 0 END)             AS n_death_no_obs_period,
     MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  4.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS NUMERIC) END) AS lq_gap_days,
     MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  2.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS NUMERIC) END) AS median_gap_days,
     MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  4.0 * rn >= 3 * non_null_cnt THEN CAST(gap_death_after_obs AS NUMERIC) END) AS uq_gap_days,
     MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 10.0 * rn >= 9 * non_null_cnt THEN CAST(gap_death_after_obs AS NUMERIC) END) AS p90_gap_days
 FROM (
-    SELECT death_before_obs, gap_death_after_obs,
+    SELECT death_before_obs, death_no_obs_period, gap_death_after_obs,
         ROW_NUMBER() OVER (ORDER BY gap_death_after_obs) AS rn,
         SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) OVER () AS non_null_cnt
     FROM death_obs_gaps
