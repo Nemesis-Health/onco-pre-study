@@ -1867,12 +1867,23 @@ def _s05_obs_death(rd: Path) -> str:
                 if nd_val and nio_val is not None and noo_val is not None:
                     nd_before_val = max(0, nd_val - nio_val - noo_val)
                 pct_before = f"{100.0 * nd_before_val / nd_val:.1f}%" if nd_before_val and nd_val and nd_val > 0 else "—"
+                # Orphaned patients: death record but no observation_period row (from chunk 13)
+                nd_no_obs_val: int | None = None
+                if gap_summary is not None:
+                    gs_ac = _col(gap_summary, "anchor_event")
+                    gs_nop = _col(gap_summary, "n_death_no_obs_period")
+                    if gs_ac and gs_nop:
+                        gs_idx = gap_summary[gap_summary[gs_ac].astype(str).str.upper() == "INDEX"]
+                        if not gs_idx.empty:
+                            nd_no_obs_val = _safe_int(gs_idx.iloc[0].get(gs_nop))
+                pct_no_obs = f"{100.0 * nd_no_obs_val / nd_val:.1f}%" if nd_no_obs_val and nd_val and nd_val > 0 else "—"
                 parts.append(_card_grid(
                     _stat_box(_fmt_n(nd_val), "Deaths recorded", pct=pct_dead),
                     _stat_box(_fmt_n(nio_val) if nio_val else "—", "Death within obs. period", pct=pct_in, cls="highlight"),
                     _stat_box(_fmt_n(noo_val) if noo_val else "—", "Death AFTER obs. period end", pct=pct_out, cls="alert"),
                     _stat_box(_fmt_n(nd_before_val) if nd_before_val else "—", "Death BEFORE obs. period start", pct=pct_before, cls="warn"),
-                    cols=4,
+                    _stat_box(_fmt_n(nd_no_obs_val) if nd_no_obs_val else "—", "No observation period record", pct=pct_no_obs, cls="warn"),
+                    cols=5,
                 ))
 
     # Table 5.1 — category breakdown with implication
