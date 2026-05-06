@@ -28,12 +28,12 @@ GROUP BY
     END
 ORDER BY
     subgroup,
-    CASE
+    MIN(CASE
         WHEN gap_days <  30  THEN 1
         WHEN gap_days <  60  THEN 2
         WHEN gap_days <  90  THEN 3
         WHEN gap_days < 180  THEN 4
         WHEN gap_days < 365  THEN 5
         ELSE 6
-    END
+    END)
 ;

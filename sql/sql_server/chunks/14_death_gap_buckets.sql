@@ -52,7 +52,7 @@ GROUP BY
         ELSE 'ge730d'
     END
 ORDER BY
-    CASE
+    MIN(CASE
         WHEN gap_death_after_obs <   30 THEN 1
         WHEN gap_death_after_obs <   60 THEN 2
         WHEN gap_death_after_obs <   90 THEN 3
@@ -60,5 +60,5 @@ ORDER BY
         WHEN gap_death_after_obs <  365 THEN 5
         WHEN gap_death_after_obs <  730 THEN 6
         ELSE 7
-    END
+    END)
 ;
