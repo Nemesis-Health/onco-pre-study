@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : impala
--- Translated     : 2026-05-06 18:06:47 BST
+-- Translated     : 2026-05-06 18:36:47 BST
 -- Source file    : sql/sql_server/chunks/06_windowed_odx_prevalence.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -39,8 +39,8 @@ WITH odx_gdx_events AS (
         e.concept_id,
         e.person_id,
         DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END) AS days_from_index
-    FROM cbse36ibother_dx_events e
-    JOIN cbse36ibcohort c ON e.person_id = c.person_id
+    FROM ldpw47q6other_dx_events e
+    JOIN ldpw47q6cohort c ON e.person_id = c.person_id
     UNION ALL
     -- GDX events with days relative to index_date
     SELECT
@@ -48,8 +48,8 @@ WITH odx_gdx_events AS (
         e.concept_id,
         e.person_id,
         DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END) AS days_from_index
-    FROM cbse36ibgen_cancer_events e
-    JOIN cbse36ibcohort c ON e.person_id = c.person_id
+    FROM ldpw47q6gen_cancer_events e
+    JOIN ldpw47q6cohort c ON e.person_id = c.person_id
 ),
 windowed AS (
     SELECT

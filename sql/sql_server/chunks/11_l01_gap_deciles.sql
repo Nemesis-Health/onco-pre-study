@@ -10,14 +10,19 @@
 
 SELECT
     subgroup,
-    COUNT(*)                                                   AS n_gaps,
-    COUNT(DISTINCT person_id)                                  AS n_patients_with_gaps,
-    PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY gap_days)    AS p10_days,
-    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY gap_days)    AS p25_days,
-    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY gap_days)    AS p50_days,
-    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY gap_days)    AS p75_days,
-    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY gap_days)    AS p90_days
-FROM #l01_consecutive_gaps
+    COUNT(*)                  AS n_gaps,
+    COUNT(DISTINCT person_id) AS n_patients_with_gaps,
+    MIN(CASE WHEN 10.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT) END) AS p10_days,
+    MIN(CASE WHEN  4.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT) END) AS p25_days,
+    MIN(CASE WHEN  2.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT) END) AS p50_days,
+    MIN(CASE WHEN  4.0 * rn >= 3 * cnt THEN CAST(gap_days AS FLOAT) END) AS p75_days,
+    MIN(CASE WHEN 10.0 * rn >= 9 * cnt THEN CAST(gap_days AS FLOAT) END) AS p90_days
+FROM (
+    SELECT subgroup, person_id, gap_days,
+        ROW_NUMBER() OVER (PARTITION BY subgroup ORDER BY gap_days) AS rn,
+        COUNT(*)     OVER (PARTITION BY subgroup)                   AS cnt
+    FROM #l01_consecutive_gaps
+) x
 GROUP BY subgroup
 ORDER BY subgroup
 ;

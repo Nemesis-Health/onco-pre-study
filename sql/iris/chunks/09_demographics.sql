@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : iris
--- Translated     : 2026-05-06 18:06:59 BST
+-- Translated     : 2026-05-06 18:36:59 BST
 -- Source file    : sql/sql_server/chunks/09_demographics.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -15,14 +15,14 @@ WITH anchor_persons AS (
         'INDEX' AS anchor_event,
         c.person_id,
         c.index_date AS anchor_date
-    FROM cbse36ibpatient_char c
+    FROM ldpw47q6patient_char c
     WHERE c.index_date IS NOT NULL
     UNION ALL
     SELECT
         'FIRST_MET' AS anchor_event,
         c.person_id,
         c.first_met_date AS anchor_date
-    FROM cbse36ibpatient_char c
+    FROM ldpw47q6patient_char c
     WHERE c.first_met_date IS NOT NULL
 ),
 base AS (
@@ -76,11 +76,16 @@ FROM (
 JOIN (
     SELECT
         anchor_event,
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY age_years) AS age_lq_years,
-        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY age_years) AS age_median_years,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY age_years) AS age_uq_years
-    FROM ages
-    WHERE age_years IS NOT NULL
+        MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(age_years AS FLOAT) END) AS age_lq_years,
+        MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(age_years AS FLOAT) END) AS age_median_years,
+        MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(age_years AS FLOAT) END) AS age_uq_years
+    FROM (
+        SELECT anchor_event, age_years,
+            ROW_NUMBER() OVER (PARTITION BY anchor_event ORDER BY age_years) AS rn,
+            COUNT(*)     OVER (PARTITION BY anchor_event)                    AS cnt
+        FROM ages
+        WHERE age_years IS NOT NULL
+    ) y
     GROUP BY anchor_event
 ) p
   ON agg.anchor_event = p.anchor_event

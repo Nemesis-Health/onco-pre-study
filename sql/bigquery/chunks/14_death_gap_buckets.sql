@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-06 18:06:52 BST
+-- Translated     : 2026-05-06 18:36:52 BST
 -- Source file    : sql/sql_server/chunks/14_death_gap_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -26,7 +26,7 @@ with patient_obs as (
         min(observation_period_start_date) as first_obs_start,
         max(observation_period_end_date)   as last_obs_end
      from @cdm_database_schema.observation_period
-    where person_id in (select person_id from cbse36ibcohort)
+    where person_id in (select person_id from ldpw47q6cohort)
      group by  1 ),
 death_obs_gaps as (
     select
@@ -36,8 +36,8 @@ death_obs_gaps as (
                 then DATE_DIFF(IF(SAFE_CAST(dos.death_date  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(dos.death_date  AS STRING)),SAFE_CAST(dos.death_date  AS DATE)), IF(SAFE_CAST(po.last_obs_end  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(po.last_obs_end  AS STRING)),SAFE_CAST(po.last_obs_end  AS DATE)), DAY)
             else null
         end as gap_death_after_obs
-    from cbse36ibcohort c
-    inner join cbse36ibdeath_obs_status dos on dos.person_id = c.person_id
+    from ldpw47q6cohort c
+    inner join ldpw47q6death_obs_status dos on dos.person_id = c.person_id
     left join patient_obs po  on po.person_id  = c.person_id
 )
    select case

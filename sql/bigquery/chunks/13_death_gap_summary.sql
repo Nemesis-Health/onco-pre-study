@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-06 18:06:52 BST
+-- Translated     : 2026-05-06 18:36:52 BST
 -- Source file    : sql/sql_server/chunks/13_death_gap_summary.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -29,7 +29,7 @@ with patient_obs as (
         min(observation_period_start_date) as first_obs_start,
         max(observation_period_end_date)   as last_obs_end
      from @cdm_database_schema.observation_period
-    where person_id in (select person_id from cbse36ibcohort)
+    where person_id in (select person_id from ldpw47q6cohort)
      group by  1 ),
 death_obs_gaps as (
     select
@@ -49,32 +49,42 @@ death_obs_gaps as (
                 then 1
             else 0
         end as death_before_obs
-    from cbse36ibcohort c
-    inner join cbse36ibdeath_obs_status dos on dos.person_id = c.person_id
-    left join cbse36ibmet_summary ms on ms.person_id = c.person_id
+    from ldpw47q6cohort c
+    inner join ldpw47q6death_obs_status dos on dos.person_id = c.person_id
+    left join ldpw47q6met_summary ms on ms.person_id = c.person_id
     left join patient_obs po  on po.person_id  = c.person_id
 )
 select
     'INDEX' as anchor_event,
     sum(case when death_before_obs = 1 then 1 else 0 end) as n_death_before_obs,
     sum(case when gap_death_after_obs is not null then 1 else 0 end) as n_death_after_obs,
-    percentile_cont(0.25) within group (order by gap_death_after_obs) as lq_gap_days,
-    percentile_cont(0.50) within group (order by gap_death_after_obs) as median_gap_days,
-    percentile_cont(0.75) within group (order by gap_death_after_obs) as uq_gap_days,
-    percentile_cont(0.90) within group (order by gap_death_after_obs) as p90_gap_days
-from death_obs_gaps
-where death_date is not null
+    min(case when gap_death_after_obs is not null and  4.0 * rn >= non_null_cnt then cast(gap_death_after_obs  as float64) end) as lq_gap_days,
+    min(case when gap_death_after_obs is not null and  2.0 * rn >= non_null_cnt then cast(gap_death_after_obs  as float64) end) as median_gap_days,
+    min(case when gap_death_after_obs is not null and  4.0 * rn >= 3 * non_null_cnt then cast(gap_death_after_obs  as float64) end) as uq_gap_days,
+    min(case when gap_death_after_obs is not null and 10.0 * rn >= 9 * non_null_cnt then cast(gap_death_after_obs  as float64) end) as p90_gap_days
+from (
+    select death_before_obs, gap_death_after_obs,
+        row_number() over (order by gap_death_after_obs) as rn,
+        sum(case when gap_death_after_obs is not null then 1 else 0 end) over () as non_null_cnt
+    from death_obs_gaps
+    where death_date is not null
+) x
 union all
 select
     'FIRST_MET' as anchor_event,
     sum(case when death_before_obs = 1 then 1 else 0 end) as n_death_before_obs,
     sum(case when gap_death_after_obs is not null then 1 else 0 end) as n_death_after_obs,
-    percentile_cont(0.25) within group (order by gap_death_after_obs) as lq_gap_days,
-    percentile_cont(0.50) within group (order by gap_death_after_obs) as median_gap_days,
-    percentile_cont(0.75) within group (order by gap_death_after_obs) as uq_gap_days,
-    percentile_cont(0.90) within group (order by gap_death_after_obs) as p90_gap_days
-from death_obs_gaps
-where death_date is not null
-  and first_met_date is not null
+    min(case when gap_death_after_obs is not null and  4.0 * rn >= non_null_cnt then cast(gap_death_after_obs  as float64) end) as lq_gap_days,
+    min(case when gap_death_after_obs is not null and  2.0 * rn >= non_null_cnt then cast(gap_death_after_obs  as float64) end) as median_gap_days,
+    min(case when gap_death_after_obs is not null and  4.0 * rn >= 3 * non_null_cnt then cast(gap_death_after_obs  as float64) end) as uq_gap_days,
+    min(case when gap_death_after_obs is not null and 10.0 * rn >= 9 * non_null_cnt then cast(gap_death_after_obs  as float64) end) as p90_gap_days
+from (
+    select death_before_obs, gap_death_after_obs,
+        row_number() over (order by gap_death_after_obs) as rn,
+        sum(case when gap_death_after_obs is not null then 1 else 0 end) over () as non_null_cnt
+    from death_obs_gaps
+    where death_date is not null
+      and first_met_date is not null
+) x
 ;
 

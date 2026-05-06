@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : snowflake
--- Translated     : 2026-05-06 18:06:58 BST
+-- Translated     : 2026-05-06 18:36:58 BST
 -- Source file    : sql/sql_server/chunks/14_death_gap_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -22,7 +22,7 @@ WITH patient_obs AS (
         MIN(observation_period_start_date) AS first_obs_start,
         MAX(observation_period_end_date)   AS last_obs_end
     FROM @cdm_database_schema.observation_period
-    WHERE person_id IN (SELECT person_id FROM cbse36ibcohort)
+    WHERE person_id IN (SELECT person_id FROM ldpw47q6cohort)
     GROUP BY person_id
 ),
 death_obs_gaps AS (
@@ -33,8 +33,8 @@ death_obs_gaps AS (
                 THEN DATEDIFF(DAY, po.last_obs_end, dos.death_date)
             ELSE NULL
         END AS gap_death_after_obs
-    FROM cbse36ibcohort c
-    INNER JOIN cbse36ibdeath_obs_status dos ON dos.person_id = c.person_id
+    FROM ldpw47q6cohort c
+    INNER JOIN ldpw47q6death_obs_status dos ON dos.person_id = c.person_id
     LEFT JOIN patient_obs po  ON po.person_id  = c.person_id
 )
 SELECT

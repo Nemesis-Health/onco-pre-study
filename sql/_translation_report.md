@@ -1,6 +1,6 @@
 # SQL Translation Report
 
-Generated: 2026-05-06 18:06:59 BST
+Generated: 2026-05-06 18:36:59 BST
 Source: `sql/sql_server/`
 Dialects: oracle, postgresql, pdw, impala, netezza, bigquery, spark, sqlite, redshift, hive, sqlite extended, duckdb, snowflake, synapse, iris
 

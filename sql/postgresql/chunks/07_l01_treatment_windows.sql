@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : postgresql
--- Translated     : 2026-05-06 18:06:44 BST
+-- Translated     : 2026-05-06 18:36:45 BST
 -- Source file    : sql/sql_server/chunks/07_l01_treatment_windows.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R

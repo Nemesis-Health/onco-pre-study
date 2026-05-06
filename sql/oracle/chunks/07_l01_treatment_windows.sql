@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : oracle
--- Translated     : 2026-05-06 18:06:43 BST
+-- Translated     : 2026-05-06 18:36:44 BST
 -- Source file    : sql/sql_server/chunks/07_l01_treatment_windows.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -36,7 +36,7 @@ WITH window_bounds AS (SELECT 'INDEX' AS anchor_event,
         c.person_id,
         c.index_date AS anchor_date,
         w.window_index
-    FROM cbse36ibcohort c
+    FROM ldpw47q6cohort c
     CROSS JOIN (SELECT -12 AS window_index  FROM DUAL  UNION ALL SELECT -11   FROM DUAL  UNION ALL SELECT -10
           FROM DUAL  UNION ALL SELECT -9    FROM DUAL  UNION ALL SELECT -8    FROM DUAL  UNION ALL SELECT -7
           FROM DUAL  UNION ALL SELECT -6    FROM DUAL  UNION ALL SELECT -5    FROM DUAL  UNION ALL SELECT -4
@@ -64,7 +64,7 @@ WITH window_bounds AS (SELECT 'INDEX' AS anchor_event,
         ms.person_id,
         ms.first_met_date  anchor_date,
         w.window_index
-    FROM cbse36ibmet_summary ms
+    FROM ldpw47q6met_summary ms
        WHERE ms.first_met_date IS NOT NULL
     CROSS JOIN (SELECT -6  AS window_index  FROM DUAL  UNION ALL SELECT -5    FROM DUAL  UNION ALL SELECT -4
           FROM DUAL  UNION ALL SELECT -3    FROM DUAL  UNION ALL SELECT -2    FROM DUAL  UNION ALL SELECT -1
@@ -91,7 +91,7 @@ window_l01 AS (SELECT wb.anchor_event,
             END
         ) AS has_l01_in_window
     FROM window_bounds wb
-    LEFT JOIN cbse36ibl01_events le
+    LEFT JOIN ldpw47q6l01_events le
       ON wb.person_id = le.person_id
     GROUP BY wb.anchor_event, wb.person_id, wb.window_index, wb.anchor_date
  ),

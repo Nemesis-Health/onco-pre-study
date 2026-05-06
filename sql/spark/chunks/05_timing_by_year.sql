@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : spark
--- Translated     : 2026-05-06 18:06:53 BST
+-- Translated     : 2026-05-06 18:36:53 BST
 -- Source file    : sql/sql_server/chunks/05_timing_by_year.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -26,30 +26,42 @@ FROM (
  -- first_to_first by year
  SELECT
  'first_to_first' AS timing_type,
- CAST(YEAR(pc.index_date) AS STRING) AS index_year,
- p.from_event,
- p.to_event,
+ CAST(index_year_int AS STRING) AS index_year,
+ from_event,
+ to_event,
  COUNT(*) AS n_patients_with_pair,
- PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY p.days_diff) AS p25_days,
- PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY p.days_diff) AS p50_days,
- PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY p.days_diff) AS p75_days
- FROM cbse36ibpatient_timing_pairs p
- JOIN cbse36ibpatient_char pc ON p.person_id = pc.person_id
- GROUP BY YEAR(pc.index_date), p.from_event, p.to_event
+ MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(days_diff AS DOUBLE) END) AS p25_days,
+ MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_diff AS DOUBLE) END) AS p50_days,
+ MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS DOUBLE) END) AS p75_days
+ FROM (
+ SELECT p.from_event, p.to_event, p.days_diff,
+ YEAR(pc.index_date) AS index_year_int,
+ ROW_NUMBER() OVER (PARTITION BY YEAR(pc.index_date), p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
+ COUNT(*) OVER (PARTITION BY YEAR(pc.index_date), p.from_event, p.to_event) AS cnt
+ FROM ldpw47q6patient_timing_pairs p
+ JOIN ldpw47q6patient_char pc ON p.person_id = pc.person_id
+ ) y
+ GROUP BY index_year_int, from_event, to_event
  UNION ALL
  -- first_to_closest_after by year (for MET->L01 post-MET treatment timing)
  SELECT
  'first_to_closest_after' AS timing_type,
- CAST(YEAR(pc.index_date) AS STRING) AS index_year,
- p.from_event,
- p.to_event,
+ CAST(index_year_int AS STRING) AS index_year,
+ from_event,
+ to_event,
  COUNT(*) AS n_patients_with_pair,
- PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY p.days_diff) AS p25_days,
- PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY p.days_diff) AS p50_days,
- PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY p.days_diff) AS p75_days
- FROM cbse36ibpatient_timing_pairs_first_to_closest_after p
- JOIN cbse36ibpatient_char pc ON p.person_id = pc.person_id
- GROUP BY YEAR(pc.index_date), p.from_event, p.to_event
+ MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(days_diff AS DOUBLE) END) AS p25_days,
+ MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_diff AS DOUBLE) END) AS p50_days,
+ MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS DOUBLE) END) AS p75_days
+ FROM (
+ SELECT p.from_event, p.to_event, p.days_diff,
+ YEAR(pc.index_date) AS index_year_int,
+ ROW_NUMBER() OVER (PARTITION BY YEAR(pc.index_date), p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
+ COUNT(*) OVER (PARTITION BY YEAR(pc.index_date), p.from_event, p.to_event) AS cnt
+ FROM ldpw47q6patient_timing_pairs_first_to_closest_after p
+ JOIN ldpw47q6patient_char pc ON p.person_id = pc.person_id
+ ) y
+ GROUP BY index_year_int, from_event, to_event
 ) x
 ORDER BY
  x.timing_type,
