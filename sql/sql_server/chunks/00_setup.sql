@@ -1786,5 +1786,53 @@ GROUP BY prevalence_year, anchor_event
 
 
 ------------------------------------------------------------
+-- L) L01 CONSECUTIVE GAP TABLES (used by chunk 11)
+------------------------------------------------------------
+
+-- Deduplicated L01 event days per patient (one row per patient-day)
+DROP TABLE IF EXISTS #l01_event_days;
+CREATE TABLE #l01_event_days (
+    person_id  BIGINT,
+    event_day  DATE
+);
+
+INSERT INTO #l01_event_days (person_id, event_day)
+SELECT DISTINCT person_id, event_date
+FROM #l01_events
+WHERE person_id IN (SELECT person_id FROM #cohort)
+;
+
+-- Consecutive gaps between L01 event days per patient
+DROP TABLE IF EXISTS #l01_consecutive_gaps;
+CREATE TABLE #l01_consecutive_gaps (
+    person_id  BIGINT,
+    subgroup   VARCHAR(10),
+    gap_days   INT
+);
+
+WITH ranked AS (
+    SELECT
+        e.person_id,
+        e.event_day,
+        LEAD(e.event_day) OVER (PARTITION BY e.person_id ORDER BY e.event_day) AS next_day
+    FROM #l01_event_days e
+),
+gaps AS (
+    SELECT
+        person_id,
+        DATEDIFF(DAY, event_day, next_day) AS gap_days
+    FROM ranked
+    WHERE next_day IS NOT NULL
+)
+INSERT INTO #l01_consecutive_gaps (person_id, subgroup, gap_days)
+SELECT g.person_id, 'ALL_L01', g.gap_days FROM gaps g
+UNION ALL
+SELECT g.person_id, 'MET_L01', g.gap_days
+FROM gaps g
+JOIN #met_summary ms ON g.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+;
+
+
+------------------------------------------------------------
 -- K) FINAL SELECTS (export to CSV from SQL client)
 ------------------------------------------------------------
