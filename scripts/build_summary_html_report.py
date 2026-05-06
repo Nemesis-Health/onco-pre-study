@@ -3,6 +3,7 @@ from __future__ import annotations
 import html
 import math
 import os
+import re
 import sys
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -268,32 +269,52 @@ def _decile_bin_density_bars(
     return xs, ws, ys, labels, bounds
 
 
+_EVENT_DISPLAY_NAMES: dict[str, str] = {
+    "DX":  "Cancer of interest",
+    "MET": "Metastasis",
+    "L01": "Antineoplastic treatment",
+    "ODX": "Co-occurring other cancer DX",
+    "GDX": "Broader/non-specific DX",
+}
+
+# Labels used on pairwise plot axes (compact codes).
+_EVENT_PAIRWISE_LABELS: dict[str, str] = {
+    "DX":  "DX",
+    "MET": "MET",
+    "ODX": "ODX",
+    "GDX": "GDX",
+    "L01": "L01",
+}
+
+
+def _event_display_name(code: object) -> str:
+    key = str(code).strip().upper()
+    return _EVENT_DISPLAY_NAMES.get(key, str(code))
+
+
+def _event_pairwise_label(code: object) -> str:
+    key = str(code).strip().upper()
+    return _EVENT_PAIRWISE_LABELS.get(key, _EVENT_DISPLAY_NAMES.get(key, str(code)))
+
+
 def _event_family_display_name(family: object) -> str:
-    key = str(family).strip().upper()
-    mapping = {
-        "DX": "Cancer Dx (main)",
-        "GDX": "Cancer Dx (generalized)",
-        "ODX": "Cancer Dx (other malignancies)",
-        "MET": "Metastasis / Stage IV",
-        "L01": "Antineoplastic exposure (ATC L01)",
-    }
-    return mapping.get(key, str(family))
+    return _event_display_name(family)
 
 
 def _legend_table_html() -> str:
     rows = [
-        ("DX", "Main cancer diagnosis concepts (the cohort’s target cancer dx set)."),
+        ("DX", "Cancer of interest concepts (the cohort's target cancer dx set)."),
         (
             "GDX",
-            "Generalized cancer diagnosis concepts: ancestors of DX (broader codes), constrained to descendants of 443392 (Malignant neoplastic disease).",
+            "Broader/non-specific DX concepts: ancestors of DX (broader codes), constrained to descendants of 443392 (Malignant neoplastic disease).",
         ),
-        ("ODX", "Other cancer diagnosis concepts: malignancies excluding DX and GDX."),
-        ("MET", "Metastasis / Stage IV occurrence."),
-        ("L01", "Exposure to antineoplastic agents (ATC L01 descendants; from drug_exposure)."),
+        ("ODX", "Co-occurring other cancer DX concepts: malignancies excluding DX and GDX."),
+        ("MET", "Metastasis occurrence."),
+        ("L01", "Antineoplastic treatment (ATC L01 descendants; from drug_exposure)."),
         ("ANCHOR_EVENT = INDEX", "Anchored to first DX date."),
         ("ANCHOR_EVENT = FIRST_MET", "Anchored to first MET date."),
-        ("TIME_RELATIVE = BEFORE", "Event date occurs before the anchor date."),
-        ("TIME_RELATIVE = AFTER", "Event date occurs on/after the anchor date."),
+        ("time_window = before", "Event date occurs before the anchor date."),
+        ("time_window = after", "Event date occurs on/after the anchor date."),
     ]
     body = "\n".join(
         f"<tr><td><code>{html.escape(k)}</code></td><td>{html.escape(v)}</td></tr>"
@@ -309,11 +330,11 @@ def _legend_table_html() -> str:
 def _plot_abbrev_note_html() -> str:
     return (
         "<p class='subtle'>Abbreviations: "
-        "<code>DX</code> main cancer diagnosis; "
-        "<code>GDX</code> generalized dx (ancestors of DX within malignant neoplastic disease); "
-        "<code>ODX</code> other malignancies; "
-        "<code>MET</code> metastasis / stage IV; "
-        "<code>L01</code> antineoplastic exposure (ATC L01).</p>"
+        "<code>DX</code> cancer of interest; "
+        "<code>GDX</code> broader/non-specific DX (ancestors of DX within malignant neoplastic disease); "
+        "<code>ODX</code> co-occurring other cancer DX; "
+        "<code>MET</code> metastasis; "
+        "<code>L01</code> antineoplastic treatment (ATC L01).</p>"
     )
 
 TIMING_DAYS_SCALE: str = "symlog10"
@@ -366,6 +387,7 @@ SYNTHETIC_HIST_NBINS: int = 60
 
 # How many concepts to show in linked event-code-count tables.
 EVENT_CODE_COUNTS_TOP_N: int = 5
+PREVALENCE_YEAR_MIN: int = 2010
 
 # Main anchor DX code rollup (`final_anchor_dx_concept_counts.csv`): rows in summary report.
 ANCHOR_DX_COUNTS_TOP_N: int = 10
@@ -373,7 +395,7 @@ ANCHOR_DX_COUNTS_CSV: str = "final_anchor_dx_concept_counts.csv"
 
 # Must match @event_code_timing_uses_closest in the characterization SQL (0 = FIRST, 1 = CLOSEST).
 # Exports typically have a single median_days / lq / uq per row; that triple follows this rule only —
-# not the “first vs closest” wording of the pairwise timing_pair_summary CSV used for the plot above.
+# not the "first vs closest" wording of the pairwise timing_pair_summary CSV used for the plot above.
 # Override at runtime: env CHARACTERIZATION_EVENT_CODE_TIMING_USES_CLOSEST=1
 EVENT_CODE_TIMING_USES_CLOSEST: bool = False
 
@@ -382,33 +404,27 @@ EVENT_CODE_TIMING_USES_CLOSEST: bool = False
 TIMING_VARIANTS: dict[str, tuple[str, str, str]] = {
     "first_to_first": (
         "First occurrence → first occurrence",
-        "final_timing_pair_summary_first_to_first.csv",
+        "final_timing_pairwise.csv",
         "First→first",
     ),
     "first_to_closest": (
         "First occurrence → closest occurrence",
-        "final_timing_pair_summary_first_to_closest.csv",
+        "final_timing_pairwise.csv",
         "First→closest",
     ),
     "first_to_closest_before": (
         "First → closest (strictly before anchor)",
-        "final_timing_pair_summary_first_to_closest_before.csv",
+        "final_timing_pairwise.csv",
         "Before anchor",
     ),
     "first_to_closest_after": (
         "First → closest (on or after anchor)",
-        "final_timing_pair_summary_first_to_closest_after.csv",
+        "final_timing_pairwise.csv",
         "On/after anchor",
-    ),
-    # Alias: some users think of this as “after” variant.
-    "first_to_first_after": (
-        "First → closest (on or after anchor)",
-        "final_timing_pair_summary_first_to_closest_after.csv",
-        "After",
     ),
 }
 
-# Order used for the full “Timing pairs” section.
+# Order used for the full "Timing pairs" section.
 TIMING_VARIANTS_ORDER: list[str] = [
     "first_to_first",
     "first_to_closest",
@@ -419,19 +435,18 @@ TIMING_VARIANTS_ORDER: list[str] = [
 # ---------------------------------------------------------------------------
 # Focus section: timing pairs to plot (edit this list only).
 #
-# Each entry is one plot + one linked “Event code counts” appendix block.
+# Each entry is one plot + one linked "Event code counts" appendix block.
 #   from, to   — FROM_EVENT / TO_EVENT in the timing_pair_summary CSVs.
 #   timing     — key into TIMING_VARIANTS (selects which timing CSV + quantiles).
 #   ecc        — optional dict overriding the default link to event_code_counts:
-#                  export: "single" | "before_after"
-#                  time_relative: "BEFORE" | "AFTER" (only for before_after)
+#                  export: "all" | "before" | "after"
 #                  column_family: "FIRST" | "CLOSEST"
 #                  anchor: "INDEX" | "FIRST_MET" (default: from FROM — DX→INDEX, MET→FIRST_MET)
 #   commentary — optional plain text shown under the pair heading (how to read the pair, caveats).
 #                Newlines preserved; HTML is escaped (no tags).
 #
-# Default ecc (when ``ecc`` omitted) is _ecc_link_spec_default_for_timing(timing): picks export file +
-# TIME_RELATIVE stratum to align with the pairwise plot. ``column_family`` only matters if the CSV has
+# Default ecc (when ``ecc`` omitted) is _ecc_link_spec_default_for_timing(timing): picks time_window +
+# column_family to align with the pairwise plot. ``column_family`` only matters if the CSV has
 # separate *_FIRST / *_CLOSEST columns; otherwise medians come from the single triple governed by
 # EVENT_CODE_TIMING_USES_CLOSEST / @event_code_timing_uses_closest.
 # ---------------------------------------------------------------------------
@@ -440,40 +455,45 @@ FOCUS_TIMING_PLOTS: list[dict[str, Any]] = [
         "from": "DX",
         "to": "MET",
         "timing": "first_to_first",
-        "commentary": "Pairwise timing uses first DX and first MET; linked codes use the same FIRST (earliest) rule per concept.",
+        "commentary": "First DX to first MET; days positive = MET after DX.",
     },
     {
         "from": "MET",
         "to": "DX",
         "timing": "first_to_closest",
-        "commentary": "Pairwise TO uses closest DX to the MET anchor; linked DX rows use CLOSEST (min |days|) per concept.",
+        "reverse": True,
+        "x_range": (-90, 90),
+        "commentary": "Closest DX to first MET anchor (reversed to read DX → MET); zoomed to ±30 days.",
     },
     {
         "from": "MET",
         "to": "ODX",
         "timing": "first_to_closest",
-        "commentary": "Pairwise slice is strictly before the anchor; linked ODX rows use CLOSEST within the BEFORE stratum.",
+        "reverse": True,
+        "x_range": (-90, 90),
+        "commentary": "Closest other-DX to first MET anchor (reversed to read ODX → MET); zoomed to ±30 days.",
     },
     {
         "from": "MET",
-        "to": "GDX",
-        "timing": "first_to_closest",
-        "commentary": "Pairwise slice is strictly before the anchor; linked GDX rows use CLOSEST within the BEFORE stratum.",
+        "to": "L01",
+        "timing": "first_to_first",
+        "commentary": "First MET to first L01; days positive = L01 after MET.",
     },
     {
         "from": "MET",
         "to": "L01",
         "timing": "first_to_closest_after",
-        "commentary": "Pairwise slice is on or after the anchor; linked L01 rows use CLOSEST within the AFTER stratum.",
+        "x_range": (0, 365),
+        "commentary": "First MET to closest L01 on or after MET; zoomed to 0–365 days.",
     },
 ]
 
 _PREV_COLS = (
-    ("DX", "n_dx", "PCT_DX"),
-    ("MET", "n_met", "PCT_MET"),
-    ("L01", "n_l01", "PCT_L01"),
-    ("ODX", "n_odx", "PCT_ODX"),
-    ("GDX", "n_gdx", "PCT_GDX"),
+    ("Cancer of interest (DX)",            "n_dx",  "PCT_DX"),
+    ("Metastasis (MET)",                    "n_met", "PCT_MET"),
+    ("Antineoplastic treatment (L01)",      "n_l01", "PCT_L01"),
+    ("Co-occurring other cancer DX (ODX)", "n_odx", "PCT_ODX"),
+    ("Broader/non-specific DX (GDX)",      "n_gdx", "PCT_GDX"),
 )
 
 
@@ -555,7 +575,7 @@ def _yearly_prevalence_figure(yearly: pd.DataFrame) -> go.Figure | None:
         go.Bar(
             x=years,
             y=n_dx,
-            name=f"N ({_event_family_display_name('DX')} cohort; DX)",
+            name=f"N (Cancer of interest cohort) (DX)",
             marker_color="#1d4ed8",
             opacity=0.85,
         )
@@ -565,12 +585,12 @@ def _yearly_prevalence_figure(yearly: pd.DataFrame) -> go.Figure | None:
             go.Scatter(
                 x=years,
                 y=pct_met,
-                name=f"% with {_event_family_display_name('MET')} (MET)",
+                name="% with Metastasis (MET)",
                 mode="lines+markers",
                 yaxis="y2",
                 line=dict(color="#d97706", width=2.2),
                 marker=dict(size=7, color="#d97706", line=dict(width=0)),
-                hovertemplate="Year %{x}<br>% MET %{y:.1f}%<extra></extra>",
+                hovertemplate="Year %{x}<br>% Metastasis %{y:.1f}%<extra></extra>",
             )
         )
     if pct_l01 is not None:
@@ -578,12 +598,12 @@ def _yearly_prevalence_figure(yearly: pd.DataFrame) -> go.Figure | None:
             go.Scatter(
                 x=years,
                 y=pct_l01,
-                name=f"% with {_event_family_display_name('L01')} (L01)",
+                name="% with Antineoplastic treatment (L01)",
                 mode="lines+markers",
                 yaxis="y2",
                 line=dict(color="#16a34a", width=2.2, dash="dot"),
                 marker=dict(size=7, color="#16a34a", line=dict(width=0)),
-                hovertemplate="Year %{x}<br>% L01 %{y:.1f}%<extra></extra>",
+                hovertemplate="Year %{x}<br>% Antineoplastic treatment %{y:.1f}%<extra></extra>",
             )
         )
     if pct_odx is not None:
@@ -591,12 +611,12 @@ def _yearly_prevalence_figure(yearly: pd.DataFrame) -> go.Figure | None:
             go.Scatter(
                 x=years,
                 y=pct_odx,
-                name="% with other Cancer Dx (ODX)",
+                name="% with Co-occurring other cancer DX (ODX)",
                 mode="lines+markers",
                 yaxis="y2",
                 line=dict(color="#7c3aed", width=2.2, dash="dash"),
                 marker=dict(size=7, color="#7c3aed", line=dict(width=0), symbol="diamond"),
-                hovertemplate="Year %{x}<br>% ODX %{y:.1f}%<extra></extra>",
+                hovertemplate="Year %{x}<br>% Co-occurring other cancer DX %{y:.1f}%<extra></extra>",
             )
         )
 
@@ -604,7 +624,7 @@ def _yearly_prevalence_figure(yearly: pd.DataFrame) -> go.Figure | None:
         template="plotly_white",
         margin=dict(l=48, r=56, t=40, b=48),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        yaxis=dict(title="Patients (N_DX)", gridcolor="#e5e7eb"),
+        yaxis=dict(title="Patients (N)", gridcolor="#e5e7eb"),
         yaxis2=dict(
             title="Share of cohort (%)",
             overlaying="y",
@@ -612,7 +632,11 @@ def _yearly_prevalence_figure(yearly: pd.DataFrame) -> go.Figure | None:
             showgrid=False,
             rangemode="tozero",
         ),
-        xaxis=dict(title="Calendar year", dtick=1),
+        xaxis=dict(
+            title="Calendar year",
+            dtick=1,
+            range=[PREVALENCE_YEAR_MIN - 0.5, int(years.max()) + 0.5],
+        ),
         hovermode="x unified",
         height=420,
     )
@@ -764,7 +788,7 @@ def _timing_pair_focus_hist_figure(
     """
     if not SHOW_SYNTHETIC_HISTOGRAM_IN_FOCUS:
         return None
-    pair_label = f"{from_ev} → {to_ev}"
+    pair_label = f"{_event_pairwise_label(from_ev)} → {_event_pairwise_label(to_ev)}"
     chosen = [(k, TIMING_VARIANTS[k]) for k in variant_keys if k in TIMING_VARIANTS]
     if not chosen:
         return None
@@ -791,6 +815,10 @@ def _timing_pair_focus_hist_figure(
             )
             continue
         df = pd.read_csv(path)
+        # Filter to the correct timing_type stratum in the consolidated CSV.
+        _ttc = _resolve_col(df, "timing_type")
+        if _ttc:
+            df = df[df[_ttc].astype(str).str.lower().eq(key.lower())].copy()
         from_c = _resolve_col(df, "from_event")
         to_c = _resolve_col(df, "to_event")
         qcols = {
@@ -973,6 +1001,42 @@ def _fmt_n_pct_from_den(n: object, den: object) -> str:
     return f"{ni:,} ({pct:.1f}%)"
 
 
+_TIMING_VARIANT_LEGACY_FILES: dict[str, str] = {
+    "first_to_first":          "final_timing_pair_summary_first_to_first.csv",
+    "first_to_closest":        "final_timing_pair_summary_first_to_closest.csv",
+    "first_to_closest_before": "final_timing_pair_summary_first_to_closest_before.csv",
+    "first_to_closest_after":  "final_timing_pair_summary_first_to_closest_after.csv",
+}
+
+
+def _read_timing_variant_df(
+    rd: Path, key: str, consolidated_fname: str
+) -> tuple[pd.DataFrame | None, str | None]:
+    """
+    Load the timing-pair DataFrame for `key`, trying the consolidated file first.
+
+    Returns (df, None) on success, (None, error_message) when no file is found.
+    The returned df always has a `timing_type` column equal to `key` for the
+    legacy single-variant files (which never had that column).
+    """
+    consolidated = rd / consolidated_fname
+    if consolidated.exists():
+        df = pd.read_csv(consolidated)
+        ttc = _resolve_col(df, "timing_type")
+        if ttc:
+            df = df[df[ttc].astype(str).str.lower().eq(key.lower())].copy()
+        return df, None
+    legacy_fname = _TIMING_VARIANT_LEGACY_FILES.get(key)
+    if legacy_fname:
+        legacy = rd / legacy_fname
+        if legacy.exists():
+            df = pd.read_csv(legacy)
+            if _resolve_col(df, "timing_type") is None:
+                df.insert(0, "timing_type", key)
+            return df, None
+    return None, consolidated_fname
+
+
 def _timing_pair_csv_quantile_cols(df: pd.DataFrame) -> dict[str, str | None]:
     """
     Column names for timing-pair summary CSVs.
@@ -1007,9 +1071,9 @@ def _timing_pair_summary_row_html(
     median_iqr: str | None = None,
 ) -> str:
     row = {
-        "FROM": from_ev,
+        "FROM": _event_display_name(from_ev),
         "N FROM": "—" if n_from is None else f"{int(n_from):,}",
-        "TO": to_ev,
+        "TO": _event_display_name(to_ev),
         "N TO (%)": _fmt_n_pct_from_den(n_pair, n_from),
         "MEDIAN (IQR)": "—" if not median_iqr else median_iqr,
     }
@@ -1023,7 +1087,9 @@ def _timing_pair_single_row_plot(
     *,
     from_ev: str,
     to_ev: str,
-    plot_mode: str = "both",
+    plot_mode: str = "hist",
+    reverse: bool = False,
+    x_range: tuple[float, float] | None = None,
 ) -> go.Figure | None:
     """
     Build a single-row timing visualization for a specific FROM→TO pair.
@@ -1063,6 +1129,9 @@ def _timing_pair_single_row_plot(
     p90 = _num(cols["p90"])
     p95 = _num(cols["p95"])
 
+    if reverse:
+        p05, p10, lq, med, uq, p90, p95 = -p95, -p90, -uq, -med, -lq, -p10, -p05
+
     # transformed x positions
     p05s = _transform_days(p05)
     p10s = _transform_days(p10)
@@ -1077,10 +1146,14 @@ def _timing_pair_single_row_plot(
     if n_c and n_c in row.index and pd.notna(row[n_c]):
         customdata = [[int(float(row[n_c]))]]
 
-    pair_label = f"{from_ev} → {to_ev}"
-    mode = str(plot_mode or "both").strip().lower()
+    pair_label = (
+        f"{_event_pairwise_label(to_ev)} → {_event_pairwise_label(from_ev)}"
+        if reverse
+        else f"{_event_pairwise_label(from_ev)} → {_event_pairwise_label(to_ev)}"
+    )
+    mode = str(plot_mode or "hist").strip().lower()
     if mode not in ("box", "hist", "both"):
-        mode = "both"
+        mode = "hist"
     want_box = mode in ("box", "both")
     want_hist = mode in ("hist", "both")
     use_subplots = want_box and want_hist
@@ -1144,6 +1217,13 @@ def _timing_pair_single_row_plot(
                 row=(2 if use_subplots else None),
                 col=(1 if use_subplots else None),
             )
+            if meds is not None:
+                fig.add_vline(
+                    x=meds,
+                    line=dict(color="red", width=1.5, dash="dot"),
+                    row=(2 if use_subplots else "all"),
+                    col=(1 if use_subplots else "all"),
+                )
 
     if want_box:
         _add_trace(
@@ -1253,6 +1333,10 @@ def _timing_pair_single_row_plot(
         raw_all = pd.Series(raw_list)
         tickvals, ticktext = _scaled_ticks(float(pd.to_numeric(raw_all, errors="coerce").abs().max()))
         fig.update_xaxes(tickmode="array", tickvals=tickvals, ticktext=ticktext)
+    if x_range is not None:
+        x0 = _transform_days(float(x_range[0]))
+        x1 = _transform_days(float(x_range[1]))
+        fig.update_xaxes(range=[x0, x1])
     return fig
 
 
@@ -1271,7 +1355,11 @@ def _timing_pairs_figure(df: pd.DataFrame) -> go.Figure | None:
         return None
 
     sub = df.copy()
-    sub["__pair"] = sub[from_c].astype(str) + " → " + sub[to_c].astype(str)
+    sub["__pair"] = (
+        sub[from_c].astype(str).apply(_event_pairwise_label)
+        + " → "
+        + sub[to_c].astype(str).apply(_event_pairwise_label)
+    )
     sub = sub.sort_values(["__pair"]).reset_index(drop=True)
     labels = sub["__pair"].tolist()
 
@@ -1507,17 +1595,125 @@ def _deaths_by_anchor_figure(df: pd.DataFrame, *, anchor_event: str) -> go.Figur
     return fig
 
 
+def _death_timing_table_html(df: pd.DataFrame) -> str:
+    """
+    Table of death counts, in/out-obs splits, and median (IQR) for time to death
+    and observation follow-up.  Includes OVERALL and years >= 2015.
+    """
+    year_col = _resolve_col(df, "prevalence_year")
+    anchor_col = _resolve_col(df, "anchor_event")
+    npat_col = _resolve_col(df, "n_patients")
+    ndeath_col = _resolve_col(df, "n_deaths")
+    in_obs_col = _resolve_col(df, "n_deaths_in_obs")
+    out_obs_col = _resolve_col(df, "n_deaths_out_obs")
+    lq_col = _resolve_col(df, "lq_days")
+    med_col = _resolve_col(df, "median_days")
+    uq_col = _resolve_col(df, "uq_days")
+    lq_fu_col = _resolve_col(df, "lq_followup_days")
+    med_fu_col = _resolve_col(df, "median_followup_days")
+    uq_fu_col = _resolve_col(df, "uq_followup_days")
+
+    if not year_col or not anchor_col or not npat_col or not ndeath_col:
+        return ""
+
+    overall_mask = df[year_col].astype(str).str.upper().eq("OVERALL")
+    year_num = pd.to_numeric(df[year_col], errors="coerce")
+    sub = df[overall_mask | (year_num >= 2015)].copy()
+    if sub.empty:
+        return ""
+
+    # Overall rows first (by anchor), then non-Overall sorted by anchor then year.
+    sub["__overall_sort"] = sub[year_col].apply(
+        lambda v: 0 if str(v).upper() == "OVERALL" else 1
+    )
+    sub["__anchor_sort"] = sub[anchor_col].apply(
+        lambda v: 0 if str(v).upper() == "INDEX" else 1
+    )
+    sub["__year_sort"] = sub[year_col].apply(
+        lambda v: -1 if str(v).upper() == "OVERALL" else pd.to_numeric(v, errors="coerce")
+    )
+    sub = sub.sort_values(["__overall_sort", "__anchor_sort", "__year_sort"])
+
+    min_cell = _infer_min_cell_from_sentinels(df, [npat_col, ndeath_col])
+
+    def _safe_int(v: object) -> int | None:
+        try:
+            if pd.isna(v):
+                return None
+            x = int(float(v))
+            return None if x < 0 else x
+        except Exception:
+            return None
+
+    def _fmt_count(v: object) -> str:
+        x = _safe_int(v)
+        return "—" if x is None else f"{x:,}"
+
+    def _fmt_deaths(ndeath: object, npat: object) -> str:
+        nd = _safe_int(ndeath)
+        np_ = _safe_int(npat)
+        if nd is None:
+            return "—"
+        if np_ is None or np_ <= min_cell:
+            return f"{nd:,}"
+        return f"{nd:,} ({100.0 * nd / np_:.1f}%)"
+
+    def _fmt_obs_deaths(count: object, total_deaths: object) -> str:
+        n = _safe_int(count)
+        td = _safe_int(total_deaths)
+        if n is None:
+            return "—"
+        if td is None or td == 0:
+            return f"{n:,}"
+        return f"{n:,} ({100.0 * n / td:.1f}%)"
+
+    def _median_iqr(med: object, lq: object, uq: object) -> str:
+        m, lo, hi = _day_label(med), _day_label(lq), _day_label(uq)
+        if m == "—":
+            return "—"
+        if lo == "—" or hi == "—":
+            return m
+        return f"{m} ({lo}–{hi})"
+
+    _anchor_labels = {"INDEX": "Index Dx", "FIRST_MET": "First Met"}
+
+    rows_out = []
+    for _, row in sub.iterrows():
+        anchor_raw = str(row[anchor_col]).upper()
+        y = str(row[year_col])
+        nd_val = row[ndeath_col]
+        rows_out.append({
+            "Year": "Overall" if y.upper() == "OVERALL" else y,
+            "Anchor": _anchor_labels.get(anchor_raw, anchor_raw),
+            "Patients": _fmt_count(row[npat_col]),
+            "Deaths": _fmt_deaths(nd_val, row[npat_col]),
+            "Deaths in obs. period": _fmt_obs_deaths(row[in_obs_col], nd_val) if in_obs_col else "—",
+            "Deaths outside obs. period": _fmt_obs_deaths(row[out_obs_col], nd_val) if out_obs_col else "—",
+            "Days to death, median (IQR)": _median_iqr(
+                row.get(med_col), row.get(lq_col), row.get(uq_col)
+            ),
+            "Obs. follow-up, median (IQR)": _median_iqr(
+                row.get(med_fu_col), row.get(lq_fu_col), row.get(uq_fu_col)
+            ),
+        })
+
+    tbl = pd.DataFrame(rows_out).to_html(index=False, border=0, classes="report-table")
+    tbl = tbl.replace('class="dataframe report-table"', 'class="report-table"', 1)
+    tbl = re.sub(r"(<tr>)(\s*<td>Overall</td>)", r"<tr style='background-color:#dbeafe'>\2", tbl)
+    return tbl
+
+
 def _timing_pair_focus_figure(
     rd: Path, from_ev: str, to_ev: str, variant_keys: list[str]
 ) -> go.Figure | None:
     """
     One row of panels: same FROM→TO pair across chosen timing CSVs, shared horizontal scale.
     """
-    pair_label = f"{from_ev} → {to_ev}"
-    chosen = [TIMING_VARIANTS[k] for k in variant_keys if k in TIMING_VARIANTS]
+    pair_label = f"{_event_pairwise_label(from_ev)} → {_event_pairwise_label(to_ev)}"
+    chosen = [(k, TIMING_VARIANTS[k]) for k in variant_keys if k in TIMING_VARIANTS]
     if not chosen:
         return None
-    subplot_titles = [short for _, _, short in chosen]
+    subplot_titles = [short for _, (_, _, short) in chosen]
     fig = make_subplots(
         rows=1,
         cols=len(chosen),
@@ -1527,7 +1723,7 @@ def _timing_pair_focus_figure(
         shared_yaxes=False,
     )
     any_data = False
-    for j, (_, fname, _) in enumerate(chosen, start=1):
+    for j, (vkey, (_, fname, _)) in enumerate(chosen, start=1):
         path = rd / fname
         if not path.exists():
             fig.add_annotation(
@@ -1539,6 +1735,10 @@ def _timing_pair_focus_figure(
             )
             continue
         df = pd.read_csv(path)
+        # Filter to the correct timing_type stratum in the consolidated CSV.
+        ttc = _resolve_col(df, "timing_type")
+        if ttc:
+            df = df[df[ttc].astype(str).str.lower().eq(vkey.lower())].copy()
         from_c = _resolve_col(df, "from_event")
         to_c = _resolve_col(df, "to_event")
         cols = _timing_pair_csv_quantile_cols(df)
@@ -1764,7 +1964,7 @@ def _deaths_pct_compare_figure(df: pd.DataFrame) -> go.Figure | None:
                 x=dx["__year"].astype(int),
                 y=dx["__pct"],
                 mode="lines+markers",
-                name="% deaths (DX index)",
+                name=f"% deaths ({_event_display_name('DX')} index)",
                 line=dict(color="#111827", width=2),
                 marker=dict(size=6, color="#111827"),
                 hovertemplate="Year %{x}<br>% deaths %{y:.1f}%<extra></extra>",
@@ -1776,7 +1976,7 @@ def _deaths_pct_compare_figure(df: pd.DataFrame) -> go.Figure | None:
                 x=met["__year"].astype(int),
                 y=met["__pct"],
                 mode="lines+markers",
-                name="% deaths (MET index)",
+                name=f"% deaths ({_event_display_name('MET')} index)",
                 line=dict(color="#2563eb", width=2),
                 marker=dict(size=6, color="#2563eb"),
                 hovertemplate="Year %{x}<br>% deaths %{y:.1f}%<extra></extra>",
@@ -1806,7 +2006,7 @@ def _timing_variant_heading_word(vkey: str) -> str:
         return "Closest"
     if k in ("first_to_closest_before",):
         return "Closest (before)"
-    if k in ("first_to_closest_after", "first_to_first_after"):
+    if k == "first_to_closest_after":
         return "Closest (after)"
     return "Timing"
 
@@ -1816,7 +2016,7 @@ def _anchor_for_from_event(from_ev: str) -> str:
     Map FROM event family to event-code-count anchor.
     User rule:
     - FROM=DX -> ANCHOR_EVENT=INDEX
-    - FROM=MET -> ANCHOR_EVENT=FIRST_MET (called “MET” colloquially)
+    - FROM=MET -> ANCHOR_EVENT=FIRST_MET (called "MET" colloquially)
     """
     fe = str(from_ev).strip().upper()
     if fe == "DX":
@@ -1838,16 +2038,16 @@ def _timing_suffix_for_variant(vkey: str) -> str:
     return "CLOSEST"
 
 
-def _time_relative_for_variant(vkey: str) -> str | None:
+def _time_window_for_variant(vkey: str) -> str:
     """
-    For variants that conceptually mean BEFORE/AFTER, use the before/after event-code-count export.
+    Return the time_window value for the consolidated final_code_counts.csv.
     """
     k = str(vkey).strip().lower()
     if k in ("first_to_closest_before",):
-        return "BEFORE"
-    if k in ("first_to_closest_after", "first_to_first_after"):
-        return "AFTER"
-    return None
+        return "before"
+    if k in ("first_to_closest_after",):
+        return "after"
+    return "all"
 
 
 @dataclass(frozen=True)
@@ -1855,9 +2055,10 @@ class EccLinkSpec:
     """
     Which event-code-count rows to join to a focus timing plot.
 
-    export
-        "single"  -> final_event_code_counts.csv (no TIME_RELATIVE stratum).
-        "before_after" -> final_event_code_counts_before_after.csv (filter TIME_RELATIVE).
+    time_window
+        "all"    -> final_code_counts.csv rows where time_window == "all".
+        "before" -> final_code_counts.csv rows where time_window == "before".
+        "after"  -> final_code_counts.csv rows where time_window == "after".
     column_family
         Which suffixed timing columns to prefer when the export has MEDIAN_DAYS_FIRST / _CLOSEST.
         Many pipelines emit only median_days (one triple), determined by SQL @event_code_timing_uses_closest.
@@ -1865,8 +2066,7 @@ class EccLinkSpec:
         INDEX or FIRST_MET; None means DX→INDEX, MET→FIRST_MET (same as timing FROM).
     """
 
-    export: Literal["single", "before_after"]
-    time_relative: str | None
+    time_window: Literal["all", "before", "after"]
     column_family: Literal["FIRST", "CLOSEST"]
     anchor: str | None = None
 
@@ -1875,18 +2075,18 @@ def _ecc_link_spec_default_for_timing(timing_key: str) -> EccLinkSpec:
     """
     Default event-code-count link for a timing variant (matches pre-refactor report behavior).
 
-    - first_to_first -> single export, FIRST timing columns.
-    - first_to_closest (undirected) -> single export, CLOSEST columns.
-    - first_to_closest_before / first_to_closest_after / first_to_first_after
-      -> before_after export, same TIME_RELATIVE as the timing name implies, CLOSEST columns.
+    - first_to_first -> time_window="all", FIRST timing columns.
+    - first_to_closest (undirected) -> time_window="all", CLOSEST columns.
+    - first_to_closest_before -> time_window="before", CLOSEST columns.
+    - first_to_closest_after  -> time_window="after",  CLOSEST columns.
     """
     k = str(timing_key).strip().lower()
-    tr = _time_relative_for_variant(k)
-    if tr:
-        return EccLinkSpec(export="before_after", time_relative=tr, column_family="CLOSEST", anchor=None)
+    tw = _time_window_for_variant(k)
     if k == "first_to_first":
-        return EccLinkSpec(export="single", time_relative=None, column_family="FIRST", anchor=None)
-    return EccLinkSpec(export="single", time_relative=None, column_family="CLOSEST", anchor=None)
+        return EccLinkSpec(time_window="all", column_family="FIRST", anchor=None)
+    if tw in ("before", "after"):
+        return EccLinkSpec(time_window=tw, column_family="CLOSEST", anchor=None)
+    return EccLinkSpec(time_window="all", column_family="CLOSEST", anchor=None)
 
 
 def _ecc_link_spec_with_overrides(base: EccLinkSpec, ov: dict[str, Any] | None) -> EccLinkSpec:
@@ -1896,10 +2096,12 @@ def _ecc_link_spec_with_overrides(base: EccLinkSpec, ov: dict[str, Any] | None) 
     kw: dict[str, Any] = {}
     if "export" in ov:
         e = str(ov["export"]).strip().lower()
-        if e in ("single", "before_after"):
-            kw["export"] = e
-    if "time_relative" in ov and ov["time_relative"] is not None:
-        kw["time_relative"] = str(ov["time_relative"]).strip().upper()
+        if e in ("all", "before", "after"):
+            kw["time_window"] = e
+    if "time_window" in ov:
+        tw = str(ov["time_window"]).strip().lower()
+        if tw in ("all", "before", "after"):
+            kw["time_window"] = tw
     if "column_family" in ov:
         cf = str(ov["column_family"]).strip().upper()
         if cf in ("FIRST", "CLOSEST"):
@@ -1910,12 +2112,7 @@ def _ecc_link_spec_with_overrides(base: EccLinkSpec, ov: dict[str, Any] | None) 
 
 
 def _ecc_event_code_counts_path(rd: Path, ecc_spec: EccLinkSpec) -> Path:
-    name = (
-        "final_event_code_counts_before_after.csv"
-        if ecc_spec.export == "before_after"
-        else "final_event_code_counts.csv"
-    )
-    return rd / name
+    return rd / "final_code_counts.csv"
 
 
 def _ecc_export_has_dual_timing_columns(rd: Path, ecc_spec: EccLinkSpec) -> bool:
@@ -1929,13 +2126,8 @@ def _ecc_export_has_dual_timing_columns(rd: Path, ecc_spec: EccLinkSpec) -> bool
 
 
 def _results_have_dual_event_code_timing(rd: Path) -> bool:
-    for export in ("single", "before_after"):
-        spec = EccLinkSpec(export=export, time_relative=None, column_family="FIRST")
-        if export == "before_after":
-            spec = replace(spec, time_relative="BEFORE")
-        if _ecc_export_has_dual_timing_columns(rd, spec):
-            return True
-    return False
+    spec = EccLinkSpec(time_window="all", column_family="FIRST")
+    return _ecc_export_has_dual_timing_columns(rd, spec)
 
 
 def _ecc_timing_triple_columns_for_suffix(
@@ -1991,8 +2183,8 @@ def _event_code_occurrence_rule_sentences() -> tuple[str, str]:
             "per SQL <code>@event_code_timing_uses_closest=0</code>."
         )
     note = (
-        "The focus plot title (e.g. “Closest (before)”) refers to the <i>pairwise</i> timing definition in its CSV; "
-        "this table follows the global concept-level rule above, which may differ."
+        'The focus plot title (e.g. "Closest (before)") refers to the <i>pairwise</i> timing definition in its CSV; '
+        'this table follows the global concept-level rule above, which may differ.'
     )
     return rule, note
 
@@ -2000,14 +2192,8 @@ def _event_code_occurrence_rule_sentences() -> tuple[str, str]:
 def _ecc_link_caption_html(ecc_spec: EccLinkSpec, from_ev: str, rd: Path | None = None) -> str:
     """HTML description of the linked event-code-count slice (file, stratum, timing rule)."""
     anchor = ecc_spec.anchor or _anchor_for_from_event(from_ev)
-    file_lbl = (
-        "<code>final_event_code_counts_before_after.csv</code>"
-        if ecc_spec.export == "before_after"
-        else "<code>final_event_code_counts.csv</code>"
-    )
-    tr_bit = ""
-    if ecc_spec.export == "before_after" and ecc_spec.time_relative:
-        tr_bit = f", <code>TIME_RELATIVE</code>={html.escape(ecc_spec.time_relative)}"
+    file_lbl = "<code>final_code_counts.csv</code>"
+    tr_bit = f", <code>time_window</code>={html.escape(ecc_spec.time_window)}"
     dual = rd is not None and _ecc_export_has_dual_timing_columns(rd, ecc_spec)
     if dual:
         cf = ecc_spec.column_family
@@ -2061,18 +2247,13 @@ def _event_code_counts_topn_for_timing_pair(
     Return top N event code counts for the TO event family for a resolved EccLinkSpec.
     Includes CONCEPT_NAME if available via CDM lookup (best-effort).
     """
-    path = rd / (
-        "final_event_code_counts_before_after.csv"
-        if ecc_spec.export == "before_after"
-        else "final_event_code_counts.csv"
-    )
+    path = rd / "final_code_counts.csv"
     if not path.exists():
         return None
     df = pd.read_csv(path)
     a = _resolve_col(df, "anchor_event")
     ef = _resolve_col(df, "event_family")
-    tr = ecc_spec.time_relative if ecc_spec.export == "before_after" else None
-    trc = _resolve_col(df, "time_relative") if tr else None
+    twc = _resolve_col(df, "time_window")
     cid = _resolve_col(df, "concept_id")
     nrec = _resolve_col(df, "n_records")
     npat = _resolve_col(df, "n_patients")
@@ -2085,8 +2266,8 @@ def _event_code_counts_topn_for_timing_pair(
         df[a].astype(str).str.upper().eq(anchor.upper())
         & df[ef].astype(str).str.upper().eq(fam)
     ].copy()
-    if tr and trc:
-        sub = sub[sub[trc].astype(str).str.upper().eq(tr.upper())].copy()
+    if twc:
+        sub = sub[sub[twc].astype(str).str.lower().eq(ecc_spec.time_window.lower())].copy()
     if sub.empty:
         return None
 
@@ -2152,8 +2333,8 @@ def _event_code_counts_topn_for_timing_pair(
 
 
 _DEMO_ANCHOR_ORDER: tuple[tuple[str, str], ...] = (
-    ("INDEX", "DX (INDEX)"),
-    ("FIRST_MET", "MET (FIRST_MET)"),
+    ("INDEX", "Cancer of interest (first)"),
+    ("FIRST_MET", "Metastasis (first)"),
 )
 
 
@@ -2178,7 +2359,7 @@ def _demographics_section_html(rd: Path) -> list[str]:
     out: list[str] = [
         "<h2>Demographics</h2>",
         "<p class='subtle'>By anchor cohort: count, age at anchor in years (median and IQR), and sex. "
-        "<code>INDEX</code> = DX index date; <code>FIRST_MET</code> = first metastasis / stage IV.</p>",
+        "<code>INDEX</code> = main cancer diagnosis index date; <code>FIRST_MET</code> = first metastasis.</p>",
     ]
     if not path.exists():
         out.append(
@@ -2362,7 +2543,7 @@ def _anchor_dx_concept_counts_section_html(
 def build_summary_report(
     results_dir: Path | str | None = None,
     *,
-    focus_timing_plot: str = "both",
+    focus_timing_plot: str = "hist",
 ) -> Path:
     rd = Path(results_dir).expanduser().resolve() if results_dir else RESULTS_DIR
     csv_path = rd / "final_population_prevalence.csv"
@@ -2402,14 +2583,14 @@ def build_summary_report(
         "<body>",
         "<h1>Data characterization summary</h1>",
         f'<p class="meta">Source: <code>{html.escape(str(rd))}</code></p>',
-        "<div class='section card stack'>",
-        "<h2>Legend</h2>",
-        "<p class='subtle'>Abbreviations used throughout the tables and plots.</p>",
-        _legend_table_html(),
-        "</div>",
+        # "<div class='section card stack'>",
+        # "<h2>Legend</h2>",
+        # "<p class='subtle'>Abbreviations used throughout the tables and plots.</p>",
+        # _legend_table_html(),
+        # "</div>",
         "<div class='section card stack'>",
         "<h2>Population prevalence</h2>",
-        "<p class='subtle'>Denominator for percentages is N_DX (target cancer diagnosis cohort). "
+        "<p class='subtle'>Denominator for percentages is N_DX (cancer of interest cohort). "
         "Small-cell suppression uses the same rules as the characterization SQL.</p>",
     ]
 
@@ -2456,36 +2637,6 @@ def build_summary_report(
 
     parts.extend(_anchor_dx_concept_counts_section_html(rd))
 
-    # Deaths (below demographics + anchor DX rollup)
-    deaths_path = rd / "final_death_from_anchors.csv"
-    parts.append("<h2>Deaths</h2>")
-    parts.append(
-        "<p class='subtle'>By year: % deaths for DX index (INDEX) vs MET index (FIRST_MET).</p>"
-    )
-    if not deaths_path.exists():
-        parts.append("<p class='subtle'><i>Not found: <code>final_death_from_anchors.csv</code></i></p>")
-    else:
-        ddf = pd.read_csv(deaths_path)
-        ddf = _with_death_pct_for_report(ddf)
-        year_col = _resolve_col(ddf, "prevalence_year")
-        if year_col:
-            overall_mask = ddf[year_col].astype(str).str.upper().eq("OVERALL")
-            by_year = ddf[~overall_mask].copy()
-        else:
-            by_year = ddf.copy()
-
-        fig_cmp = _deaths_pct_compare_figure(by_year)
-        if fig_cmp is None:
-            parts.append("<p class='subtle'><i>Could not build plot.</i></p>")
-        else:
-            parts.append(
-                "<div class='plot-wrap'>"
-                + _fig_to_div(fig_cmp, include_plotlyjs=need_plotly_cdn)
-                + "</div>"
-            )
-            parts.append(_plot_abbrev_note_html())
-            need_plotly_cdn = False
-
     parts.append("</div>")
 
     parts.append("<div class='section'>")
@@ -2522,11 +2673,13 @@ def build_summary_report(
         if not items:
             continue
         parts.append("<div class='section card stack'>")
-        parts.append(f"<h3>Timings from first {html.escape(from_key)}</h3>")
+        parts.append(f"<h3>Timings from first {html.escape(_event_display_name(from_key))}</h3>")
         for plot_row in items:
             from_ev = str(plot_row["from"]).strip()
             to_ev = str(plot_row["to"]).strip()
             vkey = str(plot_row["timing"]).strip()
+            do_reverse = bool(plot_row.get("reverse", False))
+            x_range = plot_row.get("x_range")  # None or (lo_days, hi_days)
             ecc_ov = plot_row.get("ecc")
             ecc_ov = ecc_ov if isinstance(ecc_ov, dict) else None
             ecc_spec = _ecc_link_spec_with_overrides(_ecc_link_spec_default_for_timing(vkey), ecc_ov)
@@ -2535,17 +2688,25 @@ def build_summary_report(
                 continue
             vtitle, vfile, _vshort = TIMING_VARIANTS[vkey]
             hword = _timing_variant_heading_word(vkey)
-            parts.append(f"<h4>{html.escape(from_ev)} → {html.escape(hword)} {html.escape(to_ev)}</h4>")
+            hword_lc = hword.lower()
+            if do_reverse:
+                _lq, _lev, _rq, _rev = hword_lc, to_ev, "first", from_ev
+            else:
+                _lq, _lev, _rq, _rev = "first", from_ev, hword_lc, to_ev
+            parts.append(
+                f"<h4>Time from {html.escape(_lq)} {html.escape(_event_pairwise_label(_lev))}"
+                f" to {html.escape(_rq)} {html.escape(_event_pairwise_label(_rev))}"
+                f" (anchored on {html.escape(_event_pairwise_label(from_ev))})</h4>"
+            )
             c_html = _focus_pair_commentary_html(plot_row.get("commentary"))
             if c_html:
                 parts.append(c_html)
-            tpath = rd / vfile
-            if not tpath.exists():
+            tdf, _missing = _read_timing_variant_df(rd, vkey, vfile)
+            if tdf is None:
                 parts.append(
-                    f"<p class='subtle'><i>Not found: <code>{html.escape(vfile)}</code></i></p>"
+                    f"<p class='subtle'><i>Not found: <code>{html.escape(_missing or vfile)}</code></i></p>"
                 )
                 continue
-            tdf = pd.read_csv(tpath)
             fc = _resolve_col(tdf, "from_event")
             tc = _resolve_col(tdf, "to_event")
             if not fc or not tc:
@@ -2569,11 +2730,13 @@ def build_summary_report(
                 rlq = _round_day_int(r[lq_c])
                 ruq = _round_day_int(r[uq_c])
                 if rm is not None and rlq is not None and ruq is not None:
+                    if do_reverse:
+                        rm, rlq, ruq = -rm, -ruq, -rlq
                     median_iqr_txt = f"{rm:d} ({rlq:d}–{ruq:d})"
             parts.append(
                 _timing_pair_summary_row_html(
-                    from_ev=from_ev,
-                    to_ev=to_ev,
+                    from_ev=to_ev if do_reverse else from_ev,
+                    to_ev=from_ev if do_reverse else to_ev,
                     n_from=n_from,
                     n_pair=(r[n_pair_c] if n_pair_c and n_pair_c in r.index else pd.NA),
                     median_iqr=median_iqr_txt,
@@ -2592,6 +2755,8 @@ def build_summary_report(
                 from_ev=from_ev,
                 to_ev=to_ev,
                 plot_mode=focus_timing_plot,
+                reverse=do_reverse,
+                x_range=x_range,
             )
             if fig_one is None:
                 parts.append("<p class='subtle'><i>Could not build plot.</i></p>")
@@ -2627,11 +2792,11 @@ def build_summary_report(
                 (
                     ecc_id,
                     f"<div id='{html.escape(ecc_id)}' class='card stack'>"
-                    f"<h3>Event code counts (top {int(EVENT_CODE_COUNTS_TOP_N)}): {html.escape(from_ev)} → {html.escape(hword)} {html.escape(to_ev)}</h3>"
+                    f"<h3>Event code counts (top {int(EVENT_CODE_COUNTS_TOP_N)}): {html.escape(_event_display_name(from_ev))} → {html.escape(hword)} {html.escape(_event_display_name(to_ev))}</h3>"
                     f"<p class='subtle'>{_ecc_link_caption_html(ecc_spec, from_ev, rd)}. "
                     f"Family={html.escape(to_ev.upper())}. "
                     f"% is N_PATIENTS / N(pair) from the timing-pair row "
-                    f"({html.escape(from_ev)}→{html.escape(to_ev)}; {html.escape(vtitle)})."
+                    f"({html.escape(_event_display_name(from_ev))}→{html.escape(_event_display_name(to_ev))}; {html.escape(vtitle)})."
                     f"</p>"
                     f"{ecc_html}</div>",
                 )
@@ -2649,8 +2814,8 @@ def build_summary_report(
             f"<p class='subtle'>These tables are linked from the focus timing plots above. Top {int(EVENT_CODE_COUNTS_TOP_N)} concepts only.</p>"
             "<p class='subtle'><b>Concept-level timing:</b> CSVs include both <b>FIRST</b> and <b>CLOSEST</b> triples. "
             "Each linked table picks the triple that matches its timing variant (see per-table caption). "
-            "In BEFORE/AFTER exports the per-patient choice is made separately within each "
-            "<code>TIME_RELATIVE</code> stratum. One patient can appear on multiple concept rows.</p>"
+            "In before/after time windows the per-patient choice is made separately within each "
+            "<code>time_window</code> stratum. One patient can appear on multiple concept rows.</p>"
         )
     else:
         _rule, _xnote = _event_code_occurrence_rule_sentences()
@@ -2660,8 +2825,8 @@ def build_summary_report(
             f"{_xnote} "
             "Align this report with your run via <code>EVENT_CODE_TIMING_USES_CLOSEST</code> in "
             "<code>build_summary_html_report.py</code> or env <code>CHARACTERIZATION_EVENT_CODE_TIMING_USES_CLOSEST</code>. "
-            "In BEFORE/AFTER exports the per-patient choice is made separately within each "
-            "<code>TIME_RELATIVE</code> stratum. One patient can appear on multiple concept rows.</p>"
+            "In before/after time windows the per-patient choice is made separately within each "
+            "<code>time_window</code> stratum. One patient can appear on multiple concept rows.</p>"
         )
     if not ecc_blocks:
         parts.append("<p class='subtle'><i>No linked tables generated.</i></p>")
@@ -2670,40 +2835,44 @@ def build_summary_report(
             parts.append(block_html)
     parts.append("</div>")
 
+    # Deaths
     parts.append("<div class='section card stack'>")
-    parts.append("<h2>Timing pairs</h2>")
+    parts.append("<h2>Deaths</h2>")
     parts.append(
-        "<p class='subtle'>Each row is a FROM→TO event pair. "
-        "The blue box spans the interquartile range (LQ–UQ); whiskers extend to P05 and P95. "
-        "Vertical tick marks show P10 and P90. "
-        "Days are TO − FROM (negative means the TO event occurred before the FROM event). "
-        "Definitions match the four timing exports in the full characterization report.</p>"
+        "<p class='subtle'>By year: % deaths for main cancer diagnosis index (INDEX) vs metastasis index (FIRST_MET).</p>"
     )
-    any_timing = False
-    for key in TIMING_VARIANTS_ORDER:
-        title, fname, _short = TIMING_VARIANTS[key]
-        tpath = rd / fname
-        parts.append(f"<h3>{html.escape(title)}</h3>")
-        if not tpath.exists():
+    deaths_path = rd / "final_death_from_anchors.csv"
+    if not deaths_path.exists():
+        parts.append("<p class='subtle'><i>Not found: <code>final_death_from_anchors.csv</code></i></p>")
+    else:
+        ddf = pd.read_csv(deaths_path)
+        ddf = _with_death_pct_for_report(ddf)
+        year_col = _resolve_col(ddf, "prevalence_year")
+        if year_col:
+            overall_mask = ddf[year_col].astype(str).str.upper().eq("OVERALL")
+            by_year = ddf[~overall_mask].copy()
+        else:
+            by_year = ddf.copy()
+
+        fig_cmp = _deaths_pct_compare_figure(by_year)
+        if fig_cmp is None:
+            parts.append("<p class='subtle'><i>Could not build plot.</i></p>")
+        else:
             parts.append(
-                f"<p class='subtle'><i>Not found: <code>{html.escape(fname)}</code></i></p>"
+                "<div class='plot-wrap'>"
+                + _fig_to_div(fig_cmp, include_plotlyjs=need_plotly_cdn)
+                + "</div>"
             )
-            continue
-        tdf = pd.read_csv(tpath)
-        tfig = _timing_pairs_figure(tdf)
-        if tfig is None:
-            parts.append("<p class='subtle'><i>Could not build chart (missing columns or empty).</i></p>")
-            continue
-        parts.append(
-            "<div class='plot-wrap'>"
-            + _fig_to_div(tfig, include_plotlyjs=need_plotly_cdn)
-            + "</div>"
-        )
-        parts.append(_plot_abbrev_note_html())
-        need_plotly_cdn = False
-        any_timing = True
-    if not any_timing:
-        parts.append("<p class='subtle'><i>No timing pair CSVs were available to plot.</i></p>")
+            parts.append(_plot_abbrev_note_html())
+            need_plotly_cdn = False
+        tbl_html = _death_timing_table_html(ddf)
+        if tbl_html:
+            parts.append(
+                "<p class='subtle'>Overall and 2015 onwards. "
+                "Deaths in/outside observation period; timing from anchor date. "
+                "Suppressed cells shown as —.</p>"
+            )
+            parts.append(tbl_html)
     parts.append("</div>")
 
     parts.extend(["</body></html>"])
@@ -2726,9 +2895,9 @@ if __name__ == "__main__":
     )
     ap.add_argument(
         "--focus-timing-plot",
-        default="both",
+        default="hist",
         choices=["box", "hist", "both"],
-        help="Focus timing plot style: boxplot only (box), P05–P95 decile density (hist) when columns allow, or both (default).",
+        help="Focus timing plot style: boxplot only (box), P05–P95 decile density (hist, default) when columns allow, or both.",
     )
     ap.add_argument(
         "--event-code-timing-uses-closest",

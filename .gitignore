@@ -9,5 +9,10 @@ venv/
 # Generated report outputs (keep sample CSVs, ignore generated HTML)
 outputs/*.html
 
+# DB connection (credentials — never commit)
+db_config.yaml
+scripts/db_adapter.py
+scripts/db_config.py
+
 # macOS
 .DS_Store

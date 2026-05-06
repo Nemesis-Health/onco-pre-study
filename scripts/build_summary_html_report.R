@@ -60,7 +60,7 @@ RESULTS_DIR <- if (!is.null(results_dir_arg)) {
     unset = file.path(BASE_DIR, "outputs"))
 }
 
-OUTPUT_PATH <- file.path(RESULTS_DIR, "summary_report.html")
+OUTPUT_PATH <- file.path(RESULTS_DIR, "summary_report_R.html")
 
 # ---------------------------------------------------------------------------
 # DatabaseConnector config (optional — concept name lookup only)
@@ -88,31 +88,32 @@ if (nchar(.omop_dbms) > 0 && requireNamespace("DatabaseConnector", quietly = TRU
 # ---------------------------------------------------------------------------
 TIMING_LINTHRESH_DAYS   <- 180.0
 EVENT_CODE_COUNTS_TOP_N <- 5L
+PREVALENCE_YEAR_MIN     <- 2010L
 ANCHOR_DX_COUNTS_TOP_N  <- 10L
 TICK_ANCHOR_DAYS        <- c(30, 60, 90, 180, 365, 730, 1460, 1920)
 
 TIMING_VARIANTS <- list(
   first_to_first = list(
     title = "First occurrence → first occurrence",
-    file  = "final_timing_pair_summary_first_to_first.csv",
+    file  = "final_timing_pairwise.csv",
     short = "First→first",
     time_relative = NULL
   ),
   first_to_closest = list(
     title = "First occurrence → closest occurrence",
-    file  = "final_timing_pair_summary_first_to_closest.csv",
+    file  = "final_timing_pairwise.csv",
     short = "First→closest",
     time_relative = NULL
   ),
   first_to_closest_before = list(
     title = "First → closest (strictly before anchor)",
-    file  = "final_timing_pair_summary_first_to_closest_before.csv",
+    file  = "final_timing_pairwise.csv",
     short = "Before anchor",
     time_relative = "BEFORE"
   ),
   first_to_closest_after = list(
     title = "First → closest (on or after anchor)",
-    file  = "final_timing_pair_summary_first_to_closest_after.csv",
+    file  = "final_timing_pairwise.csv",
     short = "On/after anchor",
     time_relative = "AFTER"
   )
@@ -120,15 +121,18 @@ TIMING_VARIANTS <- list(
 
 FOCUS_TIMING_PLOTS <- list(
   list(from = "DX",  to = "MET", timing = "first_to_first",
-       commentary = "Pairwise timing uses first DX and first MET."),
+       commentary = "First DX to first MET; days positive = MET after DX."),
   list(from = "MET", to = "DX",  timing = "first_to_closest",
-       commentary = "TO uses closest DX to the MET anchor."),
+       reverse = TRUE, x_range = c(-30, 30),
+       commentary = "Closest DX to first MET anchor (reversed to read DX → MET); zoomed to ±30 days."),
   list(from = "MET", to = "ODX", timing = "first_to_closest",
-       commentary = "Before-anchor slice; linked ODX rows use CLOSEST within BEFORE stratum."),
-  list(from = "MET", to = "GDX", timing = "first_to_closest",
-       commentary = "Before-anchor slice; linked GDX rows use CLOSEST within BEFORE stratum."),
+       reverse = TRUE, x_range = c(-30, 30),
+       commentary = "Closest other-DX to first MET anchor (reversed to read ODX → MET); zoomed to ±30 days."),
+  list(from = "MET", to = "L01", timing = "first_to_first",
+       commentary = "First MET to first L01; days positive = L01 after MET."),
   list(from = "MET", to = "L01", timing = "first_to_closest_after",
-       commentary = "On/after-anchor slice; linked L01 rows use CLOSEST within AFTER stratum.")
+       x_range = c(0, 365),
+       commentary = "First MET to closest L01 on or after MET; zoomed to 0–365 days.")
 )
 
 TIMING_VARIANTS_ORDER <- c(
@@ -306,7 +310,7 @@ fetch_concept_names <- function(concept_ids) {
 # ---------------------------------------------------------------------------
 
 # Single-row horizontal boxplot for one timing pair (focus section)
-timing_single_row_plot <- function(df, from_ev, to_ev) {
+timing_single_row_plot <- function(df, from_ev, to_ev, reverse = FALSE, x_range = NULL) {
   if (is.null(df) || nrow(df) == 0) return(NULL)
   fc  <- col_ci(df, "from_event")
   tc  <- col_ci(df, "to_event")
@@ -322,12 +326,19 @@ timing_single_row_plot <- function(df, from_ev, to_ev) {
   p05 <- get_num(qcs$p05); p10 <- get_num(qcs$p10)
   lq  <- get_num(qcs$lq);  med <- get_num(qcs$med); uq <- get_num(qcs$uq)
   p90 <- get_num(qcs$p90); p95 <- get_num(qcs$p95)
+
+  if (isTRUE(reverse)) {
+    tmp <- c(p05, p10, lq, med, uq, p90, p95)
+    p05 <- -tmp[7]; p10 <- -tmp[6]; lq <- -tmp[5]
+    med <- -tmp[4]; uq  <- -tmp[3]; p90 <- -tmp[2]; p95 <- -tmp[1]
+  }
+
   raw_vals <- c(p05, p10, lq, med, uq, p90, p95)
 
   p05s <- symlog10(p05); p10s <- symlog10(p10)
   lqs  <- symlog10(lq);  meds <- symlog10(med);  uqs <- symlog10(uq)
   p90s <- symlog10(p90); p95s <- symlog10(p95)
-  lbl  <- paste(from_ev, "→", to_ev)
+  lbl  <- if (isTRUE(reverse)) paste(to_ev, "→", from_ev) else paste(from_ev, "→", to_ev)
 
   nc <- col_ci(df, "n_patients_with_pair")
   n_val <- if (!is.na(nc)) suppressWarnings(as.integer(r[[nc]])) else NA_integer_
@@ -381,6 +392,12 @@ timing_single_row_plot <- function(df, from_ev, to_ev) {
       hovermode = "closest"
     ) %>%
     apply_timing_xaxis(raw_vals)
+
+  if (!is.null(x_range) && length(x_range) == 2) {
+    x0  <- symlog10(x_range[[1]])
+    x1  <- symlog10(x_range[[2]])
+    fig <- fig %>% layout(xaxis = list(range = list(x0, x1)))
+  }
 
   fig
 }
@@ -598,7 +615,8 @@ section_prevalence <- function(rd) {
       yaxis     = list(title = "Patients (N_DX)", gridcolor = "#e5e7eb"),
       yaxis2    = list(title = "Share of cohort (%)", overlaying = "y", side = "right",
                        showgrid = FALSE, rangemode = "tozero"),
-      xaxis     = list(title = "Calendar year", dtick = 1),
+      xaxis     = list(title = "Calendar year", dtick = 1,
+                       range = list(PREVALENCE_YEAR_MIN - 0.5, max(years) + 0.5)),
       hovermode = "x unified"
     )
   }
@@ -841,28 +859,25 @@ ecc_top_n <- function(rd, from_ev, to_ev, timing_key,
                       n_pair = NULL, top_n = EVENT_CODE_COUNTS_TOP_N) {
   vinfo      <- TIMING_VARIANTS[[timing_key]]
   time_rel   <- vinfo$time_relative   # NULL | "BEFORE" | "AFTER"
+  time_win   <- if (!is.null(time_rel)) tolower(time_rel) else "all"
   anchor_ev  <- if (toupper(from_ev) == "DX") "INDEX" else "FIRST_MET"
   family     <- toupper(to_ev)
 
-  if (!is.null(time_rel)) {
-    df <- read_csv_safe(file.path(rd, "final_event_code_counts_before_after.csv"))
-  } else {
-    df <- read_csv_safe(file.path(rd, "final_event_code_counts.csv"))
-  }
+  df <- read_csv_safe(file.path(rd, "final_code_counts.csv"))
   if (is.null(df)) return(NULL)
 
   aev_c  <- col_ci(df, "anchor_event")
   fam_c  <- col_ci(df, "event_family")
   cid_c  <- col_ci(df, "concept_id")
   np_c   <- col_ci(df, "n_patients")
-  tr_c   <- if (!is.null(time_rel)) col_ci(df, "time_relative") else NA_character_
+  tw_c   <- col_ci(df, "time_window")
   med_c  <- coalesce(col_ci(df, "median_days_closest"), col_ci(df, "median_days"))
 
   if (is.na(aev_c) || is.na(fam_c) || is.na(cid_c) || is.na(np_c)) return(NULL)
 
   mask <- toupper(df[[aev_c]]) == anchor_ev & toupper(df[[fam_c]]) == family
-  if (!is.null(time_rel) && !is.na(tr_c)) {
-    mask <- mask & toupper(df[[tr_c]]) == time_rel
+  if (!is.na(tw_c)) {
+    mask <- mask & tolower(df[[tw_c]]) == time_win
   }
   sub <- df[mask, , drop = FALSE]
   if (nrow(sub) == 0) return(NULL)
@@ -906,15 +921,23 @@ section_focus_timing <- function(rd) {
   focus_items <- list()
 
   for (plot_row in FOCUS_TIMING_PLOTS) {
-    from_ev <- toupper(trimws(plot_row$from))
-    to_ev   <- toupper(trimws(plot_row$to))
-    vkey    <- plot_row$timing
-    vinfo   <- TIMING_VARIANTS[[vkey]]
+    from_ev    <- toupper(trimws(plot_row$from))
+    to_ev      <- toupper(trimws(plot_row$to))
+    vkey       <- plot_row$timing
+    do_reverse <- isTRUE(plot_row$reverse)
+    x_range    <- plot_row$x_range  # NULL or c(lo_days, hi_days)
+    vinfo      <- TIMING_VARIANTS[[vkey]]
     if (is.null(vinfo)) next
 
-    tpath <- file.path(rd, vinfo$file)
-    tdf   <- read_csv_safe(tpath)
-    fig   <- if (!is.null(tdf)) timing_single_row_plot(tdf, from_ev, to_ev) else NULL
+    tpath   <- file.path(rd, vinfo$file)
+    tdf_all <- read_csv_safe(tpath)
+    ttype_c <- if (!is.null(tdf_all)) col_ci(tdf_all, "timing_type") else NA_character_
+    tdf <- if (!is.null(tdf_all) && !is.na(ttype_c))
+      tdf_all[tolower(tdf_all[[ttype_c]]) == vkey, , drop = FALSE]
+    else tdf_all
+    fig <- if (!is.null(tdf))
+      timing_single_row_plot(tdf, from_ev, to_ev, reverse = do_reverse, x_range = x_range)
+    else NULL
 
     nc <- if (!is.null(tdf)) col_ci(tdf, "n_patients_with_pair") else NA_character_
     n_pair <- if (!is.null(tdf) && !is.na(nc)) {
@@ -938,6 +961,7 @@ section_focus_timing <- function(rd) {
 
     focus_items[[length(focus_items) + 1L]] <- list(
       from_ev = from_ev, to_ev = to_ev, hword = hword,
+      do_reverse = do_reverse,
       commentary = plot_row$commentary,
       n_from = from_denoms[[from_ev]], n_pair = n_pair,
       fig = fig, ecc_id = ecc_id
@@ -972,7 +996,10 @@ section_focus_timing <- function(rd) {
           tags$h3(sprintf("Timings from first %s", from_key)),
           lapply(items, function(it) {
             tagList(
-              tags$h4(sprintf("%s → %s %s", it$from_ev, it$hword, it$to_ev)),
+              tags$h4(if (isTRUE(it$do_reverse))
+                sprintf("%s → %s %s", it$to_ev, it$hword, it$from_ev)
+              else
+                sprintf("%s → %s %s", it$from_ev, it$hword, it$to_ev)),
               if (!is.null(it$commentary) && nchar(it$commentary) > 0)
                 tags$p(class = "commentary", it$commentary)
               else NULL,
@@ -1014,8 +1041,12 @@ section_focus_timing <- function(rd) {
 # ---------------------------------------------------------------------------
 section_timing_pairs <- function(rd) {
   children <- lapply(TIMING_VARIANTS_ORDER, function(key) {
-    vinfo <- TIMING_VARIANTS[[key]]
-    tdf   <- read_csv_safe(file.path(rd, vinfo$file))
+    vinfo   <- TIMING_VARIANTS[[key]]
+    tdf_all <- read_csv_safe(file.path(rd, vinfo$file))
+    ttype_c <- if (!is.null(tdf_all)) col_ci(tdf_all, "timing_type") else NA_character_
+    tdf <- if (!is.null(tdf_all) && !is.na(ttype_c))
+      tdf_all[tolower(tdf_all[[ttype_c]]) == key, , drop = FALSE]
+    else tdf_all
     fig   <- if (!is.null(tdf)) timing_pairs_overview_plot(tdf) else NULL
     tagList(
       tags$h3(vinfo$title),
@@ -1058,8 +1089,7 @@ build_report <- function(results_dir = RESULTS_DIR, output_path = OUTPUT_PATH) {
         section_demographics(results_dir),
         section_anchor_dx_counts(results_dir),
         section_deaths(results_dir),
-        section_focus_timing(results_dir),
-        section_timing_pairs(results_dir)
+        section_focus_timing(results_dir)
       )
     )
   )

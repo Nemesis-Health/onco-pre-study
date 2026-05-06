@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : hive
--- Translated     : 2026-04-26 18:36:20 BST
+-- Translated     : 2026-04-27 15:05:08 BST
 -- Source file    : sql/sql_server/chunks/00_setup.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -1421,61 +1421,72 @@ FROM patient_char
 ------------------------------------------------------------
 -- J-bis) DEATH TIMING FROM INDEX AND FIRST_MET ANCHORS
 ------------------------------------------------------------
+-- Pre-compute each cohort patient's earliest death date and whether it
+-- falls within any of their observation periods.
+DROP TABLE IF EXISTS death_obs_status;
+CREATE TEMPORARY TABLE IF NOT EXISTS death_obs_status  (person_id BIGINT,
+    death_date TIMESTAMP,
+    death_in_obs SMALLINT
+);
+INSERT INTO death_obs_status (person_id, death_date, death_in_obs)
+SELECT
+    d.person_id,
+    d.death_date,
+    CASE WHEN EXISTS (
+        SELECT 1
+        FROM @cdm_database_schema.observation_period op
+        WHERE op.person_id = d.person_id
+          AND d.death_date BETWEEN op.observation_period_start_date
+                               AND op.observation_period_end_date
+    ) THEN 1 ELSE 0 END
+FROM (
+    SELECT person_id, MIN(death_date) AS death_date
+    FROM @cdm_database_schema.death
+    GROUP BY person_id
+) d
+WHERE d.person_id IN (SELECT person_id FROM cohort)
+;
 DROP TABLE IF EXISTS death_index_long;
 CREATE TEMPORARY TABLE IF NOT EXISTS death_index_long  (prevalence_year VARCHAR(20),
     days_to_death INT
 );
 INSERT INTO death_index_long (prevalence_year, days_to_death)
-SELECT 'OVERALL', day(CAST(d.death_date AS TIMESTAMP) - CAST(c.index_date AS TIMESTAMP))
+SELECT 'OVERALL', day(CAST(dos.death_date AS TIMESTAMP) - CAST(c.index_date AS TIMESTAMP))
 FROM cohort c
-INNER JOIN (
-    SELECT person_id, MIN(death_date) AS death_date
-    FROM @cdm_database_schema.death
-    GROUP BY person_id
-) d ON d.person_id = c.person_id
-WHERE d.death_date >= c.index_date
+INNER JOIN death_obs_status dos ON dos.person_id = c.person_id
+WHERE dos.death_date >= c.index_date
 UNION ALL
-SELECT CAST(YEAR(c.index_date) AS VARCHAR(4)), day(CAST(d.death_date AS TIMESTAMP) - CAST(c.index_date AS TIMESTAMP))
+SELECT CAST(YEAR(c.index_date) AS VARCHAR(4)), day(CAST(dos.death_date AS TIMESTAMP) - CAST(c.index_date AS TIMESTAMP))
 FROM cohort c
-INNER JOIN (
-    SELECT person_id, MIN(death_date) AS death_date
-    FROM @cdm_database_schema.death
-    GROUP BY person_id
-) d ON d.person_id = c.person_id
-WHERE d.death_date >= c.index_date
+INNER JOIN death_obs_status dos ON dos.person_id = c.person_id
+WHERE dos.death_date >= c.index_date
 ;
 DROP TABLE IF EXISTS death_first_met_long;
 CREATE TEMPORARY TABLE IF NOT EXISTS death_first_met_long  (prevalence_year VARCHAR(20),
     days_to_death INT
 );
 INSERT INTO death_first_met_long (prevalence_year, days_to_death)
-SELECT 'OVERALL', day(CAST(d.death_date AS TIMESTAMP) - CAST(ms.first_met_date AS TIMESTAMP))
+SELECT 'OVERALL', day(CAST(dos.death_date AS TIMESTAMP) - CAST(ms.first_met_date AS TIMESTAMP))
 FROM cohort c
 INNER JOIN met_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
-INNER JOIN (
-    SELECT person_id, MIN(death_date) AS death_date
-    FROM @cdm_database_schema.death
-    GROUP BY person_id
-) d ON d.person_id = c.person_id
-WHERE d.death_date >= ms.first_met_date
+INNER JOIN death_obs_status dos ON dos.person_id = c.person_id
+WHERE dos.death_date >= ms.first_met_date
 UNION ALL
-SELECT CAST(YEAR(c.index_date) AS VARCHAR(4)), day(CAST(d.death_date AS TIMESTAMP) - CAST(ms.first_met_date AS TIMESTAMP))
+SELECT CAST(YEAR(c.index_date) AS VARCHAR(4)), day(CAST(dos.death_date AS TIMESTAMP) - CAST(ms.first_met_date AS TIMESTAMP))
 FROM cohort c
 INNER JOIN met_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
-INNER JOIN (
-    SELECT person_id, MIN(death_date) AS death_date
-    FROM @cdm_database_schema.death
-    GROUP BY person_id
-) d ON d.person_id = c.person_id
-WHERE d.death_date >= ms.first_met_date
+INNER JOIN death_obs_status dos ON dos.person_id = c.person_id
+WHERE dos.death_date >= ms.first_met_date
 ;
 DROP TABLE IF EXISTS death_stratum_counts;
 CREATE TEMPORARY TABLE IF NOT EXISTS death_stratum_counts  (prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     n_patients INT,
-    n_deaths INT
+    n_deaths INT,
+    n_deaths_in_obs INT,
+    n_deaths_out_obs INT
 );
-INSERT INTO death_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths)
+INSERT INTO death_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
 SELECT
     CASE
         WHEN GROUPING(YEAR(c.index_date)) = 1 THEN 'OVERALL'
@@ -1483,16 +1494,14 @@ SELECT
     END,
     'INDEX',
     COUNT(*),
-    SUM(CASE WHEN d.death_date IS NOT NULL AND d.death_date >= c.index_date THEN 1 ELSE 0 END)
+    SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= c.index_date THEN 1 ELSE 0 END),
+    SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= c.index_date AND dos.death_in_obs = 1 THEN 1 ELSE 0 END),
+    SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= c.index_date AND dos.death_in_obs = 0 THEN 1 ELSE 0 END)
 FROM cohort c
-LEFT JOIN (
-    SELECT person_id, MIN(death_date) AS death_date
-    FROM @cdm_database_schema.death
-    GROUP BY person_id
-) d ON d.person_id = c.person_id
+LEFT JOIN death_obs_status dos ON dos.person_id = c.person_id
 GROUP BY GROUPING SETS ((), (YEAR(c.index_date)))
 ;
-INSERT INTO death_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths)
+INSERT INTO death_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
 SELECT
     CASE
         WHEN GROUPING(YEAR(c.index_date)) = 1 THEN 'OVERALL'
@@ -1500,14 +1509,12 @@ SELECT
     END,
     'FIRST_MET',
     COUNT(*),
-    SUM(CASE WHEN d.death_date IS NOT NULL AND d.death_date >= ms.first_met_date THEN 1 ELSE 0 END)
+    SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= ms.first_met_date THEN 1 ELSE 0 END),
+    SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= ms.first_met_date AND dos.death_in_obs = 1 THEN 1 ELSE 0 END),
+    SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= ms.first_met_date AND dos.death_in_obs = 0 THEN 1 ELSE 0 END)
 FROM cohort c
 INNER JOIN met_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
-LEFT JOIN (
-    SELECT person_id, MIN(death_date) AS death_date
-    FROM @cdm_database_schema.death
-    GROUP BY person_id
-) d ON d.person_id = c.person_id
+LEFT JOIN death_obs_status dos ON dos.person_id = c.person_id
 GROUP BY GROUPING SETS ((), (YEAR(c.index_date)))
 ;
 DROP TABLE IF EXISTS death_timing_long;
@@ -1523,39 +1530,89 @@ SELECT prevalence_year, 'FIRST_MET', days_to_death FROM death_first_met_long
 DROP TABLE IF EXISTS death_timing_quantiles;
 CREATE TEMPORARY TABLE IF NOT EXISTS death_timing_quantiles  (prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
-    n_deaths_in_dist INT,
-    p05_days FLOAT,
-    p10_days FLOAT,
     lq_days FLOAT,
     median_days FLOAT,
-    uq_days FLOAT,
-    p90_days FLOAT,
-    p95_days FLOAT
+    uq_days FLOAT
 );
 INSERT INTO death_timing_quantiles (
     prevalence_year,
     anchor_event,
-    n_deaths_in_dist,
-    p05_days,
-    p10_days,
     lq_days,
     median_days,
-    uq_days,
-    p90_days,
-    p95_days
+    uq_days
 )
 SELECT
     prevalence_year,
     anchor_event,
-    COUNT(*) AS n_deaths_in_dist,
-    PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY days_to_death) AS p05_days,
-    PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY days_to_death) AS p10_days,
     PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_to_death) AS lq_days,
     PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_to_death) AS median_days,
-    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_to_death) AS uq_days,
-    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY days_to_death) AS p90_days,
-    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY days_to_death) AS p95_days
+    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_to_death) AS uq_days
 FROM death_timing_long
+GROUP BY prevalence_year, anchor_event
+;
+-- Follow-up duration from anchor date to last observation period end,
+-- for all patients with at least one observation period covering or after anchor.
+DROP TABLE IF EXISTS followup_long;
+CREATE TEMPORARY TABLE IF NOT EXISTS followup_long  (prevalence_year VARCHAR(20),
+    anchor_event VARCHAR(20),
+    followup_days INT
+);
+INSERT INTO followup_long (prevalence_year, anchor_event, followup_days)
+SELECT 'OVERALL', 'INDEX',
+       day(CAST(MAX(op.observation_period_end_date) AS TIMESTAMP) - CAST(c.index_date AS TIMESTAMP))
+FROM cohort c
+INNER JOIN @cdm_database_schema.observation_period op
+  ON op.person_id = c.person_id
+ AND op.observation_period_end_date >= c.index_date
+GROUP BY c.person_id, c.index_date
+UNION ALL
+SELECT CAST(YEAR(c.index_date) AS VARCHAR(4)), 'INDEX',
+       day(CAST(MAX(op.observation_period_end_date) AS TIMESTAMP) - CAST(c.index_date AS TIMESTAMP))
+FROM cohort c
+INNER JOIN @cdm_database_schema.observation_period op
+  ON op.person_id = c.person_id
+ AND op.observation_period_end_date >= c.index_date
+GROUP BY c.person_id, c.index_date, YEAR(c.index_date)
+UNION ALL
+SELECT 'OVERALL', 'FIRST_MET',
+       day(CAST(MAX(op.observation_period_end_date) AS TIMESTAMP) - CAST(ms.first_met_date AS TIMESTAMP))
+FROM cohort c
+INNER JOIN met_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+INNER JOIN @cdm_database_schema.observation_period op
+  ON op.person_id = c.person_id
+ AND op.observation_period_end_date >= ms.first_met_date
+GROUP BY c.person_id, ms.first_met_date
+UNION ALL
+SELECT CAST(YEAR(c.index_date) AS VARCHAR(4)), 'FIRST_MET',
+       day(CAST(MAX(op.observation_period_end_date) AS TIMESTAMP) - CAST(ms.first_met_date AS TIMESTAMP))
+FROM cohort c
+INNER JOIN met_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+INNER JOIN @cdm_database_schema.observation_period op
+  ON op.person_id = c.person_id
+ AND op.observation_period_end_date >= ms.first_met_date
+GROUP BY c.person_id, c.index_date, ms.first_met_date, YEAR(c.index_date)
+;
+DROP TABLE IF EXISTS followup_quantiles;
+CREATE TEMPORARY TABLE IF NOT EXISTS followup_quantiles  (prevalence_year VARCHAR(20),
+    anchor_event VARCHAR(20),
+    lq_followup_days FLOAT,
+    median_followup_days FLOAT,
+    uq_followup_days FLOAT
+);
+INSERT INTO followup_quantiles (
+    prevalence_year,
+    anchor_event,
+    lq_followup_days,
+    median_followup_days,
+    uq_followup_days
+)
+SELECT
+    prevalence_year,
+    anchor_event,
+    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY followup_days) AS lq_followup_days,
+    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY followup_days) AS median_followup_days,
+    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY followup_days) AS uq_followup_days
+FROM followup_long
 GROUP BY prevalence_year, anchor_event
 ;
 ------------------------------------------------------------
