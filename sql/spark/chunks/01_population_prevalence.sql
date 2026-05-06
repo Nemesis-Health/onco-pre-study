@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : spark
--- Translated     : 2026-05-06 18:36:53 BST
+-- Translated     : 2026-05-06 18:54:01 BST
 -- Source file    : sql/sql_server/chunks/01_population_prevalence.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -21,7 +21,7 @@ WITH base  AS (SELECT CASE
  SUM(CASE WHEN first_gen_cancer_date IS NOT NULL THEN 1 ELSE 0 END) AS n_with_gen_cancer_dx,
  SUM(CASE WHEN first_met_date IS NOT NULL THEN 1 ELSE 0 END) AS n_with_met,
  SUM(CASE WHEN first_l01_date IS NOT NULL THEN 1 ELSE 0 END) AS n_with_l01
- FROM ldpw47q6patient_char
+ FROM sqvhwkzfpatient_char
  GROUP BY GROUPING SETS (
  (),
  (YEAR(index_date))

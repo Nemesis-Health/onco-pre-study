@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : impala
--- Translated     : 2026-05-06 18:36:47 BST
+-- Translated     : 2026-05-06 18:53:55 BST
 -- Source file    : sql/sql_server/chunks/12_l01_gap_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -29,7 +29,7 @@ SELECT
         ELSE 'ge365d'
     END AS gap_bucket,
     COUNT(*) AS n_gaps
-FROM ldpw47q6l01_consecutive_gaps
+FROM sqvhwkzfl01_consecutive_gaps
 GROUP BY
     subgroup,
     CASE
@@ -42,13 +42,13 @@ GROUP BY
     END
 ORDER BY
     subgroup,
-    CASE
+    MIN(CASE
         WHEN gap_days <  30  THEN 1
         WHEN gap_days <  60  THEN 2
         WHEN gap_days <  90  THEN 3
         WHEN gap_days < 180  THEN 4
         WHEN gap_days < 365  THEN 5
         ELSE 6
-    END
+    END)
 ;
 

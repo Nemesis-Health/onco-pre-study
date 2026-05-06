@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : impala
--- Translated     : 2026-05-06 18:36:47 BST
+-- Translated     : 2026-05-06 18:53:55 BST
 -- Source file    : sql/sql_server/chunks/05_timing_by_year.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -45,8 +45,8 @@ FROM (
             YEAR(CASE TYPEOF(pc.index_date ) WHEN 'TIMESTAMP' THEN CAST(pc.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(pc.index_date  AS STRING), 1, 4), SUBSTR(CAST(pc.index_date  AS STRING), 5, 2), SUBSTR(CAST(pc.index_date  AS STRING), 7, 2)), 'UTC') END) AS index_year_int,
             ROW_NUMBER() OVER (PARTITION BY YEAR(CASE TYPEOF(pc.index_date ) WHEN 'TIMESTAMP' THEN CAST(pc.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(pc.index_date  AS STRING), 1, 4), SUBSTR(CAST(pc.index_date  AS STRING), 5, 2), SUBSTR(CAST(pc.index_date  AS STRING), 7, 2)), 'UTC') END), p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
             COUNT(*)     OVER (PARTITION BY YEAR(CASE TYPEOF(pc.index_date ) WHEN 'TIMESTAMP' THEN CAST(pc.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(pc.index_date  AS STRING), 1, 4), SUBSTR(CAST(pc.index_date  AS STRING), 5, 2), SUBSTR(CAST(pc.index_date  AS STRING), 7, 2)), 'UTC') END), p.from_event, p.to_event)                    AS cnt
-        FROM ldpw47q6patient_timing_pairs p
-        JOIN ldpw47q6patient_char pc ON p.person_id = pc.person_id
+        FROM sqvhwkzfpatient_timing_pairs p
+        JOIN sqvhwkzfpatient_char pc ON p.person_id = pc.person_id
     ) y
     GROUP BY index_year_int, from_event, to_event
     UNION ALL
@@ -65,8 +65,8 @@ FROM (
             YEAR(CASE TYPEOF(pc.index_date ) WHEN 'TIMESTAMP' THEN CAST(pc.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(pc.index_date  AS STRING), 1, 4), SUBSTR(CAST(pc.index_date  AS STRING), 5, 2), SUBSTR(CAST(pc.index_date  AS STRING), 7, 2)), 'UTC') END) AS index_year_int,
             ROW_NUMBER() OVER (PARTITION BY YEAR(CASE TYPEOF(pc.index_date ) WHEN 'TIMESTAMP' THEN CAST(pc.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(pc.index_date  AS STRING), 1, 4), SUBSTR(CAST(pc.index_date  AS STRING), 5, 2), SUBSTR(CAST(pc.index_date  AS STRING), 7, 2)), 'UTC') END), p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
             COUNT(*)     OVER (PARTITION BY YEAR(CASE TYPEOF(pc.index_date ) WHEN 'TIMESTAMP' THEN CAST(pc.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(pc.index_date  AS STRING), 1, 4), SUBSTR(CAST(pc.index_date  AS STRING), 5, 2), SUBSTR(CAST(pc.index_date  AS STRING), 7, 2)), 'UTC') END), p.from_event, p.to_event)                    AS cnt
-        FROM ldpw47q6patient_timing_pairs_first_to_closest_after p
-        JOIN ldpw47q6patient_char pc ON p.person_id = pc.person_id
+        FROM sqvhwkzfpatient_timing_pairs_first_to_closest_after p
+        JOIN sqvhwkzfpatient_char pc ON p.person_id = pc.person_id
     ) y
     GROUP BY index_year_int, from_event, to_event
 ) x

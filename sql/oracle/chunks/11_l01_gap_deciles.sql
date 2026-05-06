@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : oracle
--- Translated     : 2026-05-06 18:36:44 BST
+-- Translated     : 2026-05-06 18:53:52 BST
 -- Source file    : sql/sql_server/chunks/11_l01_gap_deciles.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -33,7 +33,7 @@ SELECT subgroup,
 FROM (SELECT subgroup, person_id, gap_days,
         ROW_NUMBER() OVER (PARTITION BY subgroup ORDER BY gap_days) AS rn,
         COUNT(*)     OVER (PARTITION BY subgroup)                   AS cnt
-    FROM ldpw47q6l01_consecutive_gaps
+    FROM sqvhwkzfl01_consecutive_gaps
  ) x
 GROUP BY subgroup
 ORDER BY subgroup

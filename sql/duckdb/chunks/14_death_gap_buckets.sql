@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : duckdb
--- Translated     : 2026-05-06 18:36:57 BST
+-- Translated     : 2026-05-06 18:54:07 BST
 -- Source file    : sql/sql_server/chunks/14_death_gap_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -61,7 +61,7 @@ GROUP BY
         ELSE 'ge730d'
     END
 ORDER BY
-    CASE
+    MIN(CASE
         WHEN gap_death_after_obs <   30 THEN 1
         WHEN gap_death_after_obs <   60 THEN 2
         WHEN gap_death_after_obs <   90 THEN 3
@@ -69,6 +69,6 @@ ORDER BY
         WHEN gap_death_after_obs <  365 THEN 5
         WHEN gap_death_after_obs <  730 THEN 6
         ELSE 7
-    END
+    END)
 ;
 

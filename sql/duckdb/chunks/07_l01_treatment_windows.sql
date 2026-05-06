@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : duckdb
--- Translated     : 2026-05-06 18:36:57 BST
+-- Translated     : 2026-05-06 18:54:07 BST
 -- Source file    : sql/sql_server/chunks/07_l01_treatment_windows.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -61,7 +61,6 @@ WITH window_bounds  AS (SELECT  CAST('INDEX' as TEXT) AS anchor_event,
         ms.first_met_date AS anchor_date,
         w.window_index
     FROM met_summary ms
-    WHERE ms.first_met_date IS NOT NULL
     CROSS JOIN (
         SELECT -6  AS window_index UNION ALL SELECT -5  UNION ALL SELECT -4
         UNION ALL SELECT -3  UNION ALL SELECT -2  UNION ALL SELECT -1
@@ -74,6 +73,7 @@ WITH window_bounds  AS (SELECT  CAST('INDEX' as TEXT) AS anchor_event,
         UNION ALL SELECT 18  UNION ALL SELECT 19  UNION ALL SELECT 20
         UNION ALL SELECT 21  UNION ALL SELECT 22  UNION ALL SELECT 23
     ) w
+    WHERE ms.first_met_date IS NOT NULL
 ),
 -- Mark which patients have at least one L01 exposure in each window
 window_l01 AS (

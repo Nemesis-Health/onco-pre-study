@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : redshift
--- Translated     : 2026-05-06 18:36:55 BST
+-- Translated     : 2026-05-06 18:54:04 BST
 -- Source file    : sql/sql_server/chunks/12_l01_gap_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -37,13 +37,13 @@ GROUP BY
     END
 ORDER BY
     subgroup,
-    CASE
+    MIN(CASE
         WHEN gap_days <  30  THEN 1
         WHEN gap_days <  60  THEN 2
         WHEN gap_days <  90  THEN 3
         WHEN gap_days < 180  THEN 4
         WHEN gap_days < 365  THEN 5
         ELSE 6
-    END
+    END)
 ;
 
