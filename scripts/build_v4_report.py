@@ -1025,6 +1025,7 @@ def _s00_overview(rd: Path) -> str:
     prev = _read(rd, "final_population_prevalence.csv")
     demo = _read(rd, "final_demographics_from_anchors.csv")
     dx_counts = _read(rd, "final_anchor_dx_concept_counts.csv")
+    attrition = _read(rd, "final_cohort_attrition.csv")
 
     parts: list[str] = []
 
@@ -1096,6 +1097,24 @@ def _s00_overview(rd: Path) -> str:
         _stat_box(male_str, "Sex (DX cohort)", pct="male"),
         cols=4,
     ))
+
+    # ── Cohort attrition note ───────────────────────────────────────────────────
+    if attrition is not None:
+        nc_any = _col(attrition, "n_dx_any")
+        nc_excl = _col(attrition, "n_excluded_no_obs_dx")
+        if nc_any and nc_excl and not attrition.empty:
+            r = attrition.iloc[0]
+            n_any = _safe_int(r.get(nc_any))
+            n_excl = _safe_int(r.get(nc_excl))
+            if n_any and n_excl is not None:
+                pct_excl = f"{100.0 * n_excl / n_any:.1f}%" if n_any > 0 else ""
+                excl_str = f"{_fmt_n(n_excl)} ({pct_excl})" if pct_excl else _fmt_n(n_excl)
+                parts.append(
+                    f'<p class="tbl-note" style="margin:-4px 0 20px;">'
+                    f'Cohort eligibility: index date = earliest qualifying DX within an observation period '
+                    f'({_fmt_n(n_any)} patients had a qualifying DX; {excl_str} excluded — no overlapping observation period).'
+                    f'</p>'
+                )
 
     # ── Yearly prevalence chart ─────────────────────────────────────────────────
     if prev is not None:
@@ -1867,23 +1886,12 @@ def _s05_obs_death(rd: Path) -> str:
                 if nd_val and nio_val is not None and noo_val is not None:
                     nd_before_val = max(0, nd_val - nio_val - noo_val)
                 pct_before = f"{100.0 * nd_before_val / nd_val:.1f}%" if nd_before_val and nd_val and nd_val > 0 else "—"
-                # Orphaned patients: death record but no observation_period row (from chunk 13)
-                nd_no_obs_val: int | None = None
-                if gap_summary is not None:
-                    gs_ac = _col(gap_summary, "anchor_event")
-                    gs_nop = _col(gap_summary, "n_death_no_obs_period")
-                    if gs_ac and gs_nop:
-                        gs_idx = gap_summary[gap_summary[gs_ac].astype(str).str.upper() == "INDEX"]
-                        if not gs_idx.empty:
-                            nd_no_obs_val = _safe_int(gs_idx.iloc[0].get(gs_nop))
-                pct_no_obs = f"{100.0 * nd_no_obs_val / nd_val:.1f}%" if nd_no_obs_val and nd_val and nd_val > 0 else "—"
                 parts.append(_card_grid(
                     _stat_box(_fmt_n(nd_val), "Deaths recorded", pct=pct_dead),
                     _stat_box(_fmt_n(nio_val) if nio_val else "—", "Death within obs. period", pct=pct_in, cls="highlight"),
                     _stat_box(_fmt_n(noo_val) if noo_val else "—", "Death AFTER obs. period end", pct=pct_out, cls="alert"),
                     _stat_box(_fmt_n(nd_before_val) if nd_before_val else "—", "Death BEFORE obs. period start", pct=pct_before, cls="warn"),
-                    _stat_box(_fmt_n(nd_no_obs_val) if nd_no_obs_val else "—", "No observation period record", pct=pct_no_obs, cls="warn"),
-                    cols=5,
+                    cols=4,
                 ))
 
     # Table 5.1 — category breakdown with implication
@@ -1911,22 +1919,7 @@ def _s05_obs_death(rd: Path) -> str:
                 gap_iqr = _fmt_iqr(r.get(med_d) if med_d else None,
                                    r.get(lq_d) if lq_d else None,
                                    r.get(uq_d) if uq_d else None)
-
-                # Pull precise per-category counts from chunk 13 (gap_summary)
-                nd_bef: int | None = None
-                nd_no_obs: int | None = None
-                if gap_summary is not None:
-                    gs_ac = _col(gap_summary, "anchor_event")
-                    gs_bef = _col(gap_summary, "n_death_before_obs")
-                    gs_nop = _col(gap_summary, "n_death_no_obs_period")
-                    if gs_ac:
-                        gs_idx = gap_summary[gap_summary[gs_ac].astype(str).str.upper() == "INDEX"]
-                        if not gs_idx.empty:
-                            gs_r = gs_idx.iloc[0]
-                            nd_bef = _safe_int(gs_r.get(gs_bef)) if gs_bef else None
-                            nd_no_obs = _safe_int(gs_r.get(gs_nop)) if gs_nop else None
-                if nd_bef is None and nd_ is not None:
-                    nd_bef = max(0, nd_ - (nio_ or 0) - (noo_ or 0))
+                nd_bef = max(0, nd_ - (nio_ or 0) - (noo_ or 0)) if nd_ else None
 
                 cat_rows = [
                     (
@@ -1943,11 +1936,6 @@ def _s05_obs_death(rd: Path) -> str:
                         "Death BEFORE obs. period start", "",
                         _fmt_n(nd_bef), _pct_of(nd_bef, np_),
                         "—", "Likely data entry error or retro-coded death date",
-                    ),
-                    (
-                        "No observation period record", "alert",
-                        _fmt_n(nd_no_obs), _pct_of(nd_no_obs, np_),
-                        "—", "Death record exists but patient absent from observation_period — data quality orphan; excluded from gap histogram",
                     ),
                 ]
                 def _cat_row(cat: str, cls: str, n: str, pct: str, gap: str, imp: str) -> str:
@@ -2050,22 +2038,8 @@ def _s05_obs_death(rd: Path) -> str:
     if gap_buckets is not None:
         fig = _gap_bucket_chart(gap_buckets, n_col="n_patients", group_col=None)
         if fig:
-            orphan_note = ""
-            if gap_summary is not None:
-                gs_ac = _col(gap_summary, "anchor_event")
-                gs_nop = _col(gap_summary, "n_death_no_obs_period")
-                if gs_ac and gs_nop:
-                    gs_idx = gap_summary[gap_summary[gs_ac].astype(str).str.upper() == "INDEX"]
-                    if not gs_idx.empty:
-                        n_orphan = _safe_int(gs_idx.iloc[0].get(gs_nop))
-                        if n_orphan:
-                            orphan_note = (
-                                f'<p class="tbl-note">Note: {_fmt_n(n_orphan)} additional patient(s) had a death record '
-                                f'but no <code>observation_period</code> row and are excluded from this histogram. '
-                                f'See Table 5.1 — "No observation period record".</p>'
-                            )
             parts.append(_plot_box(
-                "Figure 5.1 — Gap distribution: death date − obs. period end", _fig_div(fig) + orphan_note, badge="new",
+                "Figure 5.1 — Gap distribution: death date − obs. period end", _fig_div(fig), badge="new",
                 sub="Patients whose death date falls outside their observation window",
             ))
 
