@@ -42,6 +42,6 @@ SELECT
 FROM base
 ORDER BY
     CASE WHEN prevalence_year = 'OVERALL' THEN 0 ELSE 1 END,
-    TRY_CAST(prevalence_year AS INT)
+    CASE WHEN prevalence_year = 'OVERALL' THEN NULL ELSE CAST(prevalence_year AS INT) END
 ;
 

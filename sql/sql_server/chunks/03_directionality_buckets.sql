@@ -98,7 +98,7 @@ FROM (
 ORDER BY
     x.pair,
     CASE WHEN x.index_year = 'OVERALL' THEN 0 ELSE 1 END,
-    TRY_CAST(x.index_year AS INT),
+    CASE WHEN x.index_year = 'OVERALL' THEN NULL ELSE CAST(x.index_year AS INT) END,
     CASE x.direction
         WHEN 'BEFORE_GT90'  THEN 1
         WHEN 'BEFORE_1_90'  THEN 2

@@ -25,6 +25,6 @@ LEFT JOIN #followup_quantiles f
  AND s.anchor_event = f.anchor_event
 ORDER BY
     CASE WHEN s.prevalence_year = 'OVERALL' THEN 0 ELSE 1 END,
-    TRY_CAST(s.prevalence_year AS INT),
+    CASE WHEN s.prevalence_year = 'OVERALL' THEN NULL ELSE CAST(s.prevalence_year AS INT) END,
     CASE WHEN s.anchor_event = 'INDEX' THEN 0 ELSE 1 END
 ;
