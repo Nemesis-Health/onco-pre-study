@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : sqlite
--- Translated     : 2026-04-27 15:05:07 BST
+-- Translated     : 2026-05-06 18:06:54 BST
 -- Source file    : sql/sql_server/chunks/01_population_prevalence.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -49,6 +49,6 @@ SELECT
 FROM base
 ORDER BY
     CASE WHEN prevalence_year = 'OVERALL' THEN 0 ELSE 1 END,
-    CAST(prevalence_year AS INT)
+    CASE WHEN prevalence_year = 'OVERALL' THEN NULL ELSE CAST(prevalence_year AS INT) END
 ;
 

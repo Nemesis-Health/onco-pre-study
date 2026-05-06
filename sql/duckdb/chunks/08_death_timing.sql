@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : duckdb
--- Translated     : 2026-04-27 15:05:09 BST
+-- Translated     : 2026-05-06 18:06:57 BST
 -- Source file    : sql/sql_server/chunks/08_death_timing.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -35,7 +35,7 @@ LEFT JOIN followup_quantiles f
  AND s.anchor_event = f.anchor_event
 ORDER BY
     CASE WHEN s.prevalence_year = 'OVERALL' THEN 0 ELSE 1 END,
-    CAST(s.prevalence_year AS INT),
+    CASE WHEN s.prevalence_year = 'OVERALL' THEN NULL ELSE CAST(s.prevalence_year AS INT) END,
     CASE WHEN s.anchor_event = 'INDEX' THEN 0 ELSE 1 END
 ;
 

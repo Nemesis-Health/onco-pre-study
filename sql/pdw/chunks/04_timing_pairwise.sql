@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : pdw
--- Translated     : 2026-04-27 15:05:03 BST
+-- Translated     : 2026-05-06 18:06:46 BST
 -- Source file    : sql/sql_server/chunks/04_timing_pairwise.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R

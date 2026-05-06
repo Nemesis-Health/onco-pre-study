@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : impala
--- Translated     : 2026-04-27 15:05:04 BST
+-- Translated     : 2026-05-06 18:06:47 BST
 -- Source file    : sql/sql_server/chunks/00_setup.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -62,12 +62,12 @@ Cross-dialect / SqlRender
 -- Source: cohort_definitions/UC.json — ConceptSets id 7 "UC - Malignant neoplasm"
 -- Expanded with concept_ancestor (includeDescendants / isExcluded match Atlas).
 ------------------------------------------------------------
-DROP TABLE IF EXISTS k8dhxotxdx_anchor_include;
-CREATE TABLE k8dhxotxdx_anchor_include (
+DROP TABLE IF EXISTS cbse36ibdx_anchor_include;
+CREATE TABLE cbse36ibdx_anchor_include (
     concept_id BIGINT,
     include_descendants SMALLINT
 );
-INSERT INTO k8dhxotxdx_anchor_include (concept_id, include_descendants) VALUES
+INSERT INTO cbse36ibdx_anchor_include (concept_id, include_descendants) VALUES
     (197508, 1),      -- Malignant neoplasm of urinary bladder
     (4181357, 1),     -- Malignant tumor of renal pelvis
     (4177230, 1),     -- Malignant tumor of urethra
@@ -77,12 +77,12 @@ INSERT INTO k8dhxotxdx_anchor_include (concept_id, include_descendants) VALUES
     (44501785, 0),    -- Transitional cell carcinoma, NOS, of urinary system, NOS (ICDO3)
     (37110270, 1)     -- Primary urothelial carcinoma of overlapping sites of urinary organs
 ;
-DROP TABLE IF EXISTS k8dhxotxdx_anchor_exclude;
-CREATE TABLE k8dhxotxdx_anchor_exclude (
+DROP TABLE IF EXISTS cbse36ibdx_anchor_exclude;
+CREATE TABLE cbse36ibdx_anchor_exclude (
     concept_id BIGINT,
     include_descendants SMALLINT
 );
-INSERT INTO k8dhxotxdx_anchor_exclude (concept_id, include_descendants) VALUES
+INSERT INTO cbse36ibdx_anchor_exclude (concept_id, include_descendants) VALUES
     (4280899, 1),
     (4289374, 1),
     (4280900, 1),
@@ -92,24 +92,24 @@ INSERT INTO k8dhxotxdx_anchor_exclude (concept_id, include_descendants) VALUES
     (4289376, 1),
     (4280897, 1),
     (4200889, 1);
-DROP TABLE IF EXISTS k8dhxotxdx_anchor_concepts;
-CREATE TABLE k8dhxotxdx_anchor_concepts (
+DROP TABLE IF EXISTS cbse36ibdx_anchor_concepts;
+CREATE TABLE cbse36ibdx_anchor_concepts (
     concept_id BIGINT
 );
-INSERT INTO k8dhxotxdx_anchor_concepts (concept_id)
+INSERT INTO cbse36ibdx_anchor_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
-FROM k8dhxotxdx_anchor_include i
+FROM cbse36ibdx_anchor_include i
 JOIN @cdm_database_schema.concept_ancestor ca
   ON ca.ancestor_concept_id = i.concept_id
  AND (i.include_descendants = 1 OR ca.descendant_concept_id = i.concept_id);
-INSERT OVERWRITE TABLE k8dhxotxdx_anchor_concepts
- SELECT * FROM k8dhxotxdx_anchor_concepts
+INSERT OVERWRITE TABLE cbse36ibdx_anchor_concepts
+ SELECT * FROM cbse36ibdx_anchor_concepts
  WHERE NOT(EXISTS (
     SELECT 1
-    FROM k8dhxotxdx_anchor_exclude e
+    FROM cbse36ibdx_anchor_exclude e
     JOIN @cdm_database_schema.concept_ancestor ca
       ON ca.ancestor_concept_id = e.concept_id
-     AND k8dhxotxdx_anchor_concepts.concept_id = ca.descendant_concept_id
+     AND cbse36ibdx_anchor_concepts.concept_id = ca.descendant_concept_id
      AND (e.include_descendants = 1 OR ca.descendant_concept_id = e.concept_id)
 ));
 ------------------------------------------------------------
@@ -118,21 +118,21 @@ INSERT OVERWRITE TABLE k8dhxotxdx_anchor_concepts
 -- but constrained to descendants of 443392 (Malignant neoplastic disease) to avoid overly-broad ancestors.
 -- (concept_ancestor includes self-links; we only want broader/generalized codes).
 ------------------------------------------------------------
-DROP TABLE IF EXISTS k8dhxotxgen_cancer_concepts;
-CREATE TABLE k8dhxotxgen_cancer_concepts (
+DROP TABLE IF EXISTS cbse36ibgen_cancer_concepts;
+CREATE TABLE cbse36ibgen_cancer_concepts (
     concept_id BIGINT
 );
-INSERT INTO k8dhxotxgen_cancer_concepts (concept_id)
+INSERT INTO cbse36ibgen_cancer_concepts (concept_id)
 SELECT DISTINCT ca.ancestor_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
-JOIN k8dhxotxdx_anchor_concepts d
+JOIN cbse36ibdx_anchor_concepts d
   ON ca.descendant_concept_id = d.concept_id
 JOIN @cdm_database_schema.concept_ancestor malign
   ON malign.ancestor_concept_id = 443392
  AND malign.descendant_concept_id = ca.ancestor_concept_id
 WHERE NOT EXISTS (
     SELECT 1
-    FROM k8dhxotxdx_anchor_concepts dx
+    FROM cbse36ibdx_anchor_concepts dx
     WHERE dx.concept_id = ca.ancestor_concept_id
 )
 ;
@@ -140,27 +140,27 @@ WHERE NOT EXISTS (
 -- C) OTHER CANCER DIAGNOSIS CONCEPTS (ODX)
 -- Default: descendants of 443392 excluding DX + GDX sets.
 ------------------------------------------------------------
-DROP TABLE IF EXISTS k8dhxotxother_dx_ancestor_concepts;
-CREATE TABLE k8dhxotxother_dx_ancestor_concepts (
+DROP TABLE IF EXISTS cbse36ibother_dx_ancestor_concepts;
+CREATE TABLE cbse36ibother_dx_ancestor_concepts (
     ancestor_concept_id BIGINT
 );
 -- EDIT THIS LIST
-INSERT INTO k8dhxotxother_dx_ancestor_concepts (ancestor_concept_id)
+INSERT INTO cbse36ibother_dx_ancestor_concepts (ancestor_concept_id)
 VALUES
     (443392) -- Malignant neoplastic disease
 ;
-DROP TABLE IF EXISTS k8dhxotxother_dx_concepts;
-CREATE TABLE k8dhxotxother_dx_concepts (
+DROP TABLE IF EXISTS cbse36ibother_dx_concepts;
+CREATE TABLE cbse36ibother_dx_concepts (
     concept_id BIGINT
 );
-INSERT INTO k8dhxotxother_dx_concepts (concept_id)
+INSERT INTO cbse36ibother_dx_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
-JOIN k8dhxotxother_dx_ancestor_concepts a
+JOIN cbse36ibother_dx_ancestor_concepts a
   ON ca.ancestor_concept_id = a.ancestor_concept_id
-LEFT JOIN k8dhxotxdx_anchor_concepts dx
+LEFT JOIN cbse36ibdx_anchor_concepts dx
   ON dx.concept_id = ca.descendant_concept_id
-LEFT JOIN k8dhxotxgen_cancer_concepts gdx
+LEFT JOIN cbse36ibgen_cancer_concepts gdx
   ON gdx.concept_id = ca.descendant_concept_id
 WHERE dx.concept_id IS NULL
   AND gdx.concept_id IS NULL
@@ -169,160 +169,160 @@ WHERE dx.concept_id IS NULL
 -- D) METASTASIS CONCEPTS (MEASUREMENT)
 -- Define via ancestor IDs (descendants pulled from concept_ancestor)
 ------------------------------------------------------------
-DROP TABLE IF EXISTS k8dhxotxmet_ancestor_concepts;
-CREATE TABLE k8dhxotxmet_ancestor_concepts (
+DROP TABLE IF EXISTS cbse36ibmet_ancestor_concepts;
+CREATE TABLE cbse36ibmet_ancestor_concepts (
     ancestor_concept_id BIGINT
 );
 -- Default: concept set "Secondary malignancy" from cohort_definitions/Target_Cohort_2B.json
-INSERT INTO k8dhxotxmet_ancestor_concepts (ancestor_concept_id)
+INSERT INTO cbse36ibmet_ancestor_concepts (ancestor_concept_id)
 VALUES
     (1633308),  -- AJCC/UICC Stage 4
     (1635142),  -- AJCC/UICC M1 Category
     (36769180)  -- Metastasis
 ;
-DROP TABLE IF EXISTS k8dhxotxmet_concepts;
-CREATE TABLE k8dhxotxmet_concepts (
+DROP TABLE IF EXISTS cbse36ibmet_concepts;
+CREATE TABLE cbse36ibmet_concepts (
     concept_id BIGINT
 );
-INSERT INTO k8dhxotxmet_concepts (concept_id)
+INSERT INTO cbse36ibmet_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
-JOIN k8dhxotxmet_ancestor_concepts a
+JOIN cbse36ibmet_ancestor_concepts a
   ON ca.ancestor_concept_id = a.ancestor_concept_id
 ;
 ------------------------------------------------------------
 -- E) L01 TREATMENT CONCEPTS (DRUG_EXPOSURE)
 ------------------------------------------------------------
-DROP TABLE IF EXISTS k8dhxotxl01_ancestor_concepts;
-CREATE TABLE k8dhxotxl01_ancestor_concepts (
+DROP TABLE IF EXISTS cbse36ibl01_ancestor_concepts;
+CREATE TABLE cbse36ibl01_ancestor_concepts (
     ancestor_concept_id BIGINT
 );
 -- EDIT THIS LIST
-INSERT INTO k8dhxotxl01_ancestor_concepts (ancestor_concept_id)
+INSERT INTO cbse36ibl01_ancestor_concepts (ancestor_concept_id)
 VALUES
     (21601387)
 ;
-DROP TABLE IF EXISTS k8dhxotxl01_concepts;
-CREATE TABLE k8dhxotxl01_concepts (
+DROP TABLE IF EXISTS cbse36ibl01_concepts;
+CREATE TABLE cbse36ibl01_concepts (
     concept_id BIGINT
 );
-INSERT INTO k8dhxotxl01_concepts (concept_id)
+INSERT INTO cbse36ibl01_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
-JOIN k8dhxotxl01_ancestor_concepts a
+JOIN cbse36ibl01_ancestor_concepts a
   ON ca.ancestor_concept_id = a.ancestor_concept_id
 ;
 ------------------------------------------------------------
 -- F) EVENT TABLES
 ------------------------------------------------------------
-DROP TABLE IF EXISTS k8dhxotxdx_events;
-CREATE TABLE k8dhxotxdx_events (
+DROP TABLE IF EXISTS cbse36ibdx_events;
+CREATE TABLE cbse36ibdx_events (
     person_id BIGINT,
     event_date TIMESTAMP,
     concept_id BIGINT
 );
-INSERT INTO k8dhxotxdx_events (person_id, event_date, concept_id)
+INSERT INTO cbse36ibdx_events (person_id, event_date, concept_id)
 SELECT
     co.person_id,
     co.condition_start_date,
     co.condition_concept_id
 FROM @cdm_database_schema.condition_occurrence co
-JOIN k8dhxotxdx_anchor_concepts d
+JOIN cbse36ibdx_anchor_concepts d
   ON co.condition_concept_id = d.concept_id
 ;
 -- Distinct anchor cohort persons; limits later F) pulls to rows that downstream joins to #cohort use anyway.
-DROP TABLE IF EXISTS k8dhxotxanchor_person;
-CREATE TABLE k8dhxotxanchor_person (
+DROP TABLE IF EXISTS cbse36ibanchor_person;
+CREATE TABLE cbse36ibanchor_person (
     person_id BIGINT
 );
-INSERT INTO k8dhxotxanchor_person (person_id)
+INSERT INTO cbse36ibanchor_person (person_id)
 SELECT DISTINCT person_id
-FROM k8dhxotxdx_events
+FROM cbse36ibdx_events
 ;
-DROP TABLE IF EXISTS k8dhxotxother_dx_events;
-CREATE TABLE k8dhxotxother_dx_events (
+DROP TABLE IF EXISTS cbse36ibother_dx_events;
+CREATE TABLE cbse36ibother_dx_events (
     person_id BIGINT,
     event_date TIMESTAMP,
     concept_id BIGINT
 );
-INSERT INTO k8dhxotxother_dx_events (person_id, event_date, concept_id)
+INSERT INTO cbse36ibother_dx_events (person_id, event_date, concept_id)
 SELECT
     co.person_id,
     co.condition_start_date,
     co.condition_concept_id
 FROM @cdm_database_schema.condition_occurrence co
-JOIN k8dhxotxanchor_person ap
+JOIN cbse36ibanchor_person ap
   ON co.person_id = ap.person_id
-JOIN k8dhxotxother_dx_concepts d
+JOIN cbse36ibother_dx_concepts d
   ON co.condition_concept_id = d.concept_id
 ;
-DROP TABLE IF EXISTS k8dhxotxgen_cancer_events;
-CREATE TABLE k8dhxotxgen_cancer_events (
+DROP TABLE IF EXISTS cbse36ibgen_cancer_events;
+CREATE TABLE cbse36ibgen_cancer_events (
     person_id BIGINT,
     event_date TIMESTAMP,
     concept_id BIGINT
 );
-INSERT INTO k8dhxotxgen_cancer_events (person_id, event_date, concept_id)
+INSERT INTO cbse36ibgen_cancer_events (person_id, event_date, concept_id)
 SELECT
     co.person_id,
     co.condition_start_date,
     co.condition_concept_id
 FROM @cdm_database_schema.condition_occurrence co
-JOIN k8dhxotxanchor_person ap
+JOIN cbse36ibanchor_person ap
   ON co.person_id = ap.person_id
-JOIN k8dhxotxgen_cancer_concepts g
+JOIN cbse36ibgen_cancer_concepts g
   ON co.condition_concept_id = g.concept_id
 ;
-DROP TABLE IF EXISTS k8dhxotxmet_events;
-CREATE TABLE k8dhxotxmet_events (
+DROP TABLE IF EXISTS cbse36ibmet_events;
+CREATE TABLE cbse36ibmet_events (
     person_id BIGINT,
     event_date TIMESTAMP,
     concept_id BIGINT
 );
-INSERT INTO k8dhxotxmet_events (person_id, event_date, concept_id)
+INSERT INTO cbse36ibmet_events (person_id, event_date, concept_id)
 SELECT
     m.person_id,
     m.measurement_date,
     m.measurement_concept_id
 FROM @cdm_database_schema.measurement m
-JOIN k8dhxotxanchor_person ap
+JOIN cbse36ibanchor_person ap
   ON m.person_id = ap.person_id
-JOIN k8dhxotxmet_concepts mc
+JOIN cbse36ibmet_concepts mc
   ON m.measurement_concept_id = mc.concept_id
 ;
-DROP TABLE IF EXISTS k8dhxotxl01_events;
-CREATE TABLE k8dhxotxl01_events (
+DROP TABLE IF EXISTS cbse36ibl01_events;
+CREATE TABLE cbse36ibl01_events (
     person_id BIGINT,
     event_date TIMESTAMP,
     concept_id BIGINT
 );
-INSERT INTO k8dhxotxl01_events (person_id, event_date, concept_id)
+INSERT INTO cbse36ibl01_events (person_id, event_date, concept_id)
 SELECT
     de.person_id,
     de.drug_exposure_start_date,
     de.drug_concept_id
 FROM @cdm_database_schema.drug_exposure de
-JOIN k8dhxotxanchor_person ap
+JOIN cbse36ibanchor_person ap
   ON de.person_id = ap.person_id
-JOIN k8dhxotxl01_concepts l
+JOIN cbse36ibl01_concepts l
   ON de.drug_concept_id = l.concept_id
 ;
 -- Ingredient-level L01 events used for concept-level code counts/timing.
-DROP TABLE IF EXISTS k8dhxotxl01_ingredient_events;
-CREATE TABLE k8dhxotxl01_ingredient_events (
+DROP TABLE IF EXISTS cbse36ibl01_ingredient_events;
+CREATE TABLE cbse36ibl01_ingredient_events (
     person_id BIGINT,
     event_date TIMESTAMP,
     concept_id BIGINT
 );
-INSERT INTO k8dhxotxl01_ingredient_events (person_id, event_date, concept_id)
+INSERT INTO cbse36ibl01_ingredient_events (person_id, event_date, concept_id)
 SELECT DISTINCT
     de.person_id,
     de.drug_exposure_start_date,
     ca.ancestor_concept_id
 FROM @cdm_database_schema.drug_exposure de
-JOIN k8dhxotxanchor_person ap
+JOIN cbse36ibanchor_person ap
   ON de.person_id = ap.person_id
-JOIN k8dhxotxl01_concepts l
+JOIN cbse36ibl01_concepts l
   ON de.drug_concept_id = l.concept_id
 JOIN @cdm_database_schema.concept_ancestor ca
   ON ca.descendant_concept_id = de.drug_concept_id
@@ -333,175 +333,175 @@ JOIN @cdm_database_schema.concept ing
 ------------------------------------------------------------
 -- G) COHORT ANCHOR + SUMMARIES
 ------------------------------------------------------------
-DROP TABLE IF EXISTS k8dhxotxcohort;
-CREATE TABLE k8dhxotxcohort (
+DROP TABLE IF EXISTS cbse36ibcohort;
+CREATE TABLE cbse36ibcohort (
     person_id BIGINT,
     index_date TIMESTAMP
 );
-INSERT INTO k8dhxotxcohort (person_id, index_date)
+INSERT INTO cbse36ibcohort (person_id, index_date)
 SELECT
     person_id,
     MIN(event_date) AS index_date
-FROM k8dhxotxdx_events
+FROM cbse36ibdx_events
 GROUP BY person_id
 ;
-DROP TABLE IF EXISTS k8dhxotxdx_summary;
-CREATE TABLE k8dhxotxdx_summary (
+DROP TABLE IF EXISTS cbse36ibdx_summary;
+CREATE TABLE cbse36ibdx_summary (
     person_id BIGINT,
     n_dx_records INT,
     n_dx_codes INT
 );
-INSERT INTO k8dhxotxdx_summary (person_id, n_dx_records, n_dx_codes)
+INSERT INTO cbse36ibdx_summary (person_id, n_dx_records, n_dx_codes)
 SELECT
     e.person_id,
     COUNT(*) AS n_dx_records,
     COUNT(DISTINCT e.concept_id) AS n_dx_codes
-FROM k8dhxotxdx_events e
-JOIN k8dhxotxcohort c
+FROM cbse36ibdx_events e
+JOIN cbse36ibcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
 ;
-DROP TABLE IF EXISTS k8dhxotxother_dx_summary;
-CREATE TABLE k8dhxotxother_dx_summary (
+DROP TABLE IF EXISTS cbse36ibother_dx_summary;
+CREATE TABLE cbse36ibother_dx_summary (
     person_id BIGINT,
     first_other_dx_date TIMESTAMP,
     n_other_dx_records INT,
     n_other_dx_codes INT
 );
-INSERT INTO k8dhxotxother_dx_summary (person_id, first_other_dx_date, n_other_dx_records, n_other_dx_codes)
+INSERT INTO cbse36ibother_dx_summary (person_id, first_other_dx_date, n_other_dx_records, n_other_dx_codes)
 SELECT
     e.person_id,
     MIN(e.event_date) AS first_other_dx_date,
     COUNT(*) AS n_other_dx_records,
     COUNT(DISTINCT e.concept_id) AS n_other_dx_codes
-FROM k8dhxotxother_dx_events e
-JOIN k8dhxotxcohort c
+FROM cbse36ibother_dx_events e
+JOIN cbse36ibcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
 ;
-DROP TABLE IF EXISTS k8dhxotxgen_cancer_summary;
-CREATE TABLE k8dhxotxgen_cancer_summary (
+DROP TABLE IF EXISTS cbse36ibgen_cancer_summary;
+CREATE TABLE cbse36ibgen_cancer_summary (
     person_id BIGINT,
     first_gen_cancer_date TIMESTAMP,
     n_gen_cancer_records INT,
     n_gen_cancer_codes INT
 );
-INSERT INTO k8dhxotxgen_cancer_summary (person_id, first_gen_cancer_date, n_gen_cancer_records, n_gen_cancer_codes)
+INSERT INTO cbse36ibgen_cancer_summary (person_id, first_gen_cancer_date, n_gen_cancer_records, n_gen_cancer_codes)
 SELECT
     e.person_id,
     MIN(e.event_date) AS first_gen_cancer_date,
     COUNT(*) AS n_gen_cancer_records,
     COUNT(DISTINCT e.concept_id) AS n_gen_cancer_codes
-FROM k8dhxotxgen_cancer_events e
-JOIN k8dhxotxcohort c
+FROM cbse36ibgen_cancer_events e
+JOIN cbse36ibcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
 ;
-DROP TABLE IF EXISTS k8dhxotxmet_summary;
-CREATE TABLE k8dhxotxmet_summary (
+DROP TABLE IF EXISTS cbse36ibmet_summary;
+CREATE TABLE cbse36ibmet_summary (
     person_id BIGINT,
     first_met_date TIMESTAMP,
     n_met_records INT
 );
-INSERT INTO k8dhxotxmet_summary (person_id, first_met_date, n_met_records)
+INSERT INTO cbse36ibmet_summary (person_id, first_met_date, n_met_records)
 SELECT
     e.person_id,
     MIN(e.event_date) AS first_met_date,
     COUNT(*) AS n_met_records
-FROM k8dhxotxmet_events e
-JOIN k8dhxotxcohort c
+FROM cbse36ibmet_events e
+JOIN cbse36ibcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
 ;
-DROP TABLE IF EXISTS k8dhxotxl01_summary;
-CREATE TABLE k8dhxotxl01_summary (
+DROP TABLE IF EXISTS cbse36ibl01_summary;
+CREATE TABLE cbse36ibl01_summary (
     person_id BIGINT,
     first_l01_date TIMESTAMP,
     n_l01_exposures INT
 );
-INSERT INTO k8dhxotxl01_summary (person_id, first_l01_date, n_l01_exposures)
+INSERT INTO cbse36ibl01_summary (person_id, first_l01_date, n_l01_exposures)
 SELECT
     e.person_id,
     MIN(e.event_date) AS first_l01_date,
     COUNT(*) AS n_l01_exposures
-FROM k8dhxotxl01_events e
-JOIN k8dhxotxcohort c
+FROM cbse36ibl01_events e
+JOIN cbse36ibcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
 ;
 -- H) EVENT CODE COUNTS (single table across event families)
 ------------------------------------------------------------
-DROP TABLE IF EXISTS k8dhxotxevent_code_counts;
-CREATE TABLE k8dhxotxevent_code_counts (
+DROP TABLE IF EXISTS cbse36ibevent_code_counts;
+CREATE TABLE cbse36ibevent_code_counts (
     anchor_event VARCHAR(20), -- INDEX or FIRST_MET
     event_family VARCHAR(20),
     concept_id BIGINT,
     n_records INT,
     n_patients INT
 );
-INSERT INTO k8dhxotxevent_code_counts (anchor_event, event_family, concept_id, n_records, n_patients)
+INSERT INTO cbse36ibevent_code_counts (anchor_event, event_family, concept_id, n_records, n_patients)
 SELECT 'INDEX', 'DX', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM k8dhxotxdx_events
-WHERE person_id IN (SELECT person_id FROM k8dhxotxcohort)
+FROM cbse36ibdx_events
+WHERE person_id IN (SELECT person_id FROM cbse36ibcohort)
 GROUP BY concept_id
 UNION ALL
 SELECT 'INDEX', 'ODX', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM k8dhxotxother_dx_events
-WHERE person_id IN (SELECT person_id FROM k8dhxotxcohort)
+FROM cbse36ibother_dx_events
+WHERE person_id IN (SELECT person_id FROM cbse36ibcohort)
 GROUP BY concept_id
 UNION ALL
 SELECT 'INDEX', 'GDX', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM k8dhxotxgen_cancer_events
-WHERE person_id IN (SELECT person_id FROM k8dhxotxcohort)
+FROM cbse36ibgen_cancer_events
+WHERE person_id IN (SELECT person_id FROM cbse36ibcohort)
 GROUP BY concept_id
 UNION ALL
 SELECT 'INDEX', 'MET', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM k8dhxotxmet_events
-WHERE person_id IN (SELECT person_id FROM k8dhxotxcohort)
+FROM cbse36ibmet_events
+WHERE person_id IN (SELECT person_id FROM cbse36ibcohort)
 GROUP BY concept_id
 UNION ALL
 SELECT 'INDEX', 'L01', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM k8dhxotxl01_ingredient_events
-WHERE person_id IN (SELECT person_id FROM k8dhxotxcohort)
+FROM cbse36ibl01_ingredient_events
+WHERE person_id IN (SELECT person_id FROM cbse36ibcohort)
 GROUP BY concept_id
 UNION ALL
 SELECT 'FIRST_MET', 'DX', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM k8dhxotxdx_events e
-JOIN k8dhxotxmet_summary ms
+FROM cbse36ibdx_events e
+JOIN cbse36ibmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
 UNION ALL
 SELECT 'FIRST_MET', 'ODX', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM k8dhxotxother_dx_events e
-JOIN k8dhxotxmet_summary ms
+FROM cbse36ibother_dx_events e
+JOIN cbse36ibmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
 UNION ALL
 SELECT 'FIRST_MET', 'GDX', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM k8dhxotxgen_cancer_events e
-JOIN k8dhxotxmet_summary ms
+FROM cbse36ibgen_cancer_events e
+JOIN cbse36ibmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
 UNION ALL
 SELECT 'FIRST_MET', 'MET', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM k8dhxotxmet_events e
-JOIN k8dhxotxmet_summary ms
+FROM cbse36ibmet_events e
+JOIN cbse36ibmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
 UNION ALL
 SELECT 'FIRST_MET', 'L01', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM k8dhxotxl01_ingredient_events e
-JOIN k8dhxotxmet_summary ms
+FROM cbse36ibl01_ingredient_events e
+JOIN cbse36ibmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
 ;
-DROP TABLE IF EXISTS k8dhxotxevent_code_counts_before_after;
-CREATE TABLE k8dhxotxevent_code_counts_before_after (
+DROP TABLE IF EXISTS cbse36ibevent_code_counts_before_after;
+CREATE TABLE cbse36ibevent_code_counts_before_after (
     anchor_event VARCHAR(20), -- INDEX
     event_family VARCHAR(20),
     time_relative VARCHAR(10), -- BEFORE or AFTER (relative to index_date)
@@ -509,15 +509,15 @@ CREATE TABLE k8dhxotxevent_code_counts_before_after (
     n_records INT,
     n_patients INT
 );
-INSERT INTO k8dhxotxevent_code_counts_before_after (anchor_event, event_family, time_relative, concept_id, n_records, n_patients)
+INSERT INTO cbse36ibevent_code_counts_before_after (anchor_event, event_family, time_relative, concept_id, n_records, n_patients)
 SELECT 'INDEX',
        'DX',
        CASE WHEN DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END) < 0 THEN 'BEFORE' ELSE 'AFTER' END AS time_relative,
        e.concept_id,
        COUNT(*) AS n_records,
        COUNT(DISTINCT e.person_id) AS n_patients
-FROM k8dhxotxdx_events e
-JOIN k8dhxotxcohort c
+FROM cbse36ibdx_events e
+JOIN cbse36ibcohort c
   ON e.person_id = c.person_id
 GROUP BY
     CASE WHEN DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END) < 0 THEN 'BEFORE' ELSE 'AFTER' END,
@@ -529,8 +529,8 @@ SELECT 'INDEX',
        e.concept_id,
        COUNT(*),
        COUNT(DISTINCT e.person_id)
-FROM k8dhxotxother_dx_events e
-JOIN k8dhxotxcohort c
+FROM cbse36ibother_dx_events e
+JOIN cbse36ibcohort c
   ON e.person_id = c.person_id
 GROUP BY
     CASE WHEN DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END) < 0 THEN 'BEFORE' ELSE 'AFTER' END,
@@ -542,8 +542,8 @@ SELECT 'INDEX',
        e.concept_id,
        COUNT(*),
        COUNT(DISTINCT e.person_id)
-FROM k8dhxotxgen_cancer_events e
-JOIN k8dhxotxcohort c
+FROM cbse36ibgen_cancer_events e
+JOIN cbse36ibcohort c
   ON e.person_id = c.person_id
 GROUP BY
     CASE WHEN DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END) < 0 THEN 'BEFORE' ELSE 'AFTER' END,
@@ -555,8 +555,8 @@ SELECT 'INDEX',
        e.concept_id,
        COUNT(*),
        COUNT(DISTINCT e.person_id)
-FROM k8dhxotxmet_events e
-JOIN k8dhxotxcohort c
+FROM cbse36ibmet_events e
+JOIN cbse36ibcohort c
   ON e.person_id = c.person_id
 GROUP BY
     CASE WHEN DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END) < 0 THEN 'BEFORE' ELSE 'AFTER' END,
@@ -568,15 +568,15 @@ SELECT 'INDEX',
        e.concept_id,
        COUNT(*),
        COUNT(DISTINCT e.person_id)
-FROM k8dhxotxl01_ingredient_events e
-JOIN k8dhxotxcohort c
+FROM cbse36ibl01_ingredient_events e
+JOIN cbse36ibcohort c
   ON e.person_id = c.person_id
 GROUP BY
     CASE WHEN DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END) < 0 THEN 'BEFORE' ELSE 'AFTER' END,
     e.concept_id
 ;
-DROP TABLE IF EXISTS k8dhxotxevent_code_counts_before_after_first_met;
-CREATE TABLE k8dhxotxevent_code_counts_before_after_first_met (
+DROP TABLE IF EXISTS cbse36ibevent_code_counts_before_after_first_met;
+CREATE TABLE cbse36ibevent_code_counts_before_after_first_met (
     anchor_event VARCHAR(20), -- FIRST_MET
     event_family VARCHAR(20),
     time_relative VARCHAR(10), -- BEFORE or AFTER (relative to first_met_date)
@@ -584,15 +584,15 @@ CREATE TABLE k8dhxotxevent_code_counts_before_after_first_met (
     n_records INT,
     n_patients INT
 );
-INSERT INTO k8dhxotxevent_code_counts_before_after_first_met (anchor_event, event_family, time_relative, concept_id, n_records, n_patients)
+INSERT INTO cbse36ibevent_code_counts_before_after_first_met (anchor_event, event_family, time_relative, concept_id, n_records, n_patients)
 SELECT 'FIRST_MET',
        'DX',
        CASE WHEN DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(ms.first_met_date ) WHEN 'TIMESTAMP' THEN CAST(ms.first_met_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(ms.first_met_date  AS STRING), 1, 4), SUBSTR(CAST(ms.first_met_date  AS STRING), 5, 2), SUBSTR(CAST(ms.first_met_date  AS STRING), 7, 2)), 'UTC') END) < 0 THEN 'BEFORE' ELSE 'AFTER' END AS time_relative,
        e.concept_id,
        COUNT(*) AS n_records,
        COUNT(DISTINCT e.person_id) AS n_patients
-FROM k8dhxotxdx_events e
-JOIN k8dhxotxmet_summary ms
+FROM cbse36ibdx_events e
+JOIN cbse36ibmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY
@@ -605,8 +605,8 @@ SELECT 'FIRST_MET',
        e.concept_id,
        COUNT(*),
        COUNT(DISTINCT e.person_id)
-FROM k8dhxotxother_dx_events e
-JOIN k8dhxotxmet_summary ms
+FROM cbse36ibother_dx_events e
+JOIN cbse36ibmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY
@@ -619,8 +619,8 @@ SELECT 'FIRST_MET',
        e.concept_id,
        COUNT(*),
        COUNT(DISTINCT e.person_id)
-FROM k8dhxotxgen_cancer_events e
-JOIN k8dhxotxmet_summary ms
+FROM cbse36ibgen_cancer_events e
+JOIN cbse36ibmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY
@@ -633,8 +633,8 @@ SELECT 'FIRST_MET',
        e.concept_id,
        COUNT(*),
        COUNT(DISTINCT e.person_id)
-FROM k8dhxotxmet_events e
-JOIN k8dhxotxmet_summary ms
+FROM cbse36ibmet_events e
+JOIN cbse36ibmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY
@@ -647,16 +647,16 @@ SELECT 'FIRST_MET',
        e.concept_id,
        COUNT(*),
        COUNT(DISTINCT e.person_id)
-FROM k8dhxotxl01_ingredient_events e
-JOIN k8dhxotxmet_summary ms
+FROM cbse36ibl01_ingredient_events e
+JOIN cbse36ibmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY
     CASE WHEN DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(ms.first_met_date ) WHEN 'TIMESTAMP' THEN CAST(ms.first_met_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(ms.first_met_date  AS STRING), 1, 4), SUBSTR(CAST(ms.first_met_date  AS STRING), 5, 2), SUBSTR(CAST(ms.first_met_date  AS STRING), 7, 2)), 'UTC') END) < 0 THEN 'BEFORE' ELSE 'AFTER' END,
     e.concept_id
 ;
-DROP TABLE IF EXISTS k8dhxotxevent_code_all_events;
-CREATE TABLE k8dhxotxevent_code_all_events (
+DROP TABLE IF EXISTS cbse36ibevent_code_all_events;
+CREATE TABLE cbse36ibevent_code_all_events (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     concept_id BIGINT,
@@ -664,63 +664,63 @@ CREATE TABLE k8dhxotxevent_code_all_events (
     days_diff INT,
     event_date TIMESTAMP
 );
-INSERT INTO k8dhxotxevent_code_all_events (
+INSERT INTO cbse36ibevent_code_all_events (
     anchor_event, event_family, concept_id, person_id, days_diff, event_date
 )
 SELECT 'INDEX' AS anchor_event, 'DX' AS event_family, e.concept_id, e.person_id, DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END) AS days_diff, e.event_date
-FROM k8dhxotxdx_events e
-JOIN k8dhxotxcohort c ON e.person_id = c.person_id
+FROM cbse36ibdx_events e
+JOIN cbse36ibcohort c ON e.person_id = c.person_id
 UNION ALL
 SELECT 'INDEX', 'ODX', e.concept_id, e.person_id, DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END), e.event_date
-FROM k8dhxotxother_dx_events e
-JOIN k8dhxotxcohort c ON e.person_id = c.person_id
+FROM cbse36ibother_dx_events e
+JOIN cbse36ibcohort c ON e.person_id = c.person_id
 UNION ALL
 SELECT 'INDEX', 'GDX', e.concept_id, e.person_id, DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END), e.event_date
-FROM k8dhxotxgen_cancer_events e
-JOIN k8dhxotxcohort c ON e.person_id = c.person_id
+FROM cbse36ibgen_cancer_events e
+JOIN cbse36ibcohort c ON e.person_id = c.person_id
 UNION ALL
 SELECT 'INDEX', 'MET', e.concept_id, e.person_id, DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END), e.event_date
-FROM k8dhxotxmet_events e
-JOIN k8dhxotxcohort c ON e.person_id = c.person_id
+FROM cbse36ibmet_events e
+JOIN cbse36ibcohort c ON e.person_id = c.person_id
 UNION ALL
 SELECT 'INDEX', 'L01', e.concept_id, e.person_id, DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END), e.event_date
-FROM k8dhxotxl01_ingredient_events e
-JOIN k8dhxotxcohort c ON e.person_id = c.person_id
+FROM cbse36ibl01_ingredient_events e
+JOIN cbse36ibcohort c ON e.person_id = c.person_id
 UNION ALL
 SELECT 'FIRST_MET', 'DX', e.concept_id, e.person_id, DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(ms.first_met_date ) WHEN 'TIMESTAMP' THEN CAST(ms.first_met_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(ms.first_met_date  AS STRING), 1, 4), SUBSTR(CAST(ms.first_met_date  AS STRING), 5, 2), SUBSTR(CAST(ms.first_met_date  AS STRING), 7, 2)), 'UTC') END), e.event_date
-FROM k8dhxotxdx_events e
-JOIN k8dhxotxmet_summary ms ON e.person_id = ms.person_id
+FROM cbse36ibdx_events e
+JOIN cbse36ibmet_summary ms ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 UNION ALL
 SELECT 'FIRST_MET', 'ODX', e.concept_id, e.person_id, DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(ms.first_met_date ) WHEN 'TIMESTAMP' THEN CAST(ms.first_met_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(ms.first_met_date  AS STRING), 1, 4), SUBSTR(CAST(ms.first_met_date  AS STRING), 5, 2), SUBSTR(CAST(ms.first_met_date  AS STRING), 7, 2)), 'UTC') END), e.event_date
-FROM k8dhxotxother_dx_events e
-JOIN k8dhxotxmet_summary ms ON e.person_id = ms.person_id
+FROM cbse36ibother_dx_events e
+JOIN cbse36ibmet_summary ms ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 UNION ALL
 SELECT 'FIRST_MET', 'GDX', e.concept_id, e.person_id, DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(ms.first_met_date ) WHEN 'TIMESTAMP' THEN CAST(ms.first_met_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(ms.first_met_date  AS STRING), 1, 4), SUBSTR(CAST(ms.first_met_date  AS STRING), 5, 2), SUBSTR(CAST(ms.first_met_date  AS STRING), 7, 2)), 'UTC') END), e.event_date
-FROM k8dhxotxgen_cancer_events e
-JOIN k8dhxotxmet_summary ms ON e.person_id = ms.person_id
+FROM cbse36ibgen_cancer_events e
+JOIN cbse36ibmet_summary ms ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 UNION ALL
 SELECT 'FIRST_MET', 'MET', e.concept_id, e.person_id, DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(ms.first_met_date ) WHEN 'TIMESTAMP' THEN CAST(ms.first_met_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(ms.first_met_date  AS STRING), 1, 4), SUBSTR(CAST(ms.first_met_date  AS STRING), 5, 2), SUBSTR(CAST(ms.first_met_date  AS STRING), 7, 2)), 'UTC') END), e.event_date
-FROM k8dhxotxmet_events e
-JOIN k8dhxotxmet_summary ms ON e.person_id = ms.person_id
+FROM cbse36ibmet_events e
+JOIN cbse36ibmet_summary ms ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 UNION ALL
 SELECT 'FIRST_MET', 'L01', e.concept_id, e.person_id, DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(ms.first_met_date ) WHEN 'TIMESTAMP' THEN CAST(ms.first_met_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(ms.first_met_date  AS STRING), 1, 4), SUBSTR(CAST(ms.first_met_date  AS STRING), 5, 2), SUBSTR(CAST(ms.first_met_date  AS STRING), 7, 2)), 'UTC') END), e.event_date
-FROM k8dhxotxl01_ingredient_events e
-JOIN k8dhxotxmet_summary ms ON e.person_id = ms.person_id
+FROM cbse36ibl01_ingredient_events e
+JOIN cbse36ibmet_summary ms ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 ;
-DROP TABLE IF EXISTS k8dhxotxevent_code_patient_chosen_first;
-CREATE TABLE k8dhxotxevent_code_patient_chosen_first (
+DROP TABLE IF EXISTS cbse36ibevent_code_patient_chosen_first;
+CREATE TABLE cbse36ibevent_code_patient_chosen_first (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     concept_id BIGINT,
     person_id BIGINT,
     days_diff INT
 );
-INSERT INTO k8dhxotxevent_code_patient_chosen_first (anchor_event, event_family, concept_id, person_id, days_diff)
+INSERT INTO cbse36ibevent_code_patient_chosen_first (anchor_event, event_family, concept_id, person_id, days_diff)
 SELECT anchor_event, event_family, concept_id, person_id, days_diff
 FROM (
     SELECT
@@ -733,19 +733,19 @@ FROM (
             PARTITION BY anchor_event, event_family, concept_id, person_id
             ORDER BY DATEDIFF(CASE TYPEOF(event_date ) WHEN 'TIMESTAMP' THEN CAST(event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(event_date  AS STRING), 1, 4), SUBSTR(CAST(event_date  AS STRING), 5, 2), SUBSTR(CAST(event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(CASE TYPEOF('1900-01-01' ) WHEN 'TIMESTAMP' THEN CAST('1900-01-01'  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST('1900-01-01'  AS STRING), 1, 4), SUBSTR(CAST('1900-01-01'  AS STRING), 5, 2), SUBSTR(CAST('1900-01-01'  AS STRING), 7, 2)), 'UTC') END ) WHEN 'TIMESTAMP' THEN CAST(CASE TYPEOF('1900-01-01' ) WHEN 'TIMESTAMP' THEN CAST('1900-01-01'  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST('1900-01-01'  AS STRING), 1, 4), SUBSTR(CAST('1900-01-01'  AS STRING), 5, 2), SUBSTR(CAST('1900-01-01'  AS STRING), 7, 2)), 'UTC') END  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(CASE TYPEOF('1900-01-01' ) WHEN 'TIMESTAMP' THEN CAST('1900-01-01'  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST('1900-01-01'  AS STRING), 1, 4), SUBSTR(CAST('1900-01-01'  AS STRING), 5, 2), SUBSTR(CAST('1900-01-01'  AS STRING), 7, 2)), 'UTC') END  AS STRING), 1, 4), SUBSTR(CAST(CASE TYPEOF('1900-01-01' ) WHEN 'TIMESTAMP' THEN CAST('1900-01-01'  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST('1900-01-01'  AS STRING), 1, 4), SUBSTR(CAST('1900-01-01'  AS STRING), 5, 2), SUBSTR(CAST('1900-01-01'  AS STRING), 7, 2)), 'UTC') END  AS STRING), 5, 2), SUBSTR(CAST(CASE TYPEOF('1900-01-01' ) WHEN 'TIMESTAMP' THEN CAST('1900-01-01'  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST('1900-01-01'  AS STRING), 1, 4), SUBSTR(CAST('1900-01-01'  AS STRING), 5, 2), SUBSTR(CAST('1900-01-01'  AS STRING), 7, 2)), 'UTC') END  AS STRING), 7, 2)), 'UTC') END) ASC, event_date ASC
         ) AS rn
-    FROM k8dhxotxevent_code_all_events
+    FROM cbse36ibevent_code_all_events
 ) x
 WHERE rn = 1
 ;
-DROP TABLE IF EXISTS k8dhxotxevent_code_patient_chosen_closest;
-CREATE TABLE k8dhxotxevent_code_patient_chosen_closest (
+DROP TABLE IF EXISTS cbse36ibevent_code_patient_chosen_closest;
+CREATE TABLE cbse36ibevent_code_patient_chosen_closest (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     concept_id BIGINT,
     person_id BIGINT,
     days_diff INT
 );
-INSERT INTO k8dhxotxevent_code_patient_chosen_closest (anchor_event, event_family, concept_id, person_id, days_diff)
+INSERT INTO cbse36ibevent_code_patient_chosen_closest (anchor_event, event_family, concept_id, person_id, days_diff)
 SELECT anchor_event, event_family, concept_id, person_id, days_diff
 FROM (
     SELECT
@@ -758,12 +758,12 @@ FROM (
             PARTITION BY anchor_event, event_family, concept_id, person_id
             ORDER BY ABS(days_diff) ASC, event_date ASC
         ) AS rn
-    FROM k8dhxotxevent_code_all_events
+    FROM cbse36ibevent_code_all_events
 ) x
 WHERE rn = 1
 ;
-DROP TABLE IF EXISTS k8dhxotxevent_code_timing_summary;
-CREATE TABLE k8dhxotxevent_code_timing_summary (
+DROP TABLE IF EXISTS cbse36ibevent_code_timing_summary;
+CREATE TABLE cbse36ibevent_code_timing_summary (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     concept_id BIGINT,
@@ -775,7 +775,7 @@ CREATE TABLE k8dhxotxevent_code_timing_summary (
     median_days_closest FLOAT,
     uq_days_closest FLOAT
 );
-INSERT INTO k8dhxotxevent_code_timing_summary (
+INSERT INTO cbse36ibevent_code_timing_summary (
     anchor_event,
     event_family,
     concept_id,
@@ -804,10 +804,15 @@ FROM (
         event_family,
         concept_id,
         COUNT(*) AS n_patients_with_code_timing,
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS lq_days_first,
-        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS median_days_first,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS uq_days_first
-    FROM k8dhxotxevent_code_patient_chosen_first
+        MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS lq_days_first,
+        MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS median_days_first,
+        MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS FLOAT) END) AS uq_days_first
+    FROM (
+        SELECT anchor_event, event_family, concept_id, days_diff,
+            ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, concept_id ORDER BY days_diff) AS rn,
+            COUNT(*)     OVER (PARTITION BY anchor_event, event_family, concept_id)                    AS cnt
+        FROM cbse36ibevent_code_patient_chosen_first
+    ) x
     GROUP BY anchor_event, event_family, concept_id
 ) f
 INNER JOIN (
@@ -815,18 +820,23 @@ INNER JOIN (
         anchor_event,
         event_family,
         concept_id,
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS lq_days_closest,
-        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS median_days_closest,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS uq_days_closest
-    FROM k8dhxotxevent_code_patient_chosen_closest
+        MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS lq_days_closest,
+        MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS median_days_closest,
+        MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS FLOAT) END) AS uq_days_closest
+    FROM (
+        SELECT anchor_event, event_family, concept_id, days_diff,
+            ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, concept_id ORDER BY days_diff) AS rn,
+            COUNT(*)     OVER (PARTITION BY anchor_event, event_family, concept_id)                    AS cnt
+        FROM cbse36ibevent_code_patient_chosen_closest
+    ) x
     GROUP BY anchor_event, event_family, concept_id
 ) k
   ON f.anchor_event = k.anchor_event
  AND f.event_family = k.event_family
  AND f.concept_id = k.concept_id
 ;
-DROP TABLE IF EXISTS k8dhxotxevent_code_ba_events;
-CREATE TABLE k8dhxotxevent_code_ba_events (
+DROP TABLE IF EXISTS cbse36ibevent_code_ba_events;
+CREATE TABLE cbse36ibevent_code_ba_events (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     time_relative VARCHAR(10),
@@ -835,7 +845,7 @@ CREATE TABLE k8dhxotxevent_code_ba_events (
     days_diff INT,
     event_date TIMESTAMP
 );
-INSERT INTO k8dhxotxevent_code_ba_events (
+INSERT INTO cbse36ibevent_code_ba_events (
     anchor_event, event_family, time_relative, concept_id, person_id, days_diff, event_date
 )
 SELECT
@@ -846,10 +856,10 @@ SELECT
     person_id,
     days_diff,
     event_date
-FROM k8dhxotxevent_code_all_events
+FROM cbse36ibevent_code_all_events
 ;
-DROP TABLE IF EXISTS k8dhxotxevent_code_patient_chosen_before_after_first;
-CREATE TABLE k8dhxotxevent_code_patient_chosen_before_after_first (
+DROP TABLE IF EXISTS cbse36ibevent_code_patient_chosen_before_after_first;
+CREATE TABLE cbse36ibevent_code_patient_chosen_before_after_first (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     time_relative VARCHAR(10),
@@ -857,7 +867,7 @@ CREATE TABLE k8dhxotxevent_code_patient_chosen_before_after_first (
     person_id BIGINT,
     days_diff INT
 );
-INSERT INTO k8dhxotxevent_code_patient_chosen_before_after_first (
+INSERT INTO cbse36ibevent_code_patient_chosen_before_after_first (
     anchor_event, event_family, time_relative, concept_id, person_id, days_diff
 )
 SELECT anchor_event, event_family, time_relative, concept_id, person_id, days_diff
@@ -873,12 +883,12 @@ FROM (
             PARTITION BY anchor_event, event_family, time_relative, concept_id, person_id
             ORDER BY DATEDIFF(CASE TYPEOF(event_date ) WHEN 'TIMESTAMP' THEN CAST(event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(event_date  AS STRING), 1, 4), SUBSTR(CAST(event_date  AS STRING), 5, 2), SUBSTR(CAST(event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(CASE TYPEOF('1900-01-01' ) WHEN 'TIMESTAMP' THEN CAST('1900-01-01'  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST('1900-01-01'  AS STRING), 1, 4), SUBSTR(CAST('1900-01-01'  AS STRING), 5, 2), SUBSTR(CAST('1900-01-01'  AS STRING), 7, 2)), 'UTC') END ) WHEN 'TIMESTAMP' THEN CAST(CASE TYPEOF('1900-01-01' ) WHEN 'TIMESTAMP' THEN CAST('1900-01-01'  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST('1900-01-01'  AS STRING), 1, 4), SUBSTR(CAST('1900-01-01'  AS STRING), 5, 2), SUBSTR(CAST('1900-01-01'  AS STRING), 7, 2)), 'UTC') END  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(CASE TYPEOF('1900-01-01' ) WHEN 'TIMESTAMP' THEN CAST('1900-01-01'  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST('1900-01-01'  AS STRING), 1, 4), SUBSTR(CAST('1900-01-01'  AS STRING), 5, 2), SUBSTR(CAST('1900-01-01'  AS STRING), 7, 2)), 'UTC') END  AS STRING), 1, 4), SUBSTR(CAST(CASE TYPEOF('1900-01-01' ) WHEN 'TIMESTAMP' THEN CAST('1900-01-01'  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST('1900-01-01'  AS STRING), 1, 4), SUBSTR(CAST('1900-01-01'  AS STRING), 5, 2), SUBSTR(CAST('1900-01-01'  AS STRING), 7, 2)), 'UTC') END  AS STRING), 5, 2), SUBSTR(CAST(CASE TYPEOF('1900-01-01' ) WHEN 'TIMESTAMP' THEN CAST('1900-01-01'  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST('1900-01-01'  AS STRING), 1, 4), SUBSTR(CAST('1900-01-01'  AS STRING), 5, 2), SUBSTR(CAST('1900-01-01'  AS STRING), 7, 2)), 'UTC') END  AS STRING), 7, 2)), 'UTC') END) ASC, event_date ASC
         ) AS rn
-    FROM k8dhxotxevent_code_ba_events
+    FROM cbse36ibevent_code_ba_events
 ) x
 WHERE rn = 1
 ;
-DROP TABLE IF EXISTS k8dhxotxevent_code_patient_chosen_before_after_closest;
-CREATE TABLE k8dhxotxevent_code_patient_chosen_before_after_closest (
+DROP TABLE IF EXISTS cbse36ibevent_code_patient_chosen_before_after_closest;
+CREATE TABLE cbse36ibevent_code_patient_chosen_before_after_closest (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     time_relative VARCHAR(10),
@@ -886,7 +896,7 @@ CREATE TABLE k8dhxotxevent_code_patient_chosen_before_after_closest (
     person_id BIGINT,
     days_diff INT
 );
-INSERT INTO k8dhxotxevent_code_patient_chosen_before_after_closest (
+INSERT INTO cbse36ibevent_code_patient_chosen_before_after_closest (
     anchor_event, event_family, time_relative, concept_id, person_id, days_diff
 )
 SELECT anchor_event, event_family, time_relative, concept_id, person_id, days_diff
@@ -902,12 +912,12 @@ FROM (
             PARTITION BY anchor_event, event_family, time_relative, concept_id, person_id
             ORDER BY ABS(days_diff) ASC, event_date ASC
         ) AS rn
-    FROM k8dhxotxevent_code_ba_events
+    FROM cbse36ibevent_code_ba_events
 ) x
 WHERE rn = 1
 ;
-DROP TABLE IF EXISTS k8dhxotxevent_code_timing_before_after_summary;
-CREATE TABLE k8dhxotxevent_code_timing_before_after_summary (
+DROP TABLE IF EXISTS cbse36ibevent_code_timing_before_after_summary;
+CREATE TABLE cbse36ibevent_code_timing_before_after_summary (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     time_relative VARCHAR(10),
@@ -920,7 +930,7 @@ CREATE TABLE k8dhxotxevent_code_timing_before_after_summary (
     median_days_closest FLOAT,
     uq_days_closest FLOAT
 );
-INSERT INTO k8dhxotxevent_code_timing_before_after_summary (
+INSERT INTO cbse36ibevent_code_timing_before_after_summary (
     anchor_event,
     event_family,
     time_relative,
@@ -952,10 +962,15 @@ FROM (
         time_relative,
         concept_id,
         COUNT(*) AS n_patients_with_code_timing,
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS lq_days_first,
-        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS median_days_first,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS uq_days_first
-    FROM k8dhxotxevent_code_patient_chosen_before_after_first
+        MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS lq_days_first,
+        MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS median_days_first,
+        MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS FLOAT) END) AS uq_days_first
+    FROM (
+        SELECT anchor_event, event_family, time_relative, concept_id, days_diff,
+            ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id ORDER BY days_diff) AS rn,
+            COUNT(*)     OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id)                    AS cnt
+        FROM cbse36ibevent_code_patient_chosen_before_after_first
+    ) x
     GROUP BY anchor_event, event_family, time_relative, concept_id
 ) f
 INNER JOIN (
@@ -964,10 +979,15 @@ INNER JOIN (
         event_family,
         time_relative,
         concept_id,
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS lq_days_closest,
-        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS median_days_closest,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS uq_days_closest
-    FROM k8dhxotxevent_code_patient_chosen_before_after_closest
+        MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS lq_days_closest,
+        MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS median_days_closest,
+        MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS FLOAT) END) AS uq_days_closest
+    FROM (
+        SELECT anchor_event, event_family, time_relative, concept_id, days_diff,
+            ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id ORDER BY days_diff) AS rn,
+            COUNT(*)     OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id)                    AS cnt
+        FROM cbse36ibevent_code_patient_chosen_before_after_closest
+    ) x
     GROUP BY anchor_event, event_family, time_relative, concept_id
 ) k
   ON f.anchor_event = k.anchor_event
@@ -978,8 +998,8 @@ INNER JOIN (
 ------------------------------------------------------------
 -- I) PATIENT-LEVEL TABLE
 ------------------------------------------------------------
-DROP TABLE IF EXISTS k8dhxotxpatient_char;
-CREATE TABLE k8dhxotxpatient_char (
+DROP TABLE IF EXISTS cbse36ibpatient_char;
+CREATE TABLE cbse36ibpatient_char (
     person_id BIGINT,
     index_date TIMESTAMP,
     n_dx_records INT,
@@ -1000,7 +1020,7 @@ CREATE TABLE k8dhxotxpatient_char (
     days_dx_to_gen_cancer INT,
     days_met_to_l01 INT
 );
-INSERT INTO k8dhxotxpatient_char (
+INSERT INTO cbse36ibpatient_char (
     person_id,
     index_date,
     n_dx_records,
@@ -1041,40 +1061,40 @@ SELECT
     CASE WHEN odx.first_other_dx_date IS NOT NULL THEN DATEDIFF(CASE TYPEOF(odx.first_other_dx_date ) WHEN 'TIMESTAMP' THEN CAST(odx.first_other_dx_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(odx.first_other_dx_date  AS STRING), 1, 4), SUBSTR(CAST(odx.first_other_dx_date  AS STRING), 5, 2), SUBSTR(CAST(odx.first_other_dx_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END) END AS days_dx_to_other_dx,
     CASE WHEN gdx.first_gen_cancer_date IS NOT NULL THEN DATEDIFF(CASE TYPEOF(gdx.first_gen_cancer_date ) WHEN 'TIMESTAMP' THEN CAST(gdx.first_gen_cancer_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(gdx.first_gen_cancer_date  AS STRING), 1, 4), SUBSTR(CAST(gdx.first_gen_cancer_date  AS STRING), 5, 2), SUBSTR(CAST(gdx.first_gen_cancer_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END) END AS days_dx_to_gen_cancer,
     CASE WHEN mt.first_met_date IS NOT NULL AND l01.first_l01_date IS NOT NULL THEN DATEDIFF(CASE TYPEOF(l01.first_l01_date ) WHEN 'TIMESTAMP' THEN CAST(l01.first_l01_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(l01.first_l01_date  AS STRING), 1, 4), SUBSTR(CAST(l01.first_l01_date  AS STRING), 5, 2), SUBSTR(CAST(l01.first_l01_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(mt.first_met_date ) WHEN 'TIMESTAMP' THEN CAST(mt.first_met_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(mt.first_met_date  AS STRING), 1, 4), SUBSTR(CAST(mt.first_met_date  AS STRING), 5, 2), SUBSTR(CAST(mt.first_met_date  AS STRING), 7, 2)), 'UTC') END) END AS days_met_to_l01
-FROM k8dhxotxcohort c
-LEFT JOIN k8dhxotxdx_summary dx
+FROM cbse36ibcohort c
+LEFT JOIN cbse36ibdx_summary dx
        ON c.person_id = dx.person_id
-LEFT JOIN k8dhxotxother_dx_summary odx
+LEFT JOIN cbse36ibother_dx_summary odx
        ON c.person_id = odx.person_id
-LEFT JOIN k8dhxotxgen_cancer_summary gdx
+LEFT JOIN cbse36ibgen_cancer_summary gdx
        ON c.person_id = gdx.person_id
-LEFT JOIN k8dhxotxmet_summary mt
+LEFT JOIN cbse36ibmet_summary mt
        ON c.person_id = mt.person_id
-LEFT JOIN k8dhxotxl01_summary l01
+LEFT JOIN cbse36ibl01_summary l01
        ON c.person_id = l01.person_id
 ;
 ------------------------------------------------------------
 -- J) FULL CROSSWISE TIMING PAIRS
 ------------------------------------------------------------
-DROP TABLE IF EXISTS k8dhxotxpatient_timing_pairs;
-CREATE TABLE k8dhxotxpatient_timing_pairs (
+DROP TABLE IF EXISTS cbse36ibpatient_timing_pairs;
+CREATE TABLE cbse36ibpatient_timing_pairs (
     person_id BIGINT,
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     days_diff INT
 );
 WITH events AS (
-    SELECT person_id, 'DX' AS event_name, index_date AS event_date FROM k8dhxotxpatient_char
+    SELECT person_id, 'DX' AS event_name, index_date AS event_date FROM cbse36ibpatient_char
     UNION ALL
-    SELECT person_id, 'ODX', first_other_dx_date FROM k8dhxotxpatient_char
+    SELECT person_id, 'ODX', first_other_dx_date FROM cbse36ibpatient_char
     UNION ALL
-    SELECT person_id, 'GDX', first_gen_cancer_date FROM k8dhxotxpatient_char
+    SELECT person_id, 'GDX', first_gen_cancer_date FROM cbse36ibpatient_char
     UNION ALL
-    SELECT person_id, 'MET', first_met_date FROM k8dhxotxpatient_char
+    SELECT person_id, 'MET', first_met_date FROM cbse36ibpatient_char
     UNION ALL
-    SELECT person_id, 'L01', first_l01_date FROM k8dhxotxpatient_char
+    SELECT person_id, 'L01', first_l01_date FROM cbse36ibpatient_char
 )
-INSERT INTO k8dhxotxpatient_timing_pairs (person_id, from_event, to_event, days_diff)
+INSERT INTO cbse36ibpatient_timing_pairs (person_id, from_event, to_event, days_diff)
 SELECT
     e1.person_id,
     e1.event_name AS from_event,
@@ -1087,8 +1107,8 @@ JOIN events e2
 WHERE e1.event_date IS NOT NULL
   AND e2.event_date IS NOT NULL
 ;
-DROP TABLE IF EXISTS k8dhxotxtiming_pair_summary;
-CREATE TABLE k8dhxotxtiming_pair_summary (
+DROP TABLE IF EXISTS cbse36ibtiming_pair_summary;
+CREATE TABLE cbse36ibtiming_pair_summary (
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     n_patients_with_pair INT,
@@ -1106,7 +1126,7 @@ CREATE TABLE k8dhxotxtiming_pair_summary (
     p90_days FLOAT,
     p95_days FLOAT
 );
-INSERT INTO k8dhxotxtiming_pair_summary (
+INSERT INTO cbse36ibtiming_pair_summary (
     from_event,
     to_event,
     n_patients_with_pair,
@@ -1128,58 +1148,63 @@ SELECT
     from_event,
     to_event,
     COUNT(*) AS n_patients_with_pair,
-    PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY days_diff) AS p05_days,
-    PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY days_diff) AS p10_days,
-    PERCENTILE_CONT(0.20) WITHIN GROUP (ORDER BY days_diff) AS p20_days,
-    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS p25_days,
-    PERCENTILE_CONT(0.30) WITHIN GROUP (ORDER BY days_diff) AS p30_days,
-    PERCENTILE_CONT(0.40) WITHIN GROUP (ORDER BY days_diff) AS p40_days,
-    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS p50_days,
-    PERCENTILE_CONT(0.60) WITHIN GROUP (ORDER BY days_diff) AS p60_days,
-    PERCENTILE_CONT(0.70) WITHIN GROUP (ORDER BY days_diff) AS p70_days,
-    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS p75_days,
-    PERCENTILE_CONT(0.80) WITHIN GROUP (ORDER BY days_diff) AS p80_days,
-    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY days_diff) AS p90_days,
-    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY days_diff) AS p95_days
-FROM k8dhxotxpatient_timing_pairs
+    MIN(CASE WHEN 20.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p05_days,
+    MIN(CASE WHEN 10.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p10_days,
+    MIN(CASE WHEN  5.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p20_days,
+    MIN(CASE WHEN  4.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p25_days,
+    MIN(CASE WHEN 10.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p30_days,
+    MIN(CASE WHEN  5.0 * rn >= 2 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p40_days,
+    MIN(CASE WHEN  2.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p50_days,
+    MIN(CASE WHEN  5.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p60_days,
+    MIN(CASE WHEN 10.0 * rn >= 7 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p70_days,
+    MIN(CASE WHEN  4.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p75_days,
+    MIN(CASE WHEN  5.0 * rn >= 4 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p80_days,
+    MIN(CASE WHEN 10.0 * rn >= 9 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p90_days,
+    MIN(CASE WHEN 20.0 * rn >= 19 * cnt THEN CAST(days_diff AS FLOAT) END) AS p95_days
+FROM (
+    SELECT from_event, to_event, days_diff,
+        ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
+        COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
+    FROM cbse36ibpatient_timing_pairs
+) x
 GROUP BY from_event, to_event
 ;
-DROP TABLE IF EXISTS k8dhxotxall_events_for_pairs;
-CREATE TABLE k8dhxotxall_events_for_pairs (
+DROP TABLE IF EXISTS cbse36iball_events_for_pairs;
+CREATE TABLE cbse36iball_events_for_pairs (
     person_id BIGINT,
     event_family VARCHAR(10),
     event_date TIMESTAMP
 );
-INSERT INTO k8dhxotxall_events_for_pairs (person_id, event_family, event_date)
-SELECT person_id, 'DX', event_date FROM k8dhxotxdx_events
+INSERT INTO cbse36iball_events_for_pairs (person_id, event_family, event_date)
+SELECT person_id, 'DX', event_date FROM cbse36ibdx_events
 UNION ALL
-SELECT person_id, 'ODX', event_date FROM k8dhxotxother_dx_events
+SELECT person_id, 'ODX', event_date FROM cbse36ibother_dx_events
 UNION ALL
-SELECT person_id, 'GDX', event_date FROM k8dhxotxgen_cancer_events
+SELECT person_id, 'GDX', event_date FROM cbse36ibgen_cancer_events
 UNION ALL
-SELECT person_id, 'MET', event_date FROM k8dhxotxmet_events
+SELECT person_id, 'MET', event_date FROM cbse36ibmet_events
 UNION ALL
-SELECT person_id, 'L01', event_date FROM k8dhxotxl01_events
+SELECT person_id, 'L01', event_date FROM cbse36ibl01_events
 ;
-DROP TABLE IF EXISTS k8dhxotxfirst_event_dates;
-CREATE TABLE k8dhxotxfirst_event_dates (
+DROP TABLE IF EXISTS cbse36ibfirst_event_dates;
+CREATE TABLE cbse36ibfirst_event_dates (
     person_id BIGINT,
     from_event VARCHAR(10),
     from_first_date TIMESTAMP
 );
-INSERT INTO k8dhxotxfirst_event_dates (person_id, from_event, from_first_date)
-SELECT person_id, 'DX', index_date FROM k8dhxotxpatient_char
+INSERT INTO cbse36ibfirst_event_dates (person_id, from_event, from_first_date)
+SELECT person_id, 'DX', index_date FROM cbse36ibpatient_char
 UNION ALL
-SELECT person_id, 'ODX', first_other_dx_date FROM k8dhxotxpatient_char WHERE first_other_dx_date IS NOT NULL
+SELECT person_id, 'ODX', first_other_dx_date FROM cbse36ibpatient_char WHERE first_other_dx_date IS NOT NULL
 UNION ALL
-SELECT person_id, 'GDX', first_gen_cancer_date FROM k8dhxotxpatient_char WHERE first_gen_cancer_date IS NOT NULL
+SELECT person_id, 'GDX', first_gen_cancer_date FROM cbse36ibpatient_char WHERE first_gen_cancer_date IS NOT NULL
 UNION ALL
-SELECT person_id, 'MET', first_met_date FROM k8dhxotxpatient_char WHERE first_met_date IS NOT NULL
+SELECT person_id, 'MET', first_met_date FROM cbse36ibpatient_char WHERE first_met_date IS NOT NULL
 UNION ALL
-SELECT person_id, 'L01', first_l01_date FROM k8dhxotxpatient_char WHERE first_l01_date IS NOT NULL
+SELECT person_id, 'L01', first_l01_date FROM cbse36ibpatient_char WHERE first_l01_date IS NOT NULL
 ;
-DROP TABLE IF EXISTS k8dhxotxpatient_timing_pairs_first_to_closest;
-CREATE TABLE k8dhxotxpatient_timing_pairs_first_to_closest (
+DROP TABLE IF EXISTS cbse36ibpatient_timing_pairs_first_to_closest;
+CREATE TABLE cbse36ibpatient_timing_pairs_first_to_closest (
     person_id BIGINT,
     from_event VARCHAR(10),
     to_event VARCHAR(10),
@@ -1195,12 +1220,12 @@ WITH ranked AS (
             PARTITION BY f.person_id, f.from_event, a.event_family
             ORDER BY ABS(DATEDIFF(CASE TYPEOF(a.event_date ) WHEN 'TIMESTAMP' THEN CAST(a.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(a.event_date  AS STRING), 1, 4), SUBSTR(CAST(a.event_date  AS STRING), 5, 2), SUBSTR(CAST(a.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(f.from_first_date ) WHEN 'TIMESTAMP' THEN CAST(f.from_first_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(f.from_first_date  AS STRING), 1, 4), SUBSTR(CAST(f.from_first_date  AS STRING), 5, 2), SUBSTR(CAST(f.from_first_date  AS STRING), 7, 2)), 'UTC') END)), a.event_date
         ) AS rn
-    FROM k8dhxotxfirst_event_dates f
-    JOIN k8dhxotxall_events_for_pairs a
+    FROM cbse36ibfirst_event_dates f
+    JOIN cbse36iball_events_for_pairs a
       ON f.person_id = a.person_id
      AND f.from_event <> a.event_family
 )
-INSERT INTO k8dhxotxpatient_timing_pairs_first_to_closest (person_id, from_event, to_event, days_diff)
+INSERT INTO cbse36ibpatient_timing_pairs_first_to_closest (person_id, from_event, to_event, days_diff)
 SELECT
     person_id,
     from_event,
@@ -1209,8 +1234,8 @@ SELECT
 FROM ranked
 WHERE rn = 1
 ;
-DROP TABLE IF EXISTS k8dhxotxtiming_pair_summary_first_to_closest;
-CREATE TABLE k8dhxotxtiming_pair_summary_first_to_closest (
+DROP TABLE IF EXISTS cbse36ibtiming_pair_summary_first_to_closest;
+CREATE TABLE cbse36ibtiming_pair_summary_first_to_closest (
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     n_patients_with_pair INT,
@@ -1228,7 +1253,7 @@ CREATE TABLE k8dhxotxtiming_pair_summary_first_to_closest (
     p90_days FLOAT,
     p95_days FLOAT
 );
-INSERT INTO k8dhxotxtiming_pair_summary_first_to_closest (
+INSERT INTO cbse36ibtiming_pair_summary_first_to_closest (
     from_event,
     to_event,
     n_patients_with_pair,
@@ -1250,24 +1275,29 @@ SELECT
     from_event,
     to_event,
     COUNT(*) AS n_patients_with_pair,
-    PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY days_diff) AS p05_days,
-    PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY days_diff) AS p10_days,
-    PERCENTILE_CONT(0.20) WITHIN GROUP (ORDER BY days_diff) AS p20_days,
-    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS p25_days,
-    PERCENTILE_CONT(0.30) WITHIN GROUP (ORDER BY days_diff) AS p30_days,
-    PERCENTILE_CONT(0.40) WITHIN GROUP (ORDER BY days_diff) AS p40_days,
-    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS p50_days,
-    PERCENTILE_CONT(0.60) WITHIN GROUP (ORDER BY days_diff) AS p60_days,
-    PERCENTILE_CONT(0.70) WITHIN GROUP (ORDER BY days_diff) AS p70_days,
-    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS p75_days,
-    PERCENTILE_CONT(0.80) WITHIN GROUP (ORDER BY days_diff) AS p80_days,
-    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY days_diff) AS p90_days,
-    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY days_diff) AS p95_days
-FROM k8dhxotxpatient_timing_pairs_first_to_closest
+    MIN(CASE WHEN 20.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p05_days,
+    MIN(CASE WHEN 10.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p10_days,
+    MIN(CASE WHEN  5.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p20_days,
+    MIN(CASE WHEN  4.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p25_days,
+    MIN(CASE WHEN 10.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p30_days,
+    MIN(CASE WHEN  5.0 * rn >= 2 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p40_days,
+    MIN(CASE WHEN  2.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p50_days,
+    MIN(CASE WHEN  5.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p60_days,
+    MIN(CASE WHEN 10.0 * rn >= 7 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p70_days,
+    MIN(CASE WHEN  4.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p75_days,
+    MIN(CASE WHEN  5.0 * rn >= 4 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p80_days,
+    MIN(CASE WHEN 10.0 * rn >= 9 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p90_days,
+    MIN(CASE WHEN 20.0 * rn >= 19 * cnt THEN CAST(days_diff AS FLOAT) END) AS p95_days
+FROM (
+    SELECT from_event, to_event, days_diff,
+        ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
+        COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
+    FROM cbse36ibpatient_timing_pairs_first_to_closest
+) x
 GROUP BY from_event, to_event
 ;
-DROP TABLE IF EXISTS k8dhxotxpatient_timing_pairs_first_to_closest_before;
-CREATE TABLE k8dhxotxpatient_timing_pairs_first_to_closest_before (
+DROP TABLE IF EXISTS cbse36ibpatient_timing_pairs_first_to_closest_before;
+CREATE TABLE cbse36ibpatient_timing_pairs_first_to_closest_before (
     person_id BIGINT,
     from_event VARCHAR(10),
     to_event VARCHAR(10),
@@ -1283,13 +1313,13 @@ WITH ranked_before AS (
             PARTITION BY f.person_id, f.from_event, a.event_family
             ORDER BY ABS(DATEDIFF(CASE TYPEOF(a.event_date ) WHEN 'TIMESTAMP' THEN CAST(a.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(a.event_date  AS STRING), 1, 4), SUBSTR(CAST(a.event_date  AS STRING), 5, 2), SUBSTR(CAST(a.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(f.from_first_date ) WHEN 'TIMESTAMP' THEN CAST(f.from_first_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(f.from_first_date  AS STRING), 1, 4), SUBSTR(CAST(f.from_first_date  AS STRING), 5, 2), SUBSTR(CAST(f.from_first_date  AS STRING), 7, 2)), 'UTC') END)), a.event_date DESC
         ) AS rn
-    FROM k8dhxotxfirst_event_dates f
-    JOIN k8dhxotxall_events_for_pairs a
+    FROM cbse36ibfirst_event_dates f
+    JOIN cbse36iball_events_for_pairs a
       ON f.person_id = a.person_id
      AND f.from_event <> a.event_family
     WHERE DATEDIFF(CASE TYPEOF(a.event_date ) WHEN 'TIMESTAMP' THEN CAST(a.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(a.event_date  AS STRING), 1, 4), SUBSTR(CAST(a.event_date  AS STRING), 5, 2), SUBSTR(CAST(a.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(f.from_first_date ) WHEN 'TIMESTAMP' THEN CAST(f.from_first_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(f.from_first_date  AS STRING), 1, 4), SUBSTR(CAST(f.from_first_date  AS STRING), 5, 2), SUBSTR(CAST(f.from_first_date  AS STRING), 7, 2)), 'UTC') END) < 0
 )
-INSERT INTO k8dhxotxpatient_timing_pairs_first_to_closest_before (person_id, from_event, to_event, days_diff)
+INSERT INTO cbse36ibpatient_timing_pairs_first_to_closest_before (person_id, from_event, to_event, days_diff)
 SELECT
     person_id,
     from_event,
@@ -1298,8 +1328,8 @@ SELECT
 FROM ranked_before
 WHERE rn = 1
 ;
-DROP TABLE IF EXISTS k8dhxotxtiming_pair_summary_first_to_closest_before;
-CREATE TABLE k8dhxotxtiming_pair_summary_first_to_closest_before (
+DROP TABLE IF EXISTS cbse36ibtiming_pair_summary_first_to_closest_before;
+CREATE TABLE cbse36ibtiming_pair_summary_first_to_closest_before (
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     n_patients_with_pair INT,
@@ -1317,7 +1347,7 @@ CREATE TABLE k8dhxotxtiming_pair_summary_first_to_closest_before (
     p90_days FLOAT,
     p95_days FLOAT
 );
-INSERT INTO k8dhxotxtiming_pair_summary_first_to_closest_before (
+INSERT INTO cbse36ibtiming_pair_summary_first_to_closest_before (
     from_event,
     to_event,
     n_patients_with_pair,
@@ -1339,24 +1369,29 @@ SELECT
     from_event,
     to_event,
     COUNT(*) AS n_patients_with_pair,
-    PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY days_diff) AS p05_days,
-    PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY days_diff) AS p10_days,
-    PERCENTILE_CONT(0.20) WITHIN GROUP (ORDER BY days_diff) AS p20_days,
-    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS p25_days,
-    PERCENTILE_CONT(0.30) WITHIN GROUP (ORDER BY days_diff) AS p30_days,
-    PERCENTILE_CONT(0.40) WITHIN GROUP (ORDER BY days_diff) AS p40_days,
-    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS p50_days,
-    PERCENTILE_CONT(0.60) WITHIN GROUP (ORDER BY days_diff) AS p60_days,
-    PERCENTILE_CONT(0.70) WITHIN GROUP (ORDER BY days_diff) AS p70_days,
-    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS p75_days,
-    PERCENTILE_CONT(0.80) WITHIN GROUP (ORDER BY days_diff) AS p80_days,
-    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY days_diff) AS p90_days,
-    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY days_diff) AS p95_days
-FROM k8dhxotxpatient_timing_pairs_first_to_closest_before
+    MIN(CASE WHEN 20.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p05_days,
+    MIN(CASE WHEN 10.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p10_days,
+    MIN(CASE WHEN  5.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p20_days,
+    MIN(CASE WHEN  4.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p25_days,
+    MIN(CASE WHEN 10.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p30_days,
+    MIN(CASE WHEN  5.0 * rn >= 2 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p40_days,
+    MIN(CASE WHEN  2.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p50_days,
+    MIN(CASE WHEN  5.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p60_days,
+    MIN(CASE WHEN 10.0 * rn >= 7 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p70_days,
+    MIN(CASE WHEN  4.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p75_days,
+    MIN(CASE WHEN  5.0 * rn >= 4 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p80_days,
+    MIN(CASE WHEN 10.0 * rn >= 9 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p90_days,
+    MIN(CASE WHEN 20.0 * rn >= 19 * cnt THEN CAST(days_diff AS FLOAT) END) AS p95_days
+FROM (
+    SELECT from_event, to_event, days_diff,
+        ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
+        COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
+    FROM cbse36ibpatient_timing_pairs_first_to_closest_before
+) x
 GROUP BY from_event, to_event
 ;
-DROP TABLE IF EXISTS k8dhxotxpatient_timing_pairs_first_to_closest_after;
-CREATE TABLE k8dhxotxpatient_timing_pairs_first_to_closest_after (
+DROP TABLE IF EXISTS cbse36ibpatient_timing_pairs_first_to_closest_after;
+CREATE TABLE cbse36ibpatient_timing_pairs_first_to_closest_after (
     person_id BIGINT,
     from_event VARCHAR(10),
     to_event VARCHAR(10),
@@ -1372,13 +1407,13 @@ WITH ranked_after AS (
             PARTITION BY f.person_id, f.from_event, a.event_family
             ORDER BY DATEDIFF(CASE TYPEOF(a.event_date ) WHEN 'TIMESTAMP' THEN CAST(a.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(a.event_date  AS STRING), 1, 4), SUBSTR(CAST(a.event_date  AS STRING), 5, 2), SUBSTR(CAST(a.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(f.from_first_date ) WHEN 'TIMESTAMP' THEN CAST(f.from_first_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(f.from_first_date  AS STRING), 1, 4), SUBSTR(CAST(f.from_first_date  AS STRING), 5, 2), SUBSTR(CAST(f.from_first_date  AS STRING), 7, 2)), 'UTC') END), a.event_date
         ) AS rn
-    FROM k8dhxotxfirst_event_dates f
-    JOIN k8dhxotxall_events_for_pairs a
+    FROM cbse36ibfirst_event_dates f
+    JOIN cbse36iball_events_for_pairs a
       ON f.person_id = a.person_id
      AND f.from_event <> a.event_family
     WHERE DATEDIFF(CASE TYPEOF(a.event_date ) WHEN 'TIMESTAMP' THEN CAST(a.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(a.event_date  AS STRING), 1, 4), SUBSTR(CAST(a.event_date  AS STRING), 5, 2), SUBSTR(CAST(a.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(f.from_first_date ) WHEN 'TIMESTAMP' THEN CAST(f.from_first_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(f.from_first_date  AS STRING), 1, 4), SUBSTR(CAST(f.from_first_date  AS STRING), 5, 2), SUBSTR(CAST(f.from_first_date  AS STRING), 7, 2)), 'UTC') END) >= 0
 )
-INSERT INTO k8dhxotxpatient_timing_pairs_first_to_closest_after (person_id, from_event, to_event, days_diff)
+INSERT INTO cbse36ibpatient_timing_pairs_first_to_closest_after (person_id, from_event, to_event, days_diff)
 SELECT
     person_id,
     from_event,
@@ -1387,8 +1422,8 @@ SELECT
 FROM ranked_after
 WHERE rn = 1
 ;
-DROP TABLE IF EXISTS k8dhxotxtiming_pair_summary_first_to_closest_after;
-CREATE TABLE k8dhxotxtiming_pair_summary_first_to_closest_after (
+DROP TABLE IF EXISTS cbse36ibtiming_pair_summary_first_to_closest_after;
+CREATE TABLE cbse36ibtiming_pair_summary_first_to_closest_after (
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     n_patients_with_pair INT,
@@ -1406,7 +1441,7 @@ CREATE TABLE k8dhxotxtiming_pair_summary_first_to_closest_after (
     p90_days FLOAT,
     p95_days FLOAT
 );
-INSERT INTO k8dhxotxtiming_pair_summary_first_to_closest_after (
+INSERT INTO cbse36ibtiming_pair_summary_first_to_closest_after (
     from_event,
     to_event,
     n_patients_with_pair,
@@ -1428,24 +1463,29 @@ SELECT
     from_event,
     to_event,
     COUNT(*) AS n_patients_with_pair,
-    PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY days_diff) AS p05_days,
-    PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY days_diff) AS p10_days,
-    PERCENTILE_CONT(0.20) WITHIN GROUP (ORDER BY days_diff) AS p20_days,
-    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS p25_days,
-    PERCENTILE_CONT(0.30) WITHIN GROUP (ORDER BY days_diff) AS p30_days,
-    PERCENTILE_CONT(0.40) WITHIN GROUP (ORDER BY days_diff) AS p40_days,
-    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS p50_days,
-    PERCENTILE_CONT(0.60) WITHIN GROUP (ORDER BY days_diff) AS p60_days,
-    PERCENTILE_CONT(0.70) WITHIN GROUP (ORDER BY days_diff) AS p70_days,
-    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS p75_days,
-    PERCENTILE_CONT(0.80) WITHIN GROUP (ORDER BY days_diff) AS p80_days,
-    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY days_diff) AS p90_days,
-    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY days_diff) AS p95_days
-FROM k8dhxotxpatient_timing_pairs_first_to_closest_after
+    MIN(CASE WHEN 20.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p05_days,
+    MIN(CASE WHEN 10.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p10_days,
+    MIN(CASE WHEN  5.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p20_days,
+    MIN(CASE WHEN  4.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p25_days,
+    MIN(CASE WHEN 10.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p30_days,
+    MIN(CASE WHEN  5.0 * rn >= 2 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p40_days,
+    MIN(CASE WHEN  2.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p50_days,
+    MIN(CASE WHEN  5.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p60_days,
+    MIN(CASE WHEN 10.0 * rn >= 7 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p70_days,
+    MIN(CASE WHEN  4.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p75_days,
+    MIN(CASE WHEN  5.0 * rn >= 4 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p80_days,
+    MIN(CASE WHEN 10.0 * rn >= 9 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p90_days,
+    MIN(CASE WHEN 20.0 * rn >= 19 * cnt THEN CAST(days_diff AS FLOAT) END) AS p95_days
+FROM (
+    SELECT from_event, to_event, days_diff,
+        ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
+        COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
+    FROM cbse36ibpatient_timing_pairs_first_to_closest_after
+) x
 GROUP BY from_event, to_event
 ;
-DROP TABLE IF EXISTS k8dhxotxevent_presence;
-CREATE TABLE k8dhxotxevent_presence (
+DROP TABLE IF EXISTS cbse36ibevent_presence;
+CREATE TABLE cbse36ibevent_presence (
     person_id BIGINT,
     has_dx INT,
     has_odx INT,
@@ -1453,7 +1493,7 @@ CREATE TABLE k8dhxotxevent_presence (
     has_met INT,
     has_l01 INT
 );
-INSERT INTO k8dhxotxevent_presence (
+INSERT INTO cbse36ibevent_presence (
     person_id, has_dx, has_odx, has_gdx, has_met, has_l01
 )
 SELECT
@@ -1463,20 +1503,20 @@ SELECT
     CASE WHEN first_gen_cancer_date IS NOT NULL THEN 1 ELSE 0 END,
     CASE WHEN first_met_date IS NOT NULL THEN 1 ELSE 0 END,
     CASE WHEN first_l01_date IS NOT NULL THEN 1 ELSE 0 END
-FROM k8dhxotxpatient_char
+FROM cbse36ibpatient_char
 ;
 ------------------------------------------------------------
 -- J-bis) DEATH TIMING FROM INDEX AND FIRST_MET ANCHORS
 ------------------------------------------------------------
 -- Pre-compute each cohort patient's earliest death date and whether it
 -- falls within any of their observation periods.
-DROP TABLE IF EXISTS k8dhxotxdeath_obs_status;
-CREATE TABLE k8dhxotxdeath_obs_status (
+DROP TABLE IF EXISTS cbse36ibdeath_obs_status;
+CREATE TABLE cbse36ibdeath_obs_status (
     person_id BIGINT,
     death_date TIMESTAMP,
     death_in_obs SMALLINT
 );
-INSERT INTO k8dhxotxdeath_obs_status (person_id, death_date, death_in_obs)
+INSERT INTO cbse36ibdeath_obs_status (person_id, death_date, death_in_obs)
 SELECT
     d.person_id,
     d.death_date,
@@ -1492,44 +1532,44 @@ FROM (
     FROM @cdm_database_schema.death
     GROUP BY person_id
 ) d
-WHERE d.person_id IN (SELECT person_id FROM k8dhxotxcohort)
+WHERE d.person_id IN (SELECT person_id FROM cbse36ibcohort)
 ;
-DROP TABLE IF EXISTS k8dhxotxdeath_index_long;
-CREATE TABLE k8dhxotxdeath_index_long (
+DROP TABLE IF EXISTS cbse36ibdeath_index_long;
+CREATE TABLE cbse36ibdeath_index_long (
     prevalence_year VARCHAR(20),
     days_to_death INT
 );
-INSERT INTO k8dhxotxdeath_index_long (prevalence_year, days_to_death)
+INSERT INTO cbse36ibdeath_index_long (prevalence_year, days_to_death)
 SELECT 'OVERALL', DATEDIFF(CASE TYPEOF(dos.death_date ) WHEN 'TIMESTAMP' THEN CAST(dos.death_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(dos.death_date  AS STRING), 1, 4), SUBSTR(CAST(dos.death_date  AS STRING), 5, 2), SUBSTR(CAST(dos.death_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END)
-FROM k8dhxotxcohort c
-INNER JOIN k8dhxotxdeath_obs_status dos ON dos.person_id = c.person_id
+FROM cbse36ibcohort c
+INNER JOIN cbse36ibdeath_obs_status dos ON dos.person_id = c.person_id
 WHERE dos.death_date >= c.index_date
 UNION ALL
 SELECT CAST(YEAR(CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END) AS VARCHAR(4)), DATEDIFF(CASE TYPEOF(dos.death_date ) WHEN 'TIMESTAMP' THEN CAST(dos.death_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(dos.death_date  AS STRING), 1, 4), SUBSTR(CAST(dos.death_date  AS STRING), 5, 2), SUBSTR(CAST(dos.death_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END)
-FROM k8dhxotxcohort c
-INNER JOIN k8dhxotxdeath_obs_status dos ON dos.person_id = c.person_id
+FROM cbse36ibcohort c
+INNER JOIN cbse36ibdeath_obs_status dos ON dos.person_id = c.person_id
 WHERE dos.death_date >= c.index_date
 ;
-DROP TABLE IF EXISTS k8dhxotxdeath_first_met_long;
-CREATE TABLE k8dhxotxdeath_first_met_long (
+DROP TABLE IF EXISTS cbse36ibdeath_first_met_long;
+CREATE TABLE cbse36ibdeath_first_met_long (
     prevalence_year VARCHAR(20),
     days_to_death INT
 );
-INSERT INTO k8dhxotxdeath_first_met_long (prevalence_year, days_to_death)
+INSERT INTO cbse36ibdeath_first_met_long (prevalence_year, days_to_death)
 SELECT 'OVERALL', DATEDIFF(CASE TYPEOF(dos.death_date ) WHEN 'TIMESTAMP' THEN CAST(dos.death_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(dos.death_date  AS STRING), 1, 4), SUBSTR(CAST(dos.death_date  AS STRING), 5, 2), SUBSTR(CAST(dos.death_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(ms.first_met_date ) WHEN 'TIMESTAMP' THEN CAST(ms.first_met_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(ms.first_met_date  AS STRING), 1, 4), SUBSTR(CAST(ms.first_met_date  AS STRING), 5, 2), SUBSTR(CAST(ms.first_met_date  AS STRING), 7, 2)), 'UTC') END)
-FROM k8dhxotxcohort c
-INNER JOIN k8dhxotxmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
-INNER JOIN k8dhxotxdeath_obs_status dos ON dos.person_id = c.person_id
+FROM cbse36ibcohort c
+INNER JOIN cbse36ibmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+INNER JOIN cbse36ibdeath_obs_status dos ON dos.person_id = c.person_id
 WHERE dos.death_date >= ms.first_met_date
 UNION ALL
 SELECT CAST(YEAR(CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END) AS VARCHAR(4)), DATEDIFF(CASE TYPEOF(dos.death_date ) WHEN 'TIMESTAMP' THEN CAST(dos.death_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(dos.death_date  AS STRING), 1, 4), SUBSTR(CAST(dos.death_date  AS STRING), 5, 2), SUBSTR(CAST(dos.death_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(ms.first_met_date ) WHEN 'TIMESTAMP' THEN CAST(ms.first_met_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(ms.first_met_date  AS STRING), 1, 4), SUBSTR(CAST(ms.first_met_date  AS STRING), 5, 2), SUBSTR(CAST(ms.first_met_date  AS STRING), 7, 2)), 'UTC') END)
-FROM k8dhxotxcohort c
-INNER JOIN k8dhxotxmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
-INNER JOIN k8dhxotxdeath_obs_status dos ON dos.person_id = c.person_id
+FROM cbse36ibcohort c
+INNER JOIN cbse36ibmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+INNER JOIN cbse36ibdeath_obs_status dos ON dos.person_id = c.person_id
 WHERE dos.death_date >= ms.first_met_date
 ;
-DROP TABLE IF EXISTS k8dhxotxdeath_stratum_counts;
-CREATE TABLE k8dhxotxdeath_stratum_counts (
+DROP TABLE IF EXISTS cbse36ibdeath_stratum_counts;
+CREATE TABLE cbse36ibdeath_stratum_counts (
     prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     n_patients INT,
@@ -1537,7 +1577,7 @@ CREATE TABLE k8dhxotxdeath_stratum_counts (
     n_deaths_in_obs INT,
     n_deaths_out_obs INT
 );
-INSERT INTO k8dhxotxdeath_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
+INSERT INTO cbse36ibdeath_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
 SELECT
     CASE
         WHEN GROUPING(YEAR(CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END)) = 1 THEN 'OVERALL'
@@ -1548,11 +1588,11 @@ SELECT
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= c.index_date THEN 1 ELSE 0 END),
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= c.index_date AND dos.death_in_obs = 1 THEN 1 ELSE 0 END),
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= c.index_date AND dos.death_in_obs = 0 THEN 1 ELSE 0 END)
-FROM k8dhxotxcohort c
-LEFT JOIN k8dhxotxdeath_obs_status dos ON dos.person_id = c.person_id
+FROM cbse36ibcohort c
+LEFT JOIN cbse36ibdeath_obs_status dos ON dos.person_id = c.person_id
 GROUP BY GROUPING SETS ((), (YEAR(CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END)))
 ;
-INSERT INTO k8dhxotxdeath_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
+INSERT INTO cbse36ibdeath_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
 SELECT
     CASE
         WHEN GROUPING(YEAR(CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END)) = 1 THEN 'OVERALL'
@@ -1563,31 +1603,31 @@ SELECT
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= ms.first_met_date THEN 1 ELSE 0 END),
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= ms.first_met_date AND dos.death_in_obs = 1 THEN 1 ELSE 0 END),
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= ms.first_met_date AND dos.death_in_obs = 0 THEN 1 ELSE 0 END)
-FROM k8dhxotxcohort c
-INNER JOIN k8dhxotxmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
-LEFT JOIN k8dhxotxdeath_obs_status dos ON dos.person_id = c.person_id
+FROM cbse36ibcohort c
+INNER JOIN cbse36ibmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+LEFT JOIN cbse36ibdeath_obs_status dos ON dos.person_id = c.person_id
 GROUP BY GROUPING SETS ((), (YEAR(CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END)))
 ;
-DROP TABLE IF EXISTS k8dhxotxdeath_timing_long;
-CREATE TABLE k8dhxotxdeath_timing_long (
+DROP TABLE IF EXISTS cbse36ibdeath_timing_long;
+CREATE TABLE cbse36ibdeath_timing_long (
     prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     days_to_death INT
 );
-INSERT INTO k8dhxotxdeath_timing_long (prevalence_year, anchor_event, days_to_death)
-SELECT prevalence_year, 'INDEX', days_to_death FROM k8dhxotxdeath_index_long
+INSERT INTO cbse36ibdeath_timing_long (prevalence_year, anchor_event, days_to_death)
+SELECT prevalence_year, 'INDEX', days_to_death FROM cbse36ibdeath_index_long
 UNION ALL
-SELECT prevalence_year, 'FIRST_MET', days_to_death FROM k8dhxotxdeath_first_met_long
+SELECT prevalence_year, 'FIRST_MET', days_to_death FROM cbse36ibdeath_first_met_long
 ;
-DROP TABLE IF EXISTS k8dhxotxdeath_timing_quantiles;
-CREATE TABLE k8dhxotxdeath_timing_quantiles (
+DROP TABLE IF EXISTS cbse36ibdeath_timing_quantiles;
+CREATE TABLE cbse36ibdeath_timing_quantiles (
     prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     lq_days FLOAT,
     median_days FLOAT,
     uq_days FLOAT
 );
-INSERT INTO k8dhxotxdeath_timing_quantiles (
+INSERT INTO cbse36ibdeath_timing_quantiles (
     prevalence_year,
     anchor_event,
     lq_days,
@@ -1597,24 +1637,29 @@ INSERT INTO k8dhxotxdeath_timing_quantiles (
 SELECT
     prevalence_year,
     anchor_event,
-    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_to_death) AS lq_days,
-    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_to_death) AS median_days,
-    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_to_death) AS uq_days
-FROM k8dhxotxdeath_timing_long
+    MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(days_to_death AS FLOAT) END) AS lq_days,
+    MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_to_death AS FLOAT) END) AS median_days,
+    MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_to_death AS FLOAT) END) AS uq_days
+FROM (
+    SELECT prevalence_year, anchor_event, days_to_death,
+        ROW_NUMBER() OVER (PARTITION BY prevalence_year, anchor_event ORDER BY days_to_death) AS rn,
+        COUNT(*)     OVER (PARTITION BY prevalence_year, anchor_event)                        AS cnt
+    FROM cbse36ibdeath_timing_long
+) x
 GROUP BY prevalence_year, anchor_event
 ;
 -- Follow-up duration from anchor date to last observation period end,
 -- for all patients with at least one observation period covering or after anchor.
-DROP TABLE IF EXISTS k8dhxotxfollowup_long;
-CREATE TABLE k8dhxotxfollowup_long (
+DROP TABLE IF EXISTS cbse36ibfollowup_long;
+CREATE TABLE cbse36ibfollowup_long (
     prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     followup_days INT
 );
-INSERT INTO k8dhxotxfollowup_long (prevalence_year, anchor_event, followup_days)
+INSERT INTO cbse36ibfollowup_long (prevalence_year, anchor_event, followup_days)
 SELECT 'OVERALL', 'INDEX',
        DATEDIFF(CASE TYPEOF(MAX(op.observation_period_end_date) ) WHEN 'TIMESTAMP' THEN CAST(MAX(op.observation_period_end_date)  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(MAX(op.observation_period_end_date)  AS STRING), 1, 4), SUBSTR(CAST(MAX(op.observation_period_end_date)  AS STRING), 5, 2), SUBSTR(CAST(MAX(op.observation_period_end_date)  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END)
-FROM k8dhxotxcohort c
+FROM cbse36ibcohort c
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= c.index_date
@@ -1622,7 +1667,7 @@ GROUP BY c.person_id, c.index_date
 UNION ALL
 SELECT CAST(YEAR(CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END) AS VARCHAR(4)), 'INDEX',
        DATEDIFF(CASE TYPEOF(MAX(op.observation_period_end_date) ) WHEN 'TIMESTAMP' THEN CAST(MAX(op.observation_period_end_date)  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(MAX(op.observation_period_end_date)  AS STRING), 1, 4), SUBSTR(CAST(MAX(op.observation_period_end_date)  AS STRING), 5, 2), SUBSTR(CAST(MAX(op.observation_period_end_date)  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END)
-FROM k8dhxotxcohort c
+FROM cbse36ibcohort c
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= c.index_date
@@ -1630,8 +1675,8 @@ GROUP BY c.person_id, c.index_date, YEAR(CASE TYPEOF(c.index_date ) WHEN 'TIMEST
 UNION ALL
 SELECT 'OVERALL', 'FIRST_MET',
        DATEDIFF(CASE TYPEOF(MAX(op.observation_period_end_date) ) WHEN 'TIMESTAMP' THEN CAST(MAX(op.observation_period_end_date)  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(MAX(op.observation_period_end_date)  AS STRING), 1, 4), SUBSTR(CAST(MAX(op.observation_period_end_date)  AS STRING), 5, 2), SUBSTR(CAST(MAX(op.observation_period_end_date)  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(ms.first_met_date ) WHEN 'TIMESTAMP' THEN CAST(ms.first_met_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(ms.first_met_date  AS STRING), 1, 4), SUBSTR(CAST(ms.first_met_date  AS STRING), 5, 2), SUBSTR(CAST(ms.first_met_date  AS STRING), 7, 2)), 'UTC') END)
-FROM k8dhxotxcohort c
-INNER JOIN k8dhxotxmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+FROM cbse36ibcohort c
+INNER JOIN cbse36ibmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= ms.first_met_date
@@ -1639,22 +1684,22 @@ GROUP BY c.person_id, ms.first_met_date
 UNION ALL
 SELECT CAST(YEAR(CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END) AS VARCHAR(4)), 'FIRST_MET',
        DATEDIFF(CASE TYPEOF(MAX(op.observation_period_end_date) ) WHEN 'TIMESTAMP' THEN CAST(MAX(op.observation_period_end_date)  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(MAX(op.observation_period_end_date)  AS STRING), 1, 4), SUBSTR(CAST(MAX(op.observation_period_end_date)  AS STRING), 5, 2), SUBSTR(CAST(MAX(op.observation_period_end_date)  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(ms.first_met_date ) WHEN 'TIMESTAMP' THEN CAST(ms.first_met_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(ms.first_met_date  AS STRING), 1, 4), SUBSTR(CAST(ms.first_met_date  AS STRING), 5, 2), SUBSTR(CAST(ms.first_met_date  AS STRING), 7, 2)), 'UTC') END)
-FROM k8dhxotxcohort c
-INNER JOIN k8dhxotxmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+FROM cbse36ibcohort c
+INNER JOIN cbse36ibmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= ms.first_met_date
 GROUP BY c.person_id, c.index_date, ms.first_met_date, YEAR(CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END)
 ;
-DROP TABLE IF EXISTS k8dhxotxfollowup_quantiles;
-CREATE TABLE k8dhxotxfollowup_quantiles (
+DROP TABLE IF EXISTS cbse36ibfollowup_quantiles;
+CREATE TABLE cbse36ibfollowup_quantiles (
     prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     lq_followup_days FLOAT,
     median_followup_days FLOAT,
     uq_followup_days FLOAT
 );
-INSERT INTO k8dhxotxfollowup_quantiles (
+INSERT INTO cbse36ibfollowup_quantiles (
     prevalence_year,
     anchor_event,
     lq_followup_days,
@@ -1664,11 +1709,58 @@ INSERT INTO k8dhxotxfollowup_quantiles (
 SELECT
     prevalence_year,
     anchor_event,
-    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY followup_days) AS lq_followup_days,
-    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY followup_days) AS median_followup_days,
-    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY followup_days) AS uq_followup_days
-FROM k8dhxotxfollowup_long
+    MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(followup_days AS FLOAT) END) AS lq_followup_days,
+    MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(followup_days AS FLOAT) END) AS median_followup_days,
+    MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(followup_days AS FLOAT) END) AS uq_followup_days
+FROM (
+    SELECT prevalence_year, anchor_event, followup_days,
+        ROW_NUMBER() OVER (PARTITION BY prevalence_year, anchor_event ORDER BY followup_days) AS rn,
+        COUNT(*)     OVER (PARTITION BY prevalence_year, anchor_event)                        AS cnt
+    FROM cbse36ibfollowup_long
+) x
 GROUP BY prevalence_year, anchor_event
+;
+------------------------------------------------------------
+-- L) L01 CONSECUTIVE GAP TABLES (used by chunks 11 and 12)
+------------------------------------------------------------
+-- Deduplicated L01 event days per patient (one row per patient-day)
+DROP TABLE IF EXISTS cbse36ibl01_event_days;
+CREATE TABLE cbse36ibl01_event_days (
+    person_id  BIGINT,
+    event_day  TIMESTAMP
+);
+INSERT INTO cbse36ibl01_event_days (person_id, event_day)
+SELECT DISTINCT person_id, event_date
+FROM cbse36ibl01_events
+WHERE person_id IN (SELECT person_id FROM cbse36ibcohort)
+;
+-- Consecutive gaps between L01 event days per patient
+DROP TABLE IF EXISTS cbse36ibl01_consecutive_gaps;
+CREATE TABLE cbse36ibl01_consecutive_gaps (
+    person_id  BIGINT,
+    subgroup   VARCHAR(10),
+    gap_days   INT
+);
+WITH ranked AS (
+    SELECT
+        e.person_id,
+        e.event_day,
+        LEAD(e.event_day) OVER (PARTITION BY e.person_id ORDER BY e.event_day) AS next_day
+    FROM cbse36ibl01_event_days e
+),
+gaps AS (
+    SELECT
+        person_id,
+        DATEDIFF(CASE TYPEOF(next_day ) WHEN 'TIMESTAMP' THEN CAST(next_day  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(next_day  AS STRING), 1, 4), SUBSTR(CAST(next_day  AS STRING), 5, 2), SUBSTR(CAST(next_day  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(event_day ) WHEN 'TIMESTAMP' THEN CAST(event_day  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(event_day  AS STRING), 1, 4), SUBSTR(CAST(event_day  AS STRING), 5, 2), SUBSTR(CAST(event_day  AS STRING), 7, 2)), 'UTC') END) AS gap_days
+    FROM ranked
+    WHERE next_day IS NOT NULL
+)
+INSERT INTO cbse36ibl01_consecutive_gaps (person_id, subgroup, gap_days)
+SELECT g.person_id, 'ALL_L01', g.gap_days FROM gaps g
+UNION ALL
+SELECT g.person_id, 'MET_L01', g.gap_days
+FROM gaps g
+JOIN cbse36ibmet_summary ms ON g.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 ;
 ------------------------------------------------------------
 -- K) FINAL SELECTS (export to CSV from SQL client)

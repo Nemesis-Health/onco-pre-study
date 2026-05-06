@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-04-27 15:05:06 BST
+-- Translated     : 2026-05-06 18:06:52 BST
 -- Source file    : sql/sql_server/chunks/01_population_prevalence.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -24,7 +24,7 @@ with base as (
         sum(case when first_gen_cancer_date is not null then 1 else 0 end) as n_with_gen_cancer_dx,
         sum(case when first_met_date is not null then 1 else 0 end) as n_with_met,
         sum(case when first_l01_date is not null then 1 else 0 end) as n_with_l01
-     from k8dhxotxpatient_char
+     from cbse36ibpatient_char
      group by  grouping sets (
         (),
         (EXTRACT(YEAR from index_date))
@@ -53,6 +53,6 @@ with base as (
         else n_with_l01
     end as n_l01
  from base
- order by  case when prevalence_year = 'OVERALL' then 0 else 1 end, cast(prevalence_year  as int64)
+ order by  case when prevalence_year = 'OVERALL' then 0 else 1 end, case when prevalence_year = 'OVERALL' then null else cast(prevalence_year  as int64) end
  ;
 
