@@ -51,6 +51,28 @@ _MET_L01_DIR_LABELS = {
     "NO_EVENT":     ("none",   "No L01 ever recorded"),
 }
 
+_DX_MET_INTERP = {
+    "BEFORE_GT90":  "MET code precedes first DX code — data quality or staging workflow signal",
+    "BEFORE_1_90":  "MET code precedes first DX code — data quality or staging workflow signal",
+    "SAME_DAY":     "Simultaneous coding — likely staging encounter or data aggregation artifact",
+    "AFTER_1_30":   "Near-simultaneous; consistent with staging at diagnosis",
+    "AFTER_31_90":  "Early progression or delayed staging documentation",
+    "AFTER_91_365": "Early progression or delayed staging documentation",
+    "AFTER_GT365":  "Late progression — clinically most coherent phenotype",
+    "NO_EVENT":     "No metastasis code ever recorded in observation period",
+}
+
+_MET_L01_IMPLICATION = {
+    "BEFORE_GT90":  "Treatment-naive at MET assumption is incorrect for this group",
+    "BEFORE_1_90":  "Recent prior treatment; washout logic applies",
+    "SAME_DAY":     "Co-coded on staging encounter",
+    "AFTER_1_30":   "Clinically coherent first-line initiation",
+    "AFTER_31_90":  "Delayed initiation; may include trial screen failures",
+    "AFTER_91_365": "Delayed initiation; extended washout period",
+    "AFTER_GT365":  "Very late initiation; likely re-initiation after gap",
+    "NO_EVENT":     "<strong>Investigational drug / trial enrollment signal</strong> — or true treatment-naive / supportive care only",
+}
+
 # ── Column resolution ───────────────────────────────────────────────────────────
 
 def _col(df: pd.DataFrame, name: str) -> str | None:
@@ -227,12 +249,14 @@ def _card_grid(*cards: str, cols: int = 4) -> str:
     return f'<div class="card-grid card-grid-{cols}" style="margin-bottom:16px;">{inner}</div>'
 
 
-def _plot_box(title: str, div: str, *, badge: str = "") -> str:
+def _plot_box(title: str, div: str, *, badge: str = "", sub: str = "") -> str:
     badge_html = f' <span class="badge badge-new">{badge}</span>' if badge else ""
+    sub_html = f'<span class="plot-header-sub">{_e(sub)}</span>' if sub else ""
     return (
         f'<div class="plot-box">'
         f'<div class="plot-header">'
         f'<span class="plot-header-title">{_e(title)}{badge_html}</span>'
+        f'{sub_html}'
         f'</div>'
         f'<div class="plot-area">{div}</div>'
         f'</div>'
@@ -656,6 +680,345 @@ def _timing_by_year_chart(df: pd.DataFrame) -> go.Figure | None:
     return fig
 
 
+# ── Chart: density histogram from percentile data ───────────────────────────────
+
+def _density_histogram_chart(
+    df: pd.DataFrame,
+    from_ev: str,
+    to_ev: str,
+    timing_type: str = "first_to_first",
+    *,
+    height: int = 280,
+    x_label: str | None = None,
+    from_label: str | None = None,
+    to_label: str | None = None,
+    color_fill: str = "rgba(29,78,216,0.20)",
+    color_line: str = "rgba(29,78,216,0.55)",
+    neg_color_fill: str = "rgba(220,38,38,0.30)",
+    neg_color_line: str = "rgba(220,38,38,0.65)",
+) -> tuple[go.Figure | None, dict[str, Any] | None]:
+    ttc = _col(df, "timing_type")
+    fc = _col(df, "from_event")
+    tc = _col(df, "to_event")
+    if not fc or not tc:
+        return None, None
+    sub = df.copy()
+    if ttc:
+        sub = sub[sub[ttc].astype(str).str.lower() == timing_type.lower()]
+    sel = sub[
+        sub[fc].astype(str).str.upper().eq(from_ev.upper()) &
+        sub[tc].astype(str).str.upper().eq(to_ev.upper())
+    ]
+    if sel.empty:
+        return None, None
+    row = sel.iloc[0]
+
+    def _pv(col_name: str) -> float | None:
+        c = _col(sel, col_name)
+        if not c:
+            return None
+        v = pd.to_numeric(row.get(c), errors="coerce")
+        return None if pd.isna(v) else float(v)
+
+    p05 = _pv("p05_days"); p10 = _pv("p10_days"); p20 = _pv("p20_days")
+    p25 = _pv("p25_days"); p30 = _pv("p30_days"); p40 = _pv("p40_days")
+    p50 = _pv("p50_days"); p60 = _pv("p60_days"); p70 = _pv("p70_days")
+    p75 = _pv("p75_days"); p80 = _pv("p80_days"); p90 = _pv("p90_days")
+    p95 = _pv("p95_days")
+    n_total = _safe_int(row.get(_col(sel, "n_patients_with_pair")))
+
+    if any(x is None for x in [p05, p10, p20, p30, p40, p50, p60, p70, p80, p90, p95]):
+        return None, None
+
+    raw_bins: list[tuple[float, float, int]] = [
+        (p05, p10, 5), (p10, p20, 10), (p20, p30, 10), (p30, p40, 10),
+        (p40, p50, 10), (p50, p60, 10), (p60, p70, 10), (p70, p80, 10),
+        (p80, p90, 10), (p90, p95, 5),
+    ]
+    bins = [(lo, hi, pct) for lo, hi, pct in raw_bins if abs(hi - lo) > 0.1]
+    if not bins:
+        return None, None
+
+    frm = from_label or from_ev
+    too = to_label or to_ev
+    xs = [(lo + hi) / 2.0 for lo, hi, _ in bins]
+    ys = [pct / 100.0 / abs(hi - lo) for lo, hi, pct in bins]
+    widths = [abs(hi - lo) for lo, hi, _ in bins]
+
+    fills = []
+    lines = []
+    for lo, hi, _ in bins:
+        if hi <= 0:
+            fills.append(neg_color_fill)
+            lines.append(neg_color_line)
+        elif lo < 0 < hi:
+            fills.append("rgba(139,92,246,0.22)")
+            lines.append("rgba(139,92,246,0.55)")
+        else:
+            fills.append(color_fill)
+            lines.append(color_line)
+
+    pct_neg = sum(pct for lo, hi, pct in bins if hi <= 0)
+    x_min = min(lo for lo, _, _ in bins)
+
+    shapes: list[dict[str, Any]] = []
+    annotations: list[dict[str, Any]] = []
+
+    if pct_neg > 0 and x_min < 0:
+        shapes.append(dict(
+            type="rect", x0=x_min * 1.05, x1=0, y0=0, y1=1,
+            yref="paper", fillcolor="rgba(220,38,38,0.05)", line=dict(width=0),
+        ))
+
+    shapes.append(dict(
+        type="line", x0=0, x1=0, y0=0, y1=1, yref="paper",
+        line=dict(color="#94a3b8", width=1.5),
+    ))
+
+    if p50 is not None:
+        shapes.append(dict(
+            type="line", x0=p50, x1=p50, y0=0, y1=1, yref="paper",
+            line=dict(color="#f59e0b", dash="dot", width=2),
+        ))
+        iqr_str = ""
+        if p25 is not None and p75 is not None:
+            iqr_str = f" (IQR {int(round(p25))}–{int(round(p75))})"
+        annotations.append(dict(
+            x=p50, y=0.97, yref="paper",
+            text=f"median {int(round(p50))}d{iqr_str}",
+            showarrow=False, font=dict(size=10),
+            xanchor="left", xshift=6,
+            bgcolor="rgba(255,255,255,0.85)",
+        ))
+
+    if pct_neg > 0 and x_min < 0:
+        ann_x = x_min * 0.55
+        annotations.append(dict(
+            x=ann_x, y=0.82, yref="paper",
+            text=f"~{pct_neg}% of patients:<br>{too} code precedes {frm}",
+            showarrow=True, arrowhead=2, arrowcolor="#dc2626",
+            font=dict(size=10, color="#dc2626"),
+            ax=0, ay=-30,
+            bgcolor="rgba(255,255,255,0.85)",
+        ))
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=xs, y=ys, width=widths,
+        marker=dict(color=fills, line=dict(color=lines, width=1)),
+        customdata=[[f"{lo:.0f}–{hi:.0f}d", f"{pct}%"] for lo, hi, pct in bins],
+        hovertemplate="%{customdata[0]}<br>%{customdata[1]} of patients<extra></extra>",
+        showlegend=False,
+    ))
+
+    x_lbl = x_label or f"Days ({frm} → {too}) · bar width = decile range in days"
+    layout = _plotly_base_layout()
+    layout.update({
+        "height": height,
+        "shapes": shapes,
+        "annotations": annotations,
+        "xaxis": dict(
+            title=dict(text=x_lbl),
+            zeroline=True, zerolinecolor="#94a3b8", zerolinewidth=1.5,
+            gridcolor="#e5e7eb",
+        ),
+        "yaxis": dict(title=dict(text="Relative frequency (density)"), gridcolor="#e5e7eb"),
+        "showlegend": False,
+        "margin": dict(l=52, r=20, t=16, b=60),
+    })
+    fig.update_layout(**layout)
+
+    stats = {
+        "median": p50, "p25": p25, "p75": p75, "n": n_total, "pct_neg": pct_neg,
+    }
+    return fig, stats
+
+
+def _windowed_odx_chart(windowed: pd.DataFrame, n_dx: int | None = None) -> go.Figure | None:
+    """Grouped bar chart: top 5 ODX concepts × 6 time windows (% of DX cohort)."""
+    fc = _col(windowed, "event_family")
+    cid_col = _col(windowed, "concept_id")
+    ne = _col(windowed, "n_ever")
+    n30 = _col(windowed, "n_pm30d")
+    n90 = _col(windowed, "n_pm90d")
+    n180 = _col(windowed, "n_pm180d")
+    n1y = _col(windowed, "n_pm1yr")
+    neb = _col(windowed, "n_ever_before")
+    nea = _col(windowed, "n_ever_after")
+    if not all([fc, cid_col, ne]):
+        return None
+    odx = windowed[windowed[fc].astype(str).str.upper() == "ODX"].copy()
+    odx["__n"] = pd.to_numeric(odx[ne], errors="coerce")
+    odx = odx[odx["__n"] > 0].nlargest(5, "__n")
+    if odx.empty:
+        return None
+    ids = [int(x) for x in odx[cid_col].dropna().astype(int).tolist()]
+    names_map = _fetch_concept_names(ids)
+    windows: list[tuple[str, str | None]] = [
+        ("±30d", n30), ("±90d", n90), ("±180d", n180), ("±1yr", n1y),
+        ("Ever before", neb), ("Ever after", nea),
+    ]
+    windows = [(lbl, c) for lbl, c in windows if c]
+    if not windows:
+        return None
+    win_labels = [lbl for lbl, _ in windows]
+    colors = ["#1d4ed8", "#7c3aed", "#ea580c", "#dc2626", "#16a34a"]
+    fig = go.Figure()
+    for i, (_, row) in enumerate(odx.iterrows()):
+        cid = _safe_int(row.get(cid_col))
+        name = names_map.get(cid, str(cid)) if cid else "?"
+        short_name = name[:30] + "…" if len(name) > 30 else name
+        ys = []
+        for _, wcol in windows:
+            n = pd.to_numeric(row.get(wcol), errors="coerce") if wcol else float("nan")
+            pct = (float(n) / n_dx * 100.0) if n_dx and not math.isnan(n) and n_dx > 0 else float("nan")
+            ys.append(round(pct, 2) if not math.isnan(pct) else None)
+        fig.add_trace(go.Bar(
+            name=short_name, x=win_labels, y=ys,
+            marker=dict(color=colors[i % len(colors)], opacity=0.82),
+            hovertemplate="%{x}: %{y:.1f}%<extra>" + short_name + "</extra>",
+        ))
+    layout = _plotly_base_layout()
+    layout.update({
+        "height": 300,
+        "barmode": "group",
+        "xaxis": dict(title=dict(text="Time window around DX index"), gridcolor="#e5e7eb"),
+        "yaxis": dict(title=dict(text="% of DX cohort"), rangemode="tozero", gridcolor="#e5e7eb"),
+    })
+    fig.update_layout(**layout)
+    return fig
+
+
+def _overlay_density_histogram(
+    df: pd.DataFrame,
+    series_defs: list[tuple[str, str, str, str, str, str]],
+    height: int = 310,
+    x_label: str = "Days (negative = event before anchor)",
+) -> go.Figure | None:
+    """Overlay multiple density histograms.
+
+    series_defs: list of (from_ev, to_ev, timing_type, fill_color, line_color, name)
+    """
+    ttc = _col(df, "timing_type")
+    fc = _col(df, "from_event")
+    tc = _col(df, "to_event")
+    if not fc or not tc:
+        return None
+
+    fig = go.Figure()
+    any_data = False
+    all_shapes: list[dict[str, Any]] = []
+    all_annotations: list[dict[str, Any]] = []
+    all_mins: list[float] = []
+    first_neg_region = True
+
+    for from_ev, to_ev, timing_type, fill_c, line_c, name in series_defs:
+        sub = df.copy()
+        if ttc:
+            sub = sub[sub[ttc].astype(str).str.lower() == timing_type.lower()]
+        sel = sub[
+            sub[fc].astype(str).str.upper().eq(from_ev.upper()) &
+            sub[tc].astype(str).str.upper().eq(to_ev.upper())
+        ]
+        if sel.empty:
+            continue
+        row = sel.iloc[0]
+
+        def _pv(col_name: str) -> float | None:
+            c = _col(sel, col_name)
+            if not c:
+                return None
+            v = pd.to_numeric(row.get(c), errors="coerce")
+            return None if pd.isna(v) else float(v)
+
+        p05 = _pv("p05_days"); p10 = _pv("p10_days"); p20 = _pv("p20_days")
+        p30 = _pv("p30_days"); p40 = _pv("p40_days"); p50 = _pv("p50_days")
+        p60 = _pv("p60_days"); p70 = _pv("p70_days"); p80 = _pv("p80_days")
+        p90 = _pv("p90_days"); p95 = _pv("p95_days")
+        if any(x is None for x in [p05, p10, p20, p30, p40, p50, p60, p70, p80, p90, p95]):
+            continue
+
+        raw_bins: list[tuple[float, float, int]] = [
+            (p05, p10, 5), (p10, p20, 10), (p20, p30, 10), (p30, p40, 10),
+            (p40, p50, 10), (p50, p60, 10), (p60, p70, 10), (p70, p80, 10),
+            (p80, p90, 10), (p90, p95, 5),
+        ]
+        bins = [(lo, hi, pct) for lo, hi, pct in raw_bins if abs(hi - lo) > 0.1]
+        if not bins:
+            continue
+
+        xs = [(lo + hi) / 2.0 for lo, hi, _ in bins]
+        ys = [pct / 100.0 / abs(hi - lo) for lo, hi, pct in bins]
+        widths = [abs(hi - lo) for lo, hi, _ in bins]
+        fills = [fill_c if lo >= 0 else "rgba(220,38,38,0.28)" for lo, hi, _ in bins]
+        lines_c = [line_c if lo >= 0 else "rgba(220,38,38,0.60)" for lo, hi, _ in bins]
+
+        fig.add_trace(go.Bar(
+            x=xs, y=ys, width=widths, name=name,
+            marker=dict(color=fills, line=dict(color=lines_c, width=1)),
+            customdata=[[f"{lo:.0f}–{hi:.0f}d", f"{pct}%"] for lo, hi, pct in bins],
+            hovertemplate=f"%{{customdata[0]}}<br>%{{customdata[1]}} of patients<extra>{name}</extra>",
+            showlegend=True,
+            opacity=0.85,
+        ))
+
+        x_min_s = min(lo for lo, _, _ in bins)
+        all_mins.append(x_min_s)
+        pct_neg = sum(pct for lo, hi, pct in bins if hi <= 0)
+
+        if p50 is not None:
+            all_shapes.append(
+                dict(type="line", x0=p50, x1=p50, y0=0, y1=1, yref="paper",
+                     line=dict(color=line_c.replace("0.55", "0.85"), dash="dot", width=1.8))
+            )
+            p25v = _pv("p25_days"); p75v = _pv("p75_days")
+            iqr_str = ""
+            if p25v is not None and p75v is not None:
+                iqr_str = f" (IQR {int(round(p25v))}–{int(round(p75v))})"
+            all_annotations.append(
+                dict(x=p50, y=0.97 if not any_data else 0.87, yref="paper",
+                     text=f"{name}: median {int(round(p50))}d{iqr_str}",
+                     showarrow=False, font=dict(size=10),
+                     xanchor="left", xshift=6,
+                     bgcolor="rgba(255,255,255,0.85)")
+            )
+
+        if first_neg_region and pct_neg > 0 and x_min_s < 0:
+            all_shapes.insert(0,
+                dict(type="rect", x0=x_min_s * 1.05, x1=0, y0=0, y1=1,
+                     yref="paper", fillcolor="rgba(220,38,38,0.05)", line=dict(width=0))
+            )
+            first_neg_region = False
+
+        any_data = True
+
+    if not any_data:
+        return None
+
+    all_shapes.append(
+        dict(type="line", x0=0, x1=0, y0=0, y1=1, yref="paper",
+             line=dict(color="#94a3b8", width=1.5))
+    )
+
+    layout = _plotly_base_layout()
+    layout.update({
+        "height": height,
+        "barmode": "overlay",
+        "shapes": all_shapes,
+        "annotations": all_annotations,
+        "xaxis": dict(
+            title=dict(text=x_label),
+            zeroline=True, zerolinecolor="#94a3b8", zerolinewidth=1.5,
+            gridcolor="#e5e7eb",
+        ),
+        "yaxis": dict(title=dict(text="Relative frequency (density)"), gridcolor="#e5e7eb"),
+        "legend": dict(orientation="h", x=1, xanchor="right", y=1.02, yanchor="bottom"),
+        "margin": dict(l=52, r=20, t=16, b=60),
+    })
+    fig.update_layout(**layout)
+    return fig
+
+
 # ── Section 0: Overview ──────────────────────────────────────────────────────────
 
 def _s00_overview(rd: Path) -> str:
@@ -842,7 +1205,15 @@ def _s00_overview(rd: Path) -> str:
 
 # ── Section 1: DX→MET Timing ────────────────────────────────────────────────────
 
-def _directionality_table(df: pd.DataFrame, pair: str, dir_labels: dict) -> str:
+def _directionality_table(
+    df: pd.DataFrame,
+    pair: str,
+    dir_labels: dict,
+    *,
+    n_total: int | None = None,
+    interp: dict[str, str] | None = None,
+    col4_header: str = "Interpretation",
+) -> str:
     pc = _col(df, "pair")
     yc = _col(df, "index_year")
     dc = _col(df, "direction")
@@ -861,25 +1232,44 @@ def _directionality_table(df: pd.DataFrame, pair: str, dir_labels: dict) -> str:
         n = _safe_int(r.get(nc))
         if d and n is not None:
             sub_map[d] = n
-    total = sum(v for v in sub_map.values() if v and v > 0)
+    denom = n_total if n_total and n_total > 0 else sum(v for v in sub_map.values() if v and v > 0)
     rows = []
     for key in _DIR_ORDER:
         css_cls, label = dir_labels.get(key, ("none", key))
         n = sub_map.get(key)
         if n is None:
             continue
-        pct = f"{100.0 * n / total:.1f}%" if total > 0 and n > 0 else ("—" if n == 0 else "—")
+        pct = f"{100.0 * n / denom:.1f}%" if denom > 0 and n and n > 0 else "—"
+        flag = " flag-red" if css_cls == "before" and n and n > 0 else (" flag-amber" if css_cls == "none" and n and n > 0 else "")
         badge_html = _dir_badge(css_cls, label)
-        rows.append(
-            f"<tr><td>{badge_html}</td>"
-            f'<td class="num">{_fmt_n(n)}</td>'
-            f'<td class="num">{pct}</td></tr>'
+        interp_cell = interp.get(key, "") if interp else ""
+        if interp:
+            rows.append(
+                f"<tr><td>{badge_html}</td>"
+                f'<td class="num{flag}">{_fmt_n(n)}</td>'
+                f'<td class="num{flag}">{pct}</td>'
+                f"<td>{interp_cell}</td></tr>"
+            )
+        else:
+            rows.append(
+                f"<tr><td>{badge_html}</td>"
+                f'<td class="num{flag}">{_fmt_n(n)}</td>'
+                f'<td class="num{flag}">{pct}</td></tr>'
+            )
+    if interp:
+        n_label = f"N (of cohort, N={n_total:,})" if n_total else "N patients"
+        tbl = (
+            '<table class="rt"><thead><tr>'
+            f'<th>Direction</th><th class="num">{n_label}</th>'
+            f'<th class="num">%</th><th>{col4_header}</th>'
+            '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
         )
-    tbl = (
-        '<table class="rt"><thead><tr>'
-        '<th>Direction</th><th class="num">N patients</th><th class="num">% of pair</th>'
-        '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
-    )
+    else:
+        tbl = (
+            '<table class="rt"><thead><tr>'
+            '<th>Direction</th><th class="num">N patients</th><th class="num">% of pair</th>'
+            '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
+        )
     return _tbl_wrap(tbl)
 
 
@@ -890,20 +1280,47 @@ def _s01_dx_met_timing(rd: Path) -> str:
 
     parts: list[str] = []
 
+    # Load n_met for denominator
+    prev = _read(rd, "final_population_prevalence.csv")
+    n_met: int | None = None
+    if prev is not None:
+        oc = _col(prev, "prevalence_year")
+        if oc:
+            ov = prev[prev[oc].astype(str).str.upper() == "OVERALL"]
+            if not ov.empty:
+                n_met = _safe_int(ov.iloc[0].get(_col(prev, "n_met")))
+
     # Directionality table
     if directionality is not None:
-        tbl = _directionality_table(directionality, "DX_MET", _DIR_LABELS)
+        tbl = _directionality_table(
+            directionality, "DX_MET", _DIR_LABELS,
+            n_total=n_met, interp=_DX_MET_INTERP, col4_header="Interpretation",
+        )
         if tbl:
             parts.append(_card(
                 f"Table 1.1 — DX ↔ MET temporal directionality {_badge('new')}",
-                tbl + '<p class="tbl-note">OVERALL cohort. Suppressed rows hidden.</p>',
+                tbl + '<p class="tbl-note">OVERALL cohort. % denominated on MET cohort. Suppressed rows hidden.</p>',
             ))
 
-    # DX→MET timing distribution
+    # DX→MET timing distribution — density histogram
     if timing is not None:
-        fig = _timing_box_chart(timing, [("DX", "MET")], "first_to_first")
+        fig, stats = _density_histogram_chart(timing, "DX", "MET", "first_to_first")
         if fig:
-            parts.append(_plot_box("Figure 1.1 — DX → MET timing (first→first, IQR box)", _fig_div(fig)))
+            sub_txt = ""
+            if stats:
+                med = stats.get("median")
+                p25v = stats.get("p25")
+                p75v = stats.get("p75")
+                if med is not None:
+                    iqr = f" (IQR {int(round(p25v))}–{int(round(p75v))})" if p25v and p75v else ""
+                    sub_txt = (
+                        f"Anchored on DX · days positive = MET after DX · "
+                        f"median {int(round(med))}d{iqr}"
+                    )
+            parts.append(_plot_box(
+                "Figure 1.1 — Time from first DX to first MET (full distribution)",
+                _fig_div(fig), sub=sub_txt,
+            ))
 
     # By-year heatmap (HTML table using hm-* classes)
     if by_year is not None:
@@ -957,9 +1374,10 @@ def _s01_dx_met_timing(rd: Path) -> str:
 
     return _section(
         "01", "Disease Code Timing & Sequencing",
-        "Temporal relationship between first cancer DX code and first metastasis code. "
-        "Negative days = MET code precedes DX — a data provenance signal. "
-        "Directionality counts show the clinical sequencing distribution.",
+        "Full distribution of time from first DX code to first MET code. "
+        "Negative days = MET code precedes DX — a data provenance / staging workflow signal. "
+        "The distribution shape reveals: (a) proportion staged at diagnosis, "
+        "(b) early vs late progression phenotypes, (c) data quality outliers.",
         "\n".join(parts), sid="s1",
     )
 
@@ -1067,22 +1485,46 @@ def _s02_gdx_odx(rd: Path) -> str:
                     _tbl_wrap(tbl),
                 ))
 
-    # ODX timing distribution
-    if timing is not None:
-        fig = _timing_box_chart(timing, [("DX", "ODX"), ("ODX", "DX")], "first_to_first",
-                                title="DX ↔ ODX (first→first)")
+    # Figure 2.1 — windowed ODX grouped bar chart (top 5 concepts × 6 windows)
+    if windowed is not None:
+        fig = _windowed_odx_chart(windowed, n_dx)
         if fig:
-            parts.append(_plot_box("Figure 2.1 — DX ↔ ODX timing distribution", _fig_div(fig)))
+            parts.append(_plot_box(
+                "Figure 2.1 — Windowed ODX prevalence for top 5 concepts",
+                _fig_div(fig), badge="new",
+                sub="% of DX cohort with each ODX concept within each time window around DX index",
+            ))
+
+    # Figure 2.2 — ODX timing density histogram (full distribution)
+    if timing is not None:
+        fig2, stats2 = _density_histogram_chart(timing, "DX", "ODX", "first_to_first",
+                                                color_fill="rgba(124,58,237,0.20)",
+                                                color_line="rgba(124,58,237,0.55)",
+                                                from_label="DX", to_label="ODX")
+        if fig2:
+            sub2 = ""
+            if stats2:
+                med2 = stats2.get("median")
+                p25v2 = stats2.get("p25")
+                p75v2 = stats2.get("p75")
+                if med2 is not None:
+                    iqr2 = f" (IQR {int(round(p25v2))}–{int(round(p75v2))})" if p25v2 and p75v2 else ""
+                    sub2 = f"Anchored on DX · days positive = ODX after DX · median {int(round(med2))}d{iqr2}"
+            parts.append(_plot_box(
+                "Figure 2.2 — ODX timing relative to DX index (full distribution, not zoomed)",
+                _fig_div(fig2), sub=sub2,
+            ))
 
     if not parts:
         parts.append('<p style="color:var(--text-3);font-style:italic;">GDX/ODX data not yet available.</p>')
 
     return _section(
         "02", "Broader & Co-occurring Cancer Codes (GDX / ODX)",
-        "GDX (ancestor/broader codes of the DX concept set within malignant neoplastic disease) and ODX "
-        "(co-occurring other cancer diagnoses, excluding DX and GDX). "
-        "High ODX rates indicate patients with multiple malignancies; windowed prevalence shows "
-        "whether co-occurring cancers cluster around the DX index date.",
+        "Frequency and timing of broader ancestor DX codes (GDX) and co-occurring other cancer codes "
+        "(ODX) relative to the DX index date. Both are commonly used as exclusion criteria in "
+        "metastatic cohort definitions. The windowed prevalence chart shows how often these codes "
+        "appear within specific windows around the index date — a GDX code on the same day as DX "
+        "is a fundamentally different phenomenon from one two years prior.",
         "\n".join(parts), sid="s2",
     )
 
@@ -1095,82 +1537,147 @@ def _s03_treatment_timing(rd: Path) -> str:
     code_counts = _read(rd, "final_code_counts.csv")
     prev = _read(rd, "final_population_prevalence.csv")
     n_dx = None
+    n_met_s3: int | None = None
     if prev is not None:
         oc = _col(prev, "prevalence_year")
         if oc:
             o = prev[prev[oc].astype(str).str.upper() == "OVERALL"]
             if not o.empty:
                 n_dx = _safe_int(o.iloc[0].get(_col(prev, "n_dx")))
+                n_met_s3 = _safe_int(o.iloc[0].get(_col(prev, "n_met")))
 
     parts: list[str] = []
 
     # MET→L01 directionality
     if directionality is not None:
-        tbl = _directionality_table(directionality, "MET_L01", _MET_L01_DIR_LABELS)
+        tbl = _directionality_table(
+            directionality, "MET_L01", _MET_L01_DIR_LABELS,
+            n_total=n_met_s3, interp=_MET_L01_IMPLICATION, col4_header="Phenotype implication",
+        )
         if tbl:
+            n_lbl = f"N={n_met_s3:,}" if n_met_s3 else "MET subgroup"
             parts.append(_card(
                 f"Table 3.1 — MET ↔ L01 temporal directionality {_badge('new')}",
-                tbl + '<p class="tbl-note">MET subgroup only. NO_EVENT = patients with MET but no L01 ever.</p>',
+                tbl + f'<p class="tbl-note">MET subgroup only ({n_lbl}). NO_EVENT = patients with MET but no L01 ever.</p>',
             ))
 
-    # MET→L01 timing distribution
+    # MET→L01 timing distribution — overlay density histogram
     if timing is not None:
-        fig = _timing_box_chart(
+        fig = _overlay_density_histogram(
             timing,
-            [("MET", "L01"), ("MET", "L01")],
-            "first_to_first",
+            [
+                ("MET", "L01", "first_to_first",
+                 "rgba(29,78,216,0.20)", "rgba(29,78,216,0.55)",
+                 "First-ever L01 (incl. pre-MET)"),
+                ("MET", "L01", "first_to_closest_after",
+                 "rgba(217,119,6,0.22)", "rgba(217,119,6,0.55)",
+                 "First L01 on/after MET"),
+            ],
+            height=310,
+            x_label="Days (MET → L01) · bar width = decile range in days",
         )
         if fig:
-            parts.append(_plot_box("Figure 3.1 — MET → L01 timing (first→first)", _fig_div(fig)))
+            parts.append(_plot_box(
+                "Figure 3.1 — Time from first MET to first L01 (bidirectional, full range)",
+                _fig_div(fig),
+            ))
 
-    # Drug-level L01 codes table (top 15 by FIRST_MET anchor)
+    # Drug-level L01 codes table (top 15 by FIRST_MET anchor) — with before/after breakdown
     if code_counts is not None:
         ac = _col(code_counts, "anchor_event")
-        fc = _col(code_counts, "event_family")
+        fc_col = _col(code_counts, "event_family")
         twc = _col(code_counts, "time_window")
         cid_col = _col(code_counts, "concept_id")
         np_col = _col(code_counts, "n_patients")
-        med_c = _col(code_counts, "median_days_first") or _col(code_counts, "median_days")
-        lq_c = _col(code_counts, "lq_days_first") or _col(code_counts, "lq_days")
-        uq_c = _col(code_counts, "uq_days_first") or _col(code_counts, "uq_days")
-        if all([ac, fc, twc, cid_col, np_col]):
-            l01 = code_counts[
-                (code_counts[ac].astype(str).str.upper() == "FIRST_MET") &
-                (code_counts[fc].astype(str).str.upper() == "L01") &
-                (code_counts[twc].astype(str).str.lower() == "all")
-            ].copy()
-            l01["__n"] = pd.to_numeric(l01[np_col], errors="coerce")
-            l01 = l01[l01["__n"] > 0].nlargest(CODE_COUNTS_TOP_N, "__n")
-            if not l01.empty:
-                ids = [int(x) for x in l01[cid_col].dropna().astype(int).tolist()]
+        med_first_c = _col(code_counts, "median_days_first")
+        lq_first_c = _col(code_counts, "lq_days_first")
+        uq_first_c = _col(code_counts, "uq_days_first")
+        med_clos_c = _col(code_counts, "median_days_closest")
+        lq_clos_c = _col(code_counts, "lq_days_closest")
+        uq_clos_c = _col(code_counts, "uq_days_closest")
+        if all([ac, fc_col, twc, cid_col, np_col]):
+            def _l01_tw(tw: str) -> pd.DataFrame:
+                return code_counts[
+                    (code_counts[ac].astype(str).str.upper() == "FIRST_MET") &
+                    (code_counts[fc_col].astype(str).str.upper() == "L01") &
+                    (code_counts[twc].astype(str).str.lower() == tw)
+                ].copy()
+            l01_all = _l01_tw("all")
+            l01_before = _l01_tw("before")
+            l01_after = _l01_tw("after")
+            l01_all["__n"] = pd.to_numeric(l01_all[np_col], errors="coerce")
+            top_ids_df = l01_all[l01_all["__n"] > 0].nlargest(CODE_COUNTS_TOP_N, "__n")
+            if not top_ids_df.empty:
+                ids = [int(x) for x in top_ids_df[cid_col].dropna().astype(int).tolist()]
                 names_map = _fetch_concept_names(ids)
+
+                def _n_by_cid(df_tw: pd.DataFrame) -> dict[int, int]:
+                    m: dict[int, int] = {}
+                    for _, r in df_tw.iterrows():
+                        cid = _safe_int(r.get(cid_col))
+                        n = _safe_int(r.get(np_col))
+                        if cid is not None and n is not None and n > 0:
+                            m[cid] = n
+                    return m
+
+                before_map = _n_by_cid(l01_before)
+                after_map = _n_by_cid(l01_after)
+
+                def _iqr_after(cid_val: int | None) -> str:
+                    if not cid_val or not med_clos_c:
+                        return "—"
+                    sub = l01_after[l01_after[cid_col].apply(_safe_int) == cid_val]
+                    if sub.empty:
+                        return "—"
+                    r = sub.iloc[0]
+                    return _fmt_iqr(r.get(med_clos_c), r.get(lq_clos_c) if lq_clos_c else None, r.get(uq_clos_c) if uq_clos_c else None)
+
+                def _iqr_first(cid_val: int | None) -> str:
+                    if not cid_val or not med_first_c:
+                        return "—"
+                    sub = l01_all[l01_all[cid_col].apply(_safe_int) == cid_val]
+                    if sub.empty:
+                        return "—"
+                    r = sub.iloc[0]
+                    return _fmt_iqr(r.get(med_first_c), r.get(lq_first_c) if lq_first_c else None, r.get(uq_first_c) if uq_first_c else None)
+
                 rows = []
-                for i, (_, r) in enumerate(l01.iterrows(), 1):
+                for i, (_, r) in enumerate(top_ids_df.iterrows(), 1):
                     cid = _safe_int(r.get(cid_col))
                     cname = names_map.get(cid, "") if cid else ""
                     np_ = _safe_int(r.get(np_col))
-                    pct_ = _pct_of(np_, n_dx) if n_dx else "—"
-                    med = r.get(med_c) if med_c else None
-                    lq = r.get(lq_c) if lq_c else None
-                    uq = r.get(uq_c) if uq_c else None
-                    iqr_str = _fmt_iqr(med, lq, uq)
+                    pct_met = _pct_of(np_, n_met_s3) if n_met_s3 else "—"
+                    n_bef = before_map.get(cid, 0) if cid else 0
+                    n_aft = after_map.get(cid, 0) if cid else 0
+                    pct_bef = _pct_of(n_bef, np_) if np_ else "—"
+                    pct_aft = _pct_of(n_aft, np_) if np_ else "—"
+                    iqr_first_str = _iqr_first(cid)
+                    iqr_after_str = _iqr_after(cid)
                     rows.append(
                         f"<tr><td>{i}</td>"
                         f'<td><code>{_e(str(cid))}</code></td>'
                         f"<td>{_e(cname)}</td>"
                         f'<td class="num">{_fmt_n(np_)}</td>'
-                        f'<td class="num">{pct_}</td>'
-                        f'<td class="num">{_e(iqr_str)}</td></tr>'
+                        f'<td class="num">{pct_met}</td>'
+                        f'<td class="num">{pct_bef}</td>'
+                        f'<td class="num">{pct_aft}</td>'
+                        f'<td class="num">{_e(iqr_first_str)}</td>'
+                        f'<td class="num">{_e(iqr_after_str)}</td></tr>'
                     )
+                n_met_lbl = f"N={n_met_s3:,}" if n_met_s3 else "MET cohort"
                 tbl = (
                     '<table class="rt"><thead><tr>'
-                    '<th>#</th><th>Concept ID</th><th>Drug name</th>'
-                    '<th class="num">N patients</th><th class="num">% DX cohort</th>'
-                    '<th class="num">Median days (IQR) from MET</th>'
+                    '<th>#</th><th>Concept ID</th><th>Drug</th>'
+                    f'<th class="num">N patients</th>'
+                    f'<th class="num">% of MET cohort ({n_met_lbl})</th>'
+                    '<th class="num">% with record before MET</th>'
+                    '<th class="num">% with record after MET</th>'
+                    '<th class="num">Median days (IQR) — first occurrence</th>'
+                    '<th class="num">Median days (IQR) — closest after</th>'
                     '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
                 )
                 parts.append(_card(
-                    f"Table 3.2 — Drug-level treatment timing around MET (top {CODE_COUNTS_TOP_N}) {_badge('expanded', 'partial')}",
+                    f"Table 3.2 — Drug-level L01 timing around MET (top {CODE_COUNTS_TOP_N}) {_badge('new')}",
                     _tbl_wrap(tbl),
                 ))
 
@@ -1196,55 +1703,109 @@ def _s04_longitudinal(rd: Path) -> str:
 
     parts: list[str] = []
 
-    # L01 treatment windows chart
+    # L01 treatment windows — side-by-side Figures 4.1 / 4.2
     if windows is not None:
         fig = _l01_windows_chart(windows)
         if fig:
-            parts.append(_card_grid(
-                _plot_box("Figure 4.1 — % cohort with L01 per 30-day window", _fig_div(fig), badge="new"),
-                cols=1,
-            ))
+            dx_fig_html = _fig_div(fig)
+            parts.append(
+                f'<div class="card-grid card-grid-2" style="margin-bottom:16px;">'
+                + _plot_box("Figure 4.1 — % cohort with L01 per 30-day window (DX anchor)", dx_fig_html, badge="new")
+                + _plot_box("Figure 4.2 — % MET subgroup with L01 per 30-day window (MET anchor)", dx_fig_html, badge="new")
+                + "</div>"
+                + '<p class="tbl-note" style="margin:0 0 16px;">Both plots use the same source data until separate DX/MET-anchored window outputs are available.</p>'
+            )
 
-    # Gap bucket distribution chart
+    # Figure 4.3 — gap bucket distribution
     if gap_buckets is not None:
         fig = _gap_bucket_chart(gap_buckets)
         if fig:
-            parts.append(_plot_box("Figure 4.2 — Distribution of gaps between consecutive L01 records", _fig_div(fig), badge="new"))
+            parts.append(_plot_box(
+                "Figure 4.3 — Distribution of gaps between consecutive L01 records", _fig_div(fig), badge="new",
+                sub="All L01 patients vs MET subgroup · bimodal shape = empirical episode boundary",
+            ))
 
-    # Gap decile summary table
+    # Fixed-row gap summary table (Table 4.1)
+    prev_s4 = _read(rd, "final_population_prevalence.csv")
+    n_l01_s4: int | None = None
+    n_met_s4: int | None = None
+    if prev_s4 is not None:
+        oc4 = _col(prev_s4, "prevalence_year")
+        if oc4:
+            ov4 = prev_s4[prev_s4[oc4].astype(str).str.upper() == "OVERALL"]
+            if not ov4.empty:
+                n_l01_s4 = _safe_int(ov4.iloc[0].get(_col(prev_s4, "n_l01")))
+                n_met_s4 = _safe_int(ov4.iloc[0].get(_col(prev_s4, "n_met")))
+
+    n_l01_lbl = f"All L01 patients (N={n_l01_s4:,})" if n_l01_s4 else "All L01 patients"
+    n_met_lbl = f"MET subgroup (N={n_met_s4:,})" if n_met_s4 else "MET subgroup"
+
     if gap_deciles is not None:
         sc = _col(gap_deciles, "subgroup")
         ng = _col(gap_deciles, "n_gaps")
         np_ = _col(gap_deciles, "n_patients_with_gaps")
-        p10 = _col(gap_deciles, "p10_days")
         p25 = _col(gap_deciles, "p25_days")
         p50 = _col(gap_deciles, "p50_days")
         p75 = _col(gap_deciles, "p75_days")
-        p90 = _col(gap_deciles, "p90_days")
         if sc and ng and p50:
-            rows = []
+            decile_map: dict[str, Any] = {}
             for _, r in gap_deciles.iterrows():
-                sg = str(r.get(sc, ""))
-                rows.append(
-                    f"<tr><td><code>{_e(sg)}</code></td>"
-                    f'<td class="num">{_fmt_n(r.get(ng))}</td>'
-                    f'<td class="num">{_fmt_n(r.get(np_)) if np_ else "—"}</td>'
-                    f'<td class="num">{_fmt_n(r.get(p10)) if p10 else "—"}</td>'
-                    f'<td class="num">{_fmt_n(r.get(p25)) if p25 else "—"}</td>'
-                    f'<td class="num">{_fmt_n(r.get(p50))}</td>'
-                    f'<td class="num">{_fmt_n(r.get(p75)) if p75 else "—"}</td>'
-                    f'<td class="num">{_fmt_n(r.get(p90)) if p90 else "—"}</td>'
-                    f"</tr>"
-                )
+                sg = str(r.get(sc, "")).upper()
+                decile_map[sg] = r
+
+            def _dval(sg: str, col: str | None) -> str:
+                r = decile_map.get(sg)
+                if r is None or col is None:
+                    return "—"
+                return _fmt_n(r.get(col))
+
+            def _diqr(sg: str) -> str:
+                r = decile_map.get(sg)
+                if r is None:
+                    return "—"
+                return _fmt_iqr(r.get(p50) if p50 else None,
+                                r.get(p25) if p25 else None,
+                                r.get(p75) if p75 else None)
+
+            fixed_rows = [
+                ("Patients with ≥2 L01 records (gap measurable)", _dval("ALL_L01", np_), _dval("MET_L01", np_)),
+                ("Median gap, days (IQR)", _diqr("ALL_L01"), _diqr("MET_L01")),
+            ]
+
+            if gap_buckets is not None:
+                bc = _col(gap_buckets, "gap_bucket")
+                nc_gb = _col(gap_buckets, "n_gaps") or _col(gap_buckets, "n_patients")
+                gc_gb = _col(gap_buckets, "subgroup")
+                if bc and nc_gb:
+                    def _bkt(sg_key: str, bkt: str) -> str:
+                        if gc_gb:
+                            sub_gb = gap_buckets[gap_buckets[gc_gb].astype(str).str.upper() == sg_key]
+                        else:
+                            sub_gb = gap_buckets
+                        row_gb = sub_gb[sub_gb[bc].astype(str) == bkt]
+                        if row_gb.empty:
+                            return "—"
+                        total_gaps_sg = _safe_int(decile_map.get(sg_key, {}).get(ng)) if ng else None
+                        n_bkt = _safe_int(row_gb.iloc[0].get(nc_gb))
+                        return _pct_of(n_bkt, total_gaps_sg)
+
+                    for bkt, bkt_lbl in [("lt30d", "% gaps < 30d"), ("30_59d", "% gaps 30–59d"),
+                                         ("60_89d", "% gaps 60–89d"), ("90_179d", "% gaps 90–179d"),
+                                         ("ge180d", "% gaps ≥ 180d")]:
+                        fixed_rows.append((bkt_lbl, _bkt("ALL_L01", bkt), _bkt("MET_L01", bkt)))
+
             tbl = (
-                '<table class="rt"><thead><tr>'
-                '<th>Subgroup</th><th class="num">N gaps</th><th class="num">N patients</th>'
-                '<th class="num">P10</th><th class="num">P25</th><th class="num">P50</th>'
-                '<th class="num">P75</th><th class="num">P90</th>'
-                '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
+                f'<table class="rt"><thead><tr>'
+                f'<th>Metric</th><th class="num">{n_l01_lbl}</th><th class="num">{n_met_lbl}</th>'
+                f'</tr></thead><tbody>'
+                + "".join(
+                    f'<tr><td>{_e(m)}</td><td class="num">{a}</td><td class="num">{b}</td></tr>'
+                    for m, a, b in fixed_rows
+                )
+                + '</tbody></table>'
             )
             parts.append(_card(
-                f"Table 4.1 — L01 gap distribution: all L01 patients vs MET subgroup {_badge('new')}",
+                f"Table 4.1 — L01 gap distribution summary: all L01 patients vs MET subgroup {_badge('new')}",
                 _tbl_wrap(tbl),
             ))
 
@@ -1276,7 +1837,7 @@ def _s05_obs_death(rd: Path) -> str:
 
     parts: list[str] = []
 
-    # Stat boxes from death CSV
+    # Stat boxes — deaths focus
     if death is not None:
         ac = _col(death, "anchor_event")
         nc = _col(death, "n_patients")
@@ -1295,18 +1856,23 @@ def _s05_obs_death(rd: Path) -> str:
                 nd_val = _safe_int(r.get(nd))
                 nio_val = _safe_int(r.get(nio)) if nio else None
                 noo_val = _safe_int(r.get(noo)) if noo else None
-                pct_dead = f"{100.0 * nd_val / np_val:.1f}%" if nd_val and np_val and np_val > 0 else "—"
                 pct_in = f"{100.0 * nio_val / nd_val:.1f}%" if nio_val and nd_val and nd_val > 0 else "—"
                 pct_out = f"{100.0 * noo_val / nd_val:.1f}%" if noo_val and nd_val and nd_val > 0 else "—"
+                pct_dead = f"{100.0 * nd_val / np_val:.1f}%" if nd_val and np_val and np_val > 0 else "—"
+                # Infer deaths before obs: total - in - out (rough)
+                nd_before_val: int | None = None
+                if nd_val and nio_val is not None and noo_val is not None:
+                    nd_before_val = max(0, nd_val - nio_val - noo_val)
+                pct_before = f"{100.0 * nd_before_val / nd_val:.1f}%" if nd_before_val and nd_val and nd_val > 0 else "—"
                 parts.append(_card_grid(
-                    _stat_box(_fmt_n(np_val), "DX cohort (INDEX)", cls="highlight"),
-                    _stat_box(_fmt_n(nd_val), "Deceased (any)", pct=pct_dead),
-                    _stat_box(_fmt_n(nio_val) if nio_val else "—", "Deaths inside obs. period", pct=pct_in),
-                    _stat_box(_fmt_n(noo_val) if noo_val else "—", "Deaths outside obs. period", pct=pct_out, cls="alert" if noo_val else ""),
+                    _stat_box(_fmt_n(nd_val), "Deaths recorded", pct=pct_dead),
+                    _stat_box(_fmt_n(nio_val) if nio_val else "—", "Death within obs. period", pct=pct_in, cls="highlight"),
+                    _stat_box(_fmt_n(noo_val) if noo_val else "—", "Death AFTER obs. period end", pct=pct_out, cls="alert"),
+                    _stat_box(_fmt_n(nd_before_val) if nd_before_val else "—", "Death BEFORE obs. period start", pct=pct_before, cls="warn"),
                     cols=4,
                 ))
 
-    # Death/obs summary table
+    # Table 5.1 — category breakdown with implication
     if death is not None:
         ac = _col(death, "anchor_event")
         yc = _col(death, "prevalence_year")
@@ -1314,18 +1880,102 @@ def _s05_obs_death(rd: Path) -> str:
         nd = _col(death, "n_deaths")
         nio = _col(death, "n_deaths_in_obs")
         noo = _col(death, "n_deaths_out_obs")
-        med_f = _col(death, "median_followup_days")
-        lq_f = _col(death, "lq_followup_days")
-        uq_f = _col(death, "uq_followup_days")
+        med_d = _col(death, "median_days")
+        lq_d = _col(death, "lq_days")
+        uq_d = _col(death, "uq_days")
         if ac and yc and nc and nd:
             overall = death[
                 (death[ac].astype(str).str.upper() == "INDEX") &
                 (death[yc].astype(str).str.upper() == "OVERALL")
             ]
             if not overall.empty:
+                r = overall.iloc[0]
+                np_ = _safe_int(r.get(nc))
+                nd_ = _safe_int(r.get(nd))
+                nio_ = _safe_int(r.get(nio)) if nio else None
+                noo_ = _safe_int(r.get(noo)) if noo else None
+                nd_bef = max(0, nd_ - (nio_ or 0) - (noo_ or 0)) if nd_ else None
+                gap_iqr = _fmt_iqr(r.get(med_d) if med_d else None,
+                                   r.get(lq_d) if lq_d else None,
+                                   r.get(uq_d) if uq_d else None)
+
+                cat_rows = [
+                    (
+                        "Death within obs. period", "highlight",
+                        _fmt_n(nio_), _pct_of(nio_, np_),
+                        "—", "Correctly censored; obs. period end is a valid study end point",
+                    ),
+                    (
+                        "Death AFTER obs. period end", "warn",
+                        _fmt_n(noo_), _pct_of(noo_, np_),
+                        gap_iqr, "Death missed by observation window — inflates apparent survival",
+                    ),
+                    (
+                        "Death BEFORE obs. period start", "",
+                        _fmt_n(nd_bef), _pct_of(nd_bef, np_),
+                        "—", "Likely data entry error or retro-coded death date",
+                    ),
+                ]
+                def _cat_row(cat: str, cls: str, n: str, pct: str, gap: str, imp: str) -> str:
+                    row_cls = ' class="highlight"' if cls == "highlight" else ""
+                    return (
+                        f'<tr{row_cls}>'
+                        f'<td>{cat}</td>'
+                        f'<td class="num">{n}</td>'
+                        f'<td class="num">{pct}</td>'
+                        f'<td class="num">{gap}</td>'
+                        f'<td>{imp}</td>'
+                        f'</tr>'
+                    )
+                rows_html = "".join(_cat_row(*row) for row in cat_rows)
+                tbl = (
+                    '<table class="rt"><thead><tr>'
+                    f'<th>Category</th>'
+                    f'<th class="num">N (DX cohort, N={_fmt_n(np_)})</th>'
+                    '<th class="num">%</th>'
+                    '<th class="num">Gap: median days (IQR)</th>'
+                    '<th>Implication</th>'
+                    '</tr></thead><tbody>' + rows_html + '</tbody></table>'
+                )
+                parts.append(_card(
+                    f"Table 5.1 — Death vs observation period alignment {_badge('new')}",
+                    _tbl_wrap(tbl),
+                ))
+
+    # Table 5.2 — year-by-year deaths
+    if death is not None:
+        ac = _col(death, "anchor_event")
+        yc = _col(death, "prevalence_year")
+        nc = _col(death, "n_patients")
+        nd = _col(death, "n_deaths")
+        nio = _col(death, "n_deaths_in_obs")
+        noo = _col(death, "n_deaths_out_obs")
+        med_g = _col(death, "median_days")
+        lq_g = _col(death, "lq_days")
+        uq_g = _col(death, "uq_days")
+        med_f = _col(death, "median_followup_days")
+        lq_f = _col(death, "lq_followup_days")
+        uq_f = _col(death, "uq_followup_days")
+        if ac and yc and nc and nd:
+            yearly = death[
+                (death[ac].astype(str).str.upper() == "INDEX") &
+                (death[yc].astype(str).str.upper() != "OVERALL")
+            ].copy()
+            yearly["__y"] = pd.to_numeric(yearly[yc].astype(str), errors="coerce")
+            yearly = yearly.dropna(subset=["__y"]).sort_values("__y")
+            yearly = yearly[yearly["__y"] >= PREVALENCE_YEAR_MIN]
+            if not yearly.empty:
+                overall_row = death[
+                    (death[ac].astype(str).str.upper() == "INDEX") &
+                    (death[yc].astype(str).str.upper() == "OVERALL")
+                ]
                 rows = []
-                for _, r in overall.iterrows():
-                    anch = str(r.get(ac, ""))
+                all_rows = ([("Overall", overall_row.iloc[0] if not overall_row.empty else None)] +
+                            [("", r) for _, r in yearly.iterrows()])
+                for yr_lbl_override, r in all_rows:
+                    if r is None:
+                        continue
+                    yr_val = yr_lbl_override or str(int(_safe_int(r.get(yc)) or 0))
                     np_ = _safe_int(r.get(nc))
                     nd_ = _safe_int(r.get(nd))
                     nio_ = _safe_int(r.get(nio)) if nio else None
@@ -1335,78 +1985,51 @@ def _s05_obs_death(rd: Path) -> str:
                     fup = _fmt_iqr(r.get(med_f) if med_f else None,
                                    r.get(lq_f) if lq_f else None,
                                    r.get(uq_f) if uq_f else None)
+                    row_cls = ' class="highlight"' if yr_lbl_override == "Overall" else ""
+                    anchor_lbl = "Index DX"
                     rows.append(
-                        f"<tr>"
-                        f"<td>{_e(anch)}</td>"
+                        f'<tr{row_cls}>'
+                        f'<td>{_e(yr_val)}</td>'
+                        f'<td>{_e(anchor_lbl)}</td>'
                         f'<td class="num">{_fmt_n(np_)}</td>'
                         f'<td class="num">{_fmt_n(nd_)} ({pct_dead})</td>'
                         f'<td class="num">{_fmt_n(nio_)}</td>'
-                        f'<td class="num">{_fmt_n(noo_)} ({pct_out})</td>'
+                        f'<td class="num">{_fmt_n(noo_)} ({pct_out}) {_badge("new") if yr_lbl_override == "Overall" else ""}</td>'
                         f'<td class="num">{_e(fup)}</td>'
-                        f"</tr>"
+                        f'</tr>'
                     )
                 if rows:
                     tbl = (
                         '<table class="rt"><thead><tr>'
-                        '<th>Anchor</th><th class="num">N</th>'
-                        '<th class="num">Deceased (%)</th>'
+                        '<th>Year</th><th>Anchor</th><th class="num">N</th>'
+                        '<th class="num">Deaths (%)</th>'
                         '<th class="num">Deaths in obs. period</th>'
-                        '<th class="num">Deaths outside obs. period (%)</th>'
-                        '<th class="num">Follow-up median (IQR), days</th>'
+                        f'<th class="num">Deaths outside obs. period {_badge("new")}</th>'
+                        '<th class="num">Days to death (IQR)</th>'
                         '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
                     )
                     parts.append(_card(
-                        "Table 5.1 — Observation period / death alignment summary",
+                        "Table 5.2 — Deaths by year: inside vs outside observation period (DX cohort)",
                         _tbl_wrap(tbl),
                     ))
-
-    # Death gap distribution (new)
-    if gap_summary is not None:
-        ac = _col(gap_summary, "anchor_event")
-        nd_after = _col(gap_summary, "n_death_after_obs")
-        nd_before = _col(gap_summary, "n_death_before_obs")
-        med_g = _col(gap_summary, "median_gap_days")
-        lq_g = _col(gap_summary, "lq_gap_days")
-        uq_g = _col(gap_summary, "uq_gap_days")
-        if ac and nd_after:
-            rows = []
-            for _, r in gap_summary.iterrows():
-                anch = str(r.get(ac, ""))
-                nafter = _safe_int(r.get(nd_after))
-                nbefore = _safe_int(r.get(nd_before)) if nd_before else None
-                gap_iqr = _fmt_iqr(r.get(med_g) if med_g else None,
-                                    r.get(lq_g) if lq_g else None,
-                                    r.get(uq_g) if uq_g else None)
-                rows.append(
-                    f"<tr><td>{_e(anch)}</td>"
-                    f'<td class="num">{_fmt_n(nafter)}</td>'
-                    f'<td class="num">{_fmt_n(nbefore)}</td>'
-                    f'<td class="num">{_e(gap_iqr)}</td></tr>'
-                )
-            if rows:
-                tbl = (
-                    '<table class="rt"><thead><tr>'
-                    '<th>Anchor</th>'
-                    '<th class="num">Deaths after obs. period end</th>'
-                    '<th class="num">Deaths before obs. period start</th>'
-                    '<th class="num">Gap: median (IQR), days</th>'
-                    '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
-                )
-                parts.append(_card(
-                    f"Table 5.2 — Death date vs obs. period alignment {_badge('new')}",
-                    _tbl_wrap(tbl),
-                ))
 
     if gap_buckets is not None:
         fig = _gap_bucket_chart(gap_buckets, n_col="n_patients", group_col=None)
         if fig:
-            parts.append(_plot_box("Figure 5.1 — Gap distribution: death date − obs. period end", _fig_div(fig), badge="new"))
+            parts.append(_plot_box(
+                "Figure 5.1 — Gap distribution: death date − obs. period end", _fig_div(fig), badge="new",
+                sub="Patients whose death date falls outside their observation window",
+            ))
 
     # Deaths by year chart
     if death is not None:
         fig = _death_obs_chart(death)
         if fig:
-            parts.append(_plot_box("Figure 5.2 — Deaths by calendar year: inside vs outside obs. period", _fig_div(fig), badge="expanded"))
+            parts.append(_plot_box(
+                "Figure 5.2 — Deaths by calendar year: inside vs outside obs. period",
+                _fig_div(fig), badge="expanded",
+                sub="% deaths outside obs. period is the key data quality signal",
+            ))
 
     if not parts:
         parts.append('<p style="color:var(--text-3);font-style:italic;">Death/obs data not yet available.</p>')
@@ -1426,69 +2049,154 @@ def _s05_obs_death(rd: Path) -> str:
 def _s06_yoy(rd: Path) -> str:
     by_year = _read(rd, "final_timing_by_year.csv")
     directionality = _read(rd, "final_directionality.csv")
+    prev = _read(rd, "final_population_prevalence.csv")
+    death = _read(rd, "final_death_from_anchors.csv")
 
     parts: list[str] = []
 
-    # Timing matrix by year (HTML table)
+    # Table 6.1 — year-by-year timing matrix with N(DX), N(MET), % death outside obs.
+    prev_by_year: dict[int, Any] = {}
+    if prev is not None:
+        yc_p = _col(prev, "prevalence_year")
+        if yc_p:
+            for _, r in prev.iterrows():
+                yr_str = str(r.get(yc_p, "")).upper()
+                if yr_str != "OVERALL":
+                    try:
+                        yr = int(float(yr_str))
+                        if yr >= PREVALENCE_YEAR_MIN:
+                            prev_by_year[yr] = r
+                    except (ValueError, TypeError):
+                        pass
+
+    death_by_year: dict[int, Any] = {}
+    if death is not None:
+        ac_d = _col(death, "anchor_event")
+        yc_d = _col(death, "prevalence_year")
+        if ac_d and yc_d:
+            for _, r in death.iterrows():
+                if str(r.get(ac_d, "")).upper() != "INDEX":
+                    continue
+                yr_str = str(r.get(yc_d, "")).upper()
+                if yr_str != "OVERALL":
+                    try:
+                        yr = int(float(yr_str))
+                        if yr >= PREVALENCE_YEAR_MIN:
+                            death_by_year[yr] = r
+                    except (ValueError, TypeError):
+                        pass
+
+    all_years = sorted(set(prev_by_year.keys()) | set(death_by_year.keys()))
+
+    # Timing medians from by_year if available
+    timing_by_yr: dict[tuple[str, str], dict[int, float | None]] = {}
     if by_year is not None:
         ttc = _col(by_year, "timing_type")
         fc = _col(by_year, "from_event")
         tc = _col(by_year, "to_event")
         yc = _col(by_year, "index_year")
-        n_col = _col(by_year, "n_patients_with_pair")
         mc = _col(by_year, "p50_days")
         if all([fc, tc, yc, mc]):
-            sub = by_year.copy()
-            if ttc:
-                sub = sub[sub[ttc].astype(str).str.lower() == "first_to_first"]
-            sub["__y"] = pd.to_numeric(sub[yc].astype(str), errors="coerce")
-            sub = sub[sub["__y"] >= PREVALENCE_YEAR_MIN].copy()
-            years = sorted(sub["__y"].dropna().astype(int).unique().tolist())
-            pairs = [("DX", "MET"), ("MET", "L01"), ("DX", "L01")]
+            for pair in [("DX", "MET"), ("MET", "L01")]:
+                sub = by_year.copy()
+                if ttc:
+                    sub = sub[sub[ttc].astype(str).str.lower() == "first_to_first"]
+                sub = sub[
+                    sub[fc].astype(str).str.upper().eq(pair[0]) &
+                    sub[tc].astype(str).str.upper().eq(pair[1])
+                ].copy()
+                sub["__y"] = pd.to_numeric(sub[yc].astype(str), errors="coerce")
+                sub = sub.dropna(subset=["__y"])
+                timing_by_yr[pair] = {
+                    int(r["__y"]): pd.to_numeric(r.get(mc), errors="coerce")
+                    for _, r in sub.iterrows()
+                }
 
-            if years and pairs:
-                ths = "".join(f"<th>{y}</th>" for y in years)
-                rows = []
-                for from_ev, to_ev in pairs:
-                    sel = sub[
-                        sub[fc].astype(str).str.upper().eq(from_ev) &
-                        sub[tc].astype(str).str.upper().eq(to_ev)
-                    ].copy().set_index("__y")
-                    meds = [sel[mc].get(y) if y in sel.index else None for y in years]
-                    valid_meds = [m for m in meds if m is not None and not pd.isna(m)]
-                    mn_v = min(valid_meds) if valid_meds else 0
-                    mx_v = max(valid_meds) if valid_meds else 1
-                    span = max(1, mx_v - mn_v)
+    # Directionality % by year
+    dir_by_yr_before: dict[int, str] = {}
+    dir_by_yr_no_l01: dict[int, str] = {}
+    if directionality is not None:
+        pc = _col(directionality, "pair")
+        yc_dir = _col(directionality, "index_year")
+        dc = _col(directionality, "direction")
+        nc_dir = _col(directionality, "n_patients")
+        if all([pc, yc_dir, dc, nc_dir]):
+            for pair_key, dir_key, target_dict in [
+                ("DX_MET", "BEFORE_GT90", dir_by_yr_before),
+                ("MET_L01", "NO_EVENT", dir_by_yr_no_l01),
+            ]:
+                sub = directionality[
+                    (directionality[pc].astype(str).str.upper() == pair_key) &
+                    (directionality[dc].astype(str).str.upper() == dir_key) &
+                    (directionality[yc_dir].astype(str).str.upper() != "OVERALL")
+                ].copy()
+                sub["__y"] = pd.to_numeric(sub[yc_dir].astype(str), errors="coerce")
+                for _, r in sub.dropna(subset=["__y"]).iterrows():
+                    yr = int(r["__y"])
+                    if yr >= PREVALENCE_YEAR_MIN:
+                        n_dir = _safe_int(r.get(nc_dir))
+                        prev_r = prev_by_year.get(yr)
+                        denom = _safe_int(prev_r.get(_col(prev, "n_met"))) if prev_r and prev is not None else None
+                        target_dict[yr] = _pct_of(n_dir, denom)
 
-                    def _cls(v: Any) -> str:
-                        if v is None or (isinstance(v, float) and pd.isna(v)):
-                            return "hm-0"
-                        idx = int(5 * (float(v) - mn_v) / span)
-                        return f"hm-{min(5, max(1, idx))}"
-
-                    cells = "".join(
-                        f'<td class="{_cls(m)}">{_round_day(m) if m is not None and not (isinstance(m, float) and pd.isna(m)) else "—"}</td>'
-                        for m in meds
-                    )
-                    label = f"{from_ev} → {to_ev} (days)"
-                    rows.append(f'<tr><th class="row-head">{label}</th>{cells}</tr>')
-
-                tbl = (
-                    '<div class="hm-wrap"><table class="hm-table"><thead><tr>'
-                    f'<th class="row-head">Pair</th>{ths}'
-                    f'</tr></thead><tbody>' + "\n".join(rows) +
-                    '</tbody></table></div>'
-                )
-                parts.append(_card(
-                    f"Table 6.1 — Timing summary matrix by index year (median days, first→first) {_badge('new')}",
-                    tbl,
-                ))
+    if all_years:
+        rows = []
+        for yr in all_years:
+            prev_r = prev_by_year.get(yr)
+            death_r = death_by_year.get(yr)
+            n_dx_yr = _fmt_n(_safe_int(prev_r.get(_col(prev, "n_dx"))) if prev_r and prev is not None else None)
+            n_met_yr = _fmt_n(_safe_int(prev_r.get(_col(prev, "n_met"))) if prev_r and prev is not None else None)
+            pct_met_before = dir_by_yr_before.get(yr, "—")
+            dx_met_med = timing_by_yr.get(("DX", "MET"), {}).get(yr)
+            dx_met_str = f"{int(round(dx_met_med))}d" if dx_met_med is not None and not (isinstance(dx_met_med, float) and pd.isna(dx_met_med)) else "—"
+            pct_l01_before = dir_by_yr_no_l01.get(yr, "—")
+            met_l01_med = timing_by_yr.get(("MET", "L01"), {}).get(yr)
+            met_l01_str = f"{int(round(met_l01_med))}d" if met_l01_med is not None and not (isinstance(met_l01_med, float) and pd.isna(met_l01_med)) else "—"
+            pct_no_l01 = "—"
+            pct_death_out = "—"
+            if death_r is not None and death is not None:
+                nd_ = _safe_int(death_r.get(_col(death, "n_deaths")))
+                noo_ = _safe_int(death_r.get(_col(death, "n_deaths_out_obs"))) if _col(death, "n_deaths_out_obs") else None
+                pct_death_out = _pct_of(noo_, nd_)
+            rows.append(
+                f"<tr><td>{yr}</td>"
+                f'<td class="num">{n_dx_yr}</td>'
+                f'<td class="num">{n_met_yr}</td>'
+                f'<td class="num">{pct_met_before}</td>'
+                f'<td class="num">{dx_met_str}</td>'
+                f'<td class="num">{pct_l01_before}</td>'
+                f'<td class="num">{met_l01_str}</td>'
+                f'<td class="num">{pct_no_l01}</td>'
+                f'<td class="num">{pct_death_out}</td>'
+                f'</tr>'
+            )
+        tbl = (
+            '<table class="rt"><thead><tr>'
+            '<th>Year</th>'
+            '<th class="num">N (DX)</th>'
+            '<th class="num">N (MET)</th>'
+            '<th class="num">% MET before DX</th>'
+            '<th class="num">DX→MET median (d)</th>'
+            '<th class="num">% L01 before MET</th>'
+            '<th class="num">MET→L01 median (d)</th>'
+            '<th class="num">% no L01 (MET cohort)</th>'
+            '<th class="num">% death outside obs.</th>'
+            '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
+        )
+        parts.append(_card(
+            f"Table 6.1 — Timing summary matrix by index year {_badge('new')}",
+            tbl,
+        ))
 
     # Multi-line timing by year chart
     if by_year is not None:
         fig = _timing_by_year_chart(by_year)
         if fig:
-            parts.append(_plot_box("Figure 6.1 — Key timing metrics by index year", _fig_div(fig), badge="new"))
+            parts.append(_plot_box(
+                "Figure 6.1 — Key timing metrics by index year",
+                _fig_div(fig), badge="new",
+                sub="DX→MET and MET→L01 median days by index year · trend shifts indicate coding or guideline changes",
+            ))
 
     # Directionality by year table
     if directionality is not None:
@@ -1503,11 +2211,11 @@ def _s06_yoy(rd: Path) -> str:
             ].copy()
             dx_met["__y"] = pd.to_numeric(dx_met[yc].astype(str), errors="coerce")
             dx_met = dx_met[dx_met["__y"] >= PREVALENCE_YEAR_MIN].copy()
-            years = sorted(dx_met["__y"].dropna().astype(int).unique().tolist())
+            years_dir = sorted(dx_met["__y"].dropna().astype(int).unique().tolist())
             directions = [d for d in _DIR_ORDER if d != "SAME_DAY"]
-            if years and not dx_met.empty:
-                ths = "".join(f"<th>{y}</th>" for y in years)
-                rows = []
+            if years_dir and not dx_met.empty:
+                ths = "".join(f"<th>{y}</th>" for y in years_dir)
+                rows2 = []
                 for d in directions:
                     sub_d = dx_met[dx_met[dc].astype(str).str.upper() == d]
                     year_counts = dict(zip(
@@ -1517,18 +2225,18 @@ def _s06_yoy(rd: Path) -> str:
                     _, label = _DIR_LABELS.get(d, ("none", d))
                     cells = "".join(
                         f'<td class="num">{_fmt_n(year_counts.get(y))}</td>'
-                        for y in years
+                        for y in years_dir
                     )
-                    rows.append(f"<tr><td>{_e(label)}</td>{cells}</tr>")
-                if rows:
-                    tbl = (
+                    rows2.append(f"<tr><td>{_e(label)}</td>{cells}</tr>")
+                if rows2:
+                    tbl2 = (
                         '<div class="hm-wrap"><table class="rt"><thead><tr>'
                         f'<th>Direction (DX→MET)</th>{ths}'
-                        '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table></div>'
+                        '</tr></thead><tbody>' + "\n".join(rows2) + '</tbody></table></div>'
                     )
                     parts.append(_card(
                         f"Table 6.2 — DX→MET directionality by index year {_badge('new')}",
-                        tbl,
+                        tbl2,
                     ))
 
     if not parts:
@@ -1542,9 +2250,10 @@ def _s06_yoy(rd: Path) -> str:
 
     return _section(
         "06", "Year-over-Year Stability",
-        "Timing metrics and directionality patterns stratified by index year. "
-        "Stable metrics suggest consistent coding behaviour; abrupt shifts may indicate "
-        "EHR migrations, guideline changes, or selection artefacts.",
+        "Key phenotyping metrics stratified by index year. "
+        "N(DX) and N(MET) are populated from population prevalence data; timing medians and "
+        "directionality % require the full SQL run. Stable metrics suggest consistent coding "
+        "behaviour; abrupt shifts may indicate EHR migrations, guideline changes, or selection artefacts.",
         "\n".join(parts), sid="s6",
     )
 
@@ -1579,6 +2288,7 @@ _CSS = """
   body { font-family: var(--sans); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; }
   .report-header { background: var(--accent); color: white; padding: 40px 48px 36px; position: relative; overflow: hidden; }
   .report-header::before { content: ''; position: absolute; top: -60px; right: -60px; width: 300px; height: 300px; border-radius: 50%; background: rgba(255,255,255,0.04); }
+  .report-header::after { content: ''; position: absolute; bottom: -40px; left: 200px; width: 200px; height: 200px; border-radius: 50%; background: rgba(255,255,255,0.03); }
   .header-tag { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.6; margin-bottom: 12px; }
   .report-title { font-family: var(--serif); font-size: 32px; font-weight: 300; line-height: 1.2; margin-bottom: 8px; }
   .report-subtitle { font-size: 15px; opacity: 0.75; font-weight: 300; margin-bottom: 24px; }
@@ -1631,6 +2341,7 @@ _CSS = """
   .plot-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 16px; }
   .plot-header { padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
   .plot-header-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-2); }
+  .plot-header-sub { font-size: 11px; color: var(--text-3); }
   .plot-area { padding: 8px 4px 4px; }
   .dir-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; font-family: var(--mono); }
   .dir-before { background: #fee2e2; color: #991b1b; }
@@ -1652,6 +2363,12 @@ _CSS = """
   .badge-new { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
   .badge-gap { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
   .badge-partial { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  .wbars { display: flex; flex-direction: column; gap: 4px; }
+  .wbar-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .wbar-label { width: 120px; text-align: right; color: var(--text-2); font-family: var(--mono); font-size: 11px; flex-shrink: 0; }
+  .wbar-track { flex: 1; background: var(--surface2); border-radius: 3px; height: 14px; overflow: hidden; }
+  .wbar-fill { height: 100%; background: var(--accent); border-radius: 3px; opacity: 0.75; }
+  .wbar-val { width: 48px; text-align: right; font-family: var(--mono); font-size: 11px; color: var(--text-3); }
   @media (max-width: 700px) {
     .report-header { padding: 24px; }
     .report-body { padding: 20px; }
@@ -1680,14 +2397,44 @@ def build_report(outputs_dir: str | Path | None = None) -> Path:
 
     generated_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
+    # Populate header stats from prevalence CSV
+    n_dx_hdr: int | None = None
+    n_met_hdr: int | None = None
+    year_range_hdr = "—"
+    prev_hdr = _read(rd, "final_population_prevalence.csv")
+    if prev_hdr is not None:
+        yc_h = _col(prev_hdr, "prevalence_year")
+        if yc_h:
+            ov_h = prev_hdr[prev_hdr[yc_h].astype(str).str.upper() == "OVERALL"]
+            if not ov_h.empty:
+                n_dx_hdr = _safe_int(ov_h.iloc[0].get(_col(prev_hdr, "n_dx")))
+                n_met_hdr = _safe_int(ov_h.iloc[0].get(_col(prev_hdr, "n_met")))
+            yr_rows = prev_hdr[prev_hdr[yc_h].astype(str).str.upper() != "OVERALL"].copy()
+            yr_rows["__y"] = pd.to_numeric(yr_rows[yc_h].astype(str), errors="coerce")
+            ndx_c = _col(prev_hdr, "n_dx")
+            if ndx_c:
+                yr_rows = yr_rows[pd.to_numeric(yr_rows[ndx_c], errors="coerce") > 0]
+            yr_rows = yr_rows.dropna(subset=["__y"])
+            if not yr_rows.empty:
+                mn_yr = int(yr_rows["__y"].min())
+                mx_yr = int(yr_rows["__y"].max())
+                year_range_hdr = f"{mn_yr}–{mx_yr}"
+
+    n_dx_str = f"{n_dx_hdr:,}" if n_dx_hdr else "—"
+    n_met_str = f"{n_met_hdr:,}" if n_met_hdr else "—"
+    met_pct_str = f" ({100.0*n_met_hdr/n_dx_hdr:.1f}%)" if n_met_hdr and n_dx_hdr and n_dx_hdr > 0 else ""
+
     header = f"""
 <header class="report-header">
   <div class="header-tag">Oncology Phenotype Characterisation</div>
-  <div class="report-title">Data Characterisation Report</div>
-  <div class="report-subtitle">OMOP CDM · ATC L01 Antineoplastics · Metastasis cohort</div>
+  <h1 class="report-title">Data Characterisation Report</h1>
+  <p class="report-subtitle">OMOP CDM · ATC L01 Antineoplastics · Metastasis cohort</p>
   <div class="header-meta">
+    <div class="meta-item"><strong>Source database</strong>{_e(str(rd))}</div>
+    <div class="meta-item"><strong>DX cohort (N)</strong>{n_dx_str}</div>
+    <div class="meta-item"><strong>MET subgroup (N)</strong>{n_met_str}{met_pct_str}</div>
+    <div class="meta-item"><strong>Index years</strong>{year_range_hdr}</div>
     <div class="meta-item"><strong>Generated</strong>{generated_at}</div>
-    <div class="meta-item"><strong>Source</strong>{_e(str(rd))}</div>
   </div>
 </header>
 """
