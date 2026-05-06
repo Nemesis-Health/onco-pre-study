@@ -47,6 +47,7 @@ connection_details <- DatabaseConnector::createConnectionDetails(
 # rather than emitting multiple CSVs from a single chunk.
 
 result_chunks <- list(
+  list(file = "00b_cohort_attrition.sql",       output = "final_cohort_attrition.csv"),
   list(file = "01_population_prevalence.sql",   output = "final_population_prevalence.csv"),
   list(file = "02_code_counts.sql",             output = "final_code_counts.csv"),
   list(file = "03_directionality_buckets.sql",  output = "final_directionality.csv"),

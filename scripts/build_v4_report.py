@@ -1025,6 +1025,7 @@ def _s00_overview(rd: Path) -> str:
     prev = _read(rd, "final_population_prevalence.csv")
     demo = _read(rd, "final_demographics_from_anchors.csv")
     dx_counts = _read(rd, "final_anchor_dx_concept_counts.csv")
+    attrition = _read(rd, "final_cohort_attrition.csv")
 
     parts: list[str] = []
 
@@ -1096,6 +1097,24 @@ def _s00_overview(rd: Path) -> str:
         _stat_box(male_str, "Sex (DX cohort)", pct="male"),
         cols=4,
     ))
+
+    # ── Cohort attrition note ───────────────────────────────────────────────────
+    if attrition is not None:
+        nc_any = _col(attrition, "n_dx_any")
+        nc_excl = _col(attrition, "n_excluded_no_obs_dx")
+        if nc_any and nc_excl and not attrition.empty:
+            r = attrition.iloc[0]
+            n_any = _safe_int(r.get(nc_any))
+            n_excl = _safe_int(r.get(nc_excl))
+            if n_any and n_excl is not None:
+                pct_excl = f"{100.0 * n_excl / n_any:.1f}%" if n_any > 0 else ""
+                excl_str = f"{_fmt_n(n_excl)} ({pct_excl})" if pct_excl else _fmt_n(n_excl)
+                parts.append(
+                    f'<p class="tbl-note" style="margin:-4px 0 20px;">'
+                    f'Cohort eligibility: index date = earliest qualifying DX within an observation period '
+                    f'({_fmt_n(n_any)} patients had a qualifying DX; {excl_str} excluded — no overlapping observation period).'
+                    f'</p>'
+                )
 
     # ── Yearly prevalence chart ─────────────────────────────────────────────────
     if prev is not None:
@@ -1280,26 +1299,29 @@ def _s01_dx_met_timing(rd: Path) -> str:
 
     parts: list[str] = []
 
-    # Load n_met for denominator
+    # Load n_dx and n_met for denominators
     prev = _read(rd, "final_population_prevalence.csv")
+    n_dx: int | None = None
     n_met: int | None = None
     if prev is not None:
         oc = _col(prev, "prevalence_year")
         if oc:
             ov = prev[prev[oc].astype(str).str.upper() == "OVERALL"]
             if not ov.empty:
+                n_dx = _safe_int(ov.iloc[0].get(_col(prev, "n_dx")))
                 n_met = _safe_int(ov.iloc[0].get(_col(prev, "n_met")))
 
-    # Directionality table
+    # Directionality table — denominate on n_dx: DX_MET covers all DX patients
+    # (NO_EVENT alone = n_dx - n_met >> n_met, so using n_met would give >100%)
     if directionality is not None:
         tbl = _directionality_table(
             directionality, "DX_MET", _DIR_LABELS,
-            n_total=n_met, interp=_DX_MET_INTERP, col4_header="Interpretation",
+            n_total=n_dx, interp=_DX_MET_INTERP, col4_header="Interpretation",
         )
         if tbl:
             parts.append(_card(
                 f"Table 1.1 — DX ↔ MET temporal directionality {_badge('new')}",
-                tbl + '<p class="tbl-note">OVERALL cohort. % denominated on MET cohort. Suppressed rows hidden.</p>',
+                tbl + '<p class="tbl-note">OVERALL cohort. % denominated on DX cohort. Suppressed rows hidden.</p>',
             ))
 
     # DX→MET timing distribution — density histogram
@@ -1894,10 +1916,10 @@ def _s05_obs_death(rd: Path) -> str:
                 nd_ = _safe_int(r.get(nd))
                 nio_ = _safe_int(r.get(nio)) if nio else None
                 noo_ = _safe_int(r.get(noo)) if noo else None
-                nd_bef = max(0, nd_ - (nio_ or 0) - (noo_ or 0)) if nd_ else None
                 gap_iqr = _fmt_iqr(r.get(med_d) if med_d else None,
                                    r.get(lq_d) if lq_d else None,
                                    r.get(uq_d) if uq_d else None)
+                nd_bef = max(0, nd_ - (nio_ or 0) - (noo_ or 0)) if nd_ else None
 
                 cat_rows = [
                     (
@@ -2136,7 +2158,7 @@ def _s06_yoy(rd: Path) -> str:
                     if yr >= PREVALENCE_YEAR_MIN:
                         n_dir = _safe_int(r.get(nc_dir))
                         prev_r = prev_by_year.get(yr)
-                        denom = _safe_int(prev_r.get(_col(prev, "n_met"))) if prev_r and prev is not None else None
+                        denom = _safe_int(prev_r.get(_col(prev, "n_met"))) if prev_r is not None and prev is not None else None
                         target_dict[yr] = _pct_of(n_dir, denom)
 
     if all_years:
@@ -2144,8 +2166,8 @@ def _s06_yoy(rd: Path) -> str:
         for yr in all_years:
             prev_r = prev_by_year.get(yr)
             death_r = death_by_year.get(yr)
-            n_dx_yr = _fmt_n(_safe_int(prev_r.get(_col(prev, "n_dx"))) if prev_r and prev is not None else None)
-            n_met_yr = _fmt_n(_safe_int(prev_r.get(_col(prev, "n_met"))) if prev_r and prev is not None else None)
+            n_dx_yr = _fmt_n(_safe_int(prev_r.get(_col(prev, "n_dx"))) if prev_r is not None and prev is not None else None)
+            n_met_yr = _fmt_n(_safe_int(prev_r.get(_col(prev, "n_met"))) if prev_r is not None and prev is not None else None)
             pct_met_before = dir_by_yr_before.get(yr, "—")
             dx_met_med = timing_by_yr.get(("DX", "MET"), {}).get(yr)
             dx_met_str = f"{int(round(dx_met_med))}d" if dx_met_med is not None and not (isinstance(dx_met_med, float) and pd.isna(dx_met_med)) else "—"

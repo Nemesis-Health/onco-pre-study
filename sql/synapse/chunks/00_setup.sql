@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : synapse
--- Translated     : 2026-05-06 18:54:09 BST
+-- Translated     : 2026-05-06 20:28:00 BST
 -- Source file    : sql/sql_server/chunks/00_setup.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -327,18 +327,35 @@ JOIN @cdm_database_schema.concept ing
 ------------------------------------------------------------
 -- G) COHORT ANCHOR + SUMMARIES
 ------------------------------------------------------------
+-- Track attrition: count all patients with a qualifying DX before the
+-- obs-period filter so the report can show how many were excluded.
+IF OBJECT_ID('tempdb..#cohort_attrition', 'U') IS NOT NULL DROP TABLE #cohort_attrition;
+CREATE TABLE #cohort_attrition (
+    stage      VARCHAR(50),
+    n_patients INT
+);
+INSERT INTO #cohort_attrition (stage, n_patients)
+SELECT 'dx_any', COUNT(DISTINCT person_id) FROM #dx_events;
 IF OBJECT_ID('tempdb..#cohort', 'U') IS NOT NULL DROP TABLE #cohort;
 CREATE TABLE #cohort (
     person_id BIGINT,
     index_date DATE
 );
+-- Index date = earliest qualifying DX that falls within an observation period.
+-- Patients with no obs-period-covered DX are excluded entirely.
 INSERT INTO #cohort (person_id, index_date)
 SELECT
-    person_id,
-    MIN(event_date) AS index_date
-FROM #dx_events
-GROUP BY person_id
+    dx.person_id,
+    MIN(dx.event_date) AS index_date
+FROM #dx_events dx
+INNER JOIN @cdm_database_schema.observation_period op
+    ON  op.person_id = dx.person_id
+    AND dx.event_date BETWEEN op.observation_period_start_date
+                          AND op.observation_period_end_date
+GROUP BY dx.person_id
 ;
+INSERT INTO #cohort_attrition (stage, n_patients)
+SELECT 'dx_in_obs', COUNT(*) FROM #cohort;
 IF OBJECT_ID('tempdb..#dx_summary', 'U') IS NOT NULL DROP TABLE #dx_summary;
 CREATE TABLE #dx_summary (
     person_id BIGINT,
