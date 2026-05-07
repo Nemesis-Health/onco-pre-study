@@ -72,19 +72,19 @@ One row per value of `anchor_event`. Columns displayed: N (`n_patients`), median
 
 **Source:** `final_anchor_dx_concept_counts.csv`
 
-Top 10 rows by `n_distinct_patients` (positive values only). Concept names fetched live from OMOP `concept` table if DB available. Columns: rank, concept_id, concept_name, `n_distinct_patients`, `n_distinct_patient_days`, `n_distinct_patients / n_dx` (%).
+Top 10 rows by `n_distinct_patients` (positive values only). Concept names fetched live from OMOP `concept` table if DB available. Columns: concept (`concept_id` + name merged), `n_distinct_patients`, `n_distinct_patient_days`, `n_distinct_patients / n_dx` (%).
 
 ---
 
 ## Section 1 — Disease Code Timing & Sequencing
 
-### Table 1.1 — DX ↔ MET temporal directionality
+### Table 1.1 — DX ↔ MET temporal directionality (first to first)
 
 **Source:** `final_directionality.csv` (pair = `DX_MET`, `index_year = OVERALL`)
 
-Denominator = `n_dx` (from OVERALL row of `final_population_prevalence.csv`).
+Denominator = `n_met` (DX patients with MET, from OVERALL row of `final_population_prevalence.csv`). `NO_EVENT` row shows raw N only (% suppressed as it falls outside the denominator subgroup).
 
-Rows in order: `BEFORE_GT90`, `BEFORE_1_90`, `SAME_DAY`, `AFTER_1_30`, `AFTER_31_90`, `AFTER_91_365`, `AFTER_GT365`, `NO_EVENT`. Each row shows N (`n_patients`), % of DX cohort, and an interpretation string. BEFORE rows are flagged red; NO_EVENT is flagged amber.
+Rows in order: `BEFORE_GT90`, `BEFORE_1_90`, `SAME_DAY`, `AFTER_1_30`, `AFTER_31_90`, `AFTER_91_365`, `AFTER_GT365`, `NO_EVENT`. Each row shows N (`n_patients`), % of DX+MET subgroup, and an interpretation string. BEFORE rows are flagged red; NO_EVENT is flagged amber.
 
 ---
 
@@ -124,7 +124,7 @@ One cell per year. Value = `p50_days` rounded to integer. Cell class `hm-1` thro
 
 **Source:** `final_code_counts.csv` (`anchor_event = INDEX`, `event_family = GDX`, `time_window = all`)
 
-Top 15 rows by `n_patients`. Columns: rank, concept_id, concept_name (live lookup), `n_patients`, `n_patients / n_dx` (%).
+Top 15 rows by `n_patients`. Columns: concept (`concept_id` + name merged, live lookup), `n_patients`, `n_patients / n_dx` (%).
 
 ---
 
@@ -156,30 +156,29 @@ Top 5 concepts by `n_ever`. X-axis = time windows (±30d, ±90d, ±180d, ±1yr, 
 
 ## Section 3 — Treatment Timing & Data Provenance Signals
 
-### Table 3.1 — MET ↔ L01 temporal directionality
+### Table 3.1 — MET ↔ L01 temporal directionality (first to first)
 
 **Source:** `final_directionality.csv` (pair = `MET_L01`, `index_year = OVERALL`)
 
-Denominator = `n_met` (from `final_population_prevalence.csv` OVERALL row, i.e. the MET subgroup).
+Denominator = sum of `n_patients` for all non-`NO_EVENT` directions in the `MET_L01` / `OVERALL` rows (i.e. MET patients who have at least one L01 record). Derived directly from the directionality data rather than the prevalence CSV.
 
 Same 8-direction row order as Table 1.1. Column 4 header = "Phenotype implication". `NO_EVENT` (amber) = patients with MET but no L01 ever recorded; clinically this is the investigational drug / trial enrollment signal.
 
 ---
 
-### Figure 3.1 — Time from first MET to first L01 (bidirectional, full range)
+### Figure 3.1a — Time from first MET to first L01
 
-**Source:** `final_timing_pairwise.csv` (`from_event = MET`, `to_event = L01`)
+**Source:** `final_timing_pairwise.csv` (`from_event = MET`, `to_event = L01`, `timing_type = first_to_first`)
 
-**Type:** Overlaid density histogram (two series)
+**Type:** Density histogram (blue). Same percentile-to-bin construction as Figure 1.1. Includes L01 events before MET (negative days). Subtitle shows median and IQR.
 
+---
 
-| Series                         | `timing_type`            | Fill  | Meaning                                                   |
-| ------------------------------ | ------------------------ | ----- | --------------------------------------------------------- |
-| First-ever L01 (incl. pre-MET) | `first_to_first`         | Blue  | First L01 occurrence relative to first MET, any direction |
-| First L01 on/after MET         | `first_to_closest_after` | Amber | First L01 on or after the MET date                        |
+### Figure 3.1b — Time from first MET to first L01 on or after MET
 
+**Source:** `final_timing_pairwise.csv` (`from_event = MET`, `to_event = L01`, `timing_type = first_to_closest_after`)
 
-Each series uses the same percentile-to-bin construction as Figure 1.1. Median dotted lines shown per series. Bars overlap (`barmode = overlay`).
+**Type:** Density histogram (amber). Same construction as Figure 1.1. Restricted to L01 on or after MET date only. Subtitle shows median and IQR.
 
 ---
 
@@ -204,22 +203,19 @@ Top 15 concepts by `n_patients` where `time_window = all`.
 
 ## Section 4 — Longitudinal Treatment Exposure
 
-### Figures 4.1 & 4.2 — % cohort with L01 per 30-day window
+### Figure 4.1 — % cohort with L01 per 30-day window (DX anchor)
 
-**Source:** `final_l01_treatment_windows.csv`
+**Source:** `final_l01_treatment_windows.csv` (rows where `anchor_event = INDEX`)
 
-**Type:** Line chart (one line per `anchor_event` value)
+**Type:** Line chart (navy). X-axis = `window_index × 30` (days from DX). Y-axis = `n_patients_with_l01 / n_observed × 100`.
 
+---
 
-| Column                | Role                                              |
-| --------------------- | ------------------------------------------------- |
-| `anchor_event`        | Series key: `INDEX` (navy) or `FIRST_MET` (amber) |
-| `window_index`        | X-axis: multiplied by 30 to convert to days       |
-| `n_patients_with_l01` | Numerator                                         |
-| `n_observed`          | Denominator                                       |
+### Figure 4.2 — % MET subgroup with L01 per 30-day window (MET anchor)
 
+**Source:** `final_l01_treatment_windows.csv` (rows where `anchor_event = FIRST_MET`)
 
-Y-axis = `n_patients_with_l01 / n_observed × 100`. Missing `n_observed` falls back to raw `n_patients_with_l01`. Note: at time of writing both figures use the same data (DX/MET-anchored outputs not yet separated).
+**Type:** Line chart (amber). X-axis = `window_index × 30` (days from first MET). Y-axis = `n_patients_with_l01 / n_observed × 100`. Missing `n_observed` falls back to raw `n_patients_with_l01`.
 
 ---
 

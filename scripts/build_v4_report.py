@@ -16,7 +16,6 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BASE_DIR))
 
 # ── Output defaults ─────────────────────────────────────────────────────────────
-OUTPUTS_DIR = BASE_DIR / "outputs_v2"
 OUT_FILE = "summary_report_v4.html"
 
 # ── Display constants ───────────────────────────────────────────────────────────
@@ -2480,12 +2479,12 @@ _GOOGLE_FONTS = (
 
 # ── Main build ───────────────────────────────────────────────────────────────────
 
-def build_report(outputs_dir: str | Path | None = None) -> Path:
+def build_report(outputs_dir: str | Path) -> Path:
     import datetime
     global _plotly_included
     _plotly_included = False
 
-    rd = Path(outputs_dir).expanduser().resolve() if outputs_dir else OUTPUTS_DIR
+    rd = Path(outputs_dir).expanduser().resolve()
     out = rd / OUT_FILE
 
     generated_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -2579,4 +2578,7 @@ def build_report(outputs_dir: str | Path | None = None) -> Path:
 
 
 if __name__ == "__main__":
-    build_report(sys.argv[1] if len(sys.argv) > 1 else None)
+    if len(sys.argv) != 2:
+        print("Usage: python3 build_v4_report.py <outputs_dir>", file=sys.stderr)
+        sys.exit(1)
+    build_report(sys.argv[1])

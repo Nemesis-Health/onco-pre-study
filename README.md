@@ -30,21 +30,21 @@ sql/
 
 scripts/
 ├── build_full_sql.py                 # Concatenates chunks → characterization_full.sql
-├── translate_sql_dialects.R          # Translates to 14 other dialects via SqlRender
-└── build_v4_report.py               # Generates outputs_v2/summary_report_v4.html
+├── translate_sql_dialects.R          # Translates to 15 other dialects via SqlRender
+└── build_v4_report.py               # Generates summary_report_v4.html in the outputs directory
 
-outputs_v2/               # CSV results land here; summary_report_v4.html is generated here
+outputs_v*/               # CSV results land here; summary_report_v4.html is generated here
 ```
 
 ## Generating the report
 
-Place the characterization CSVs in `outputs_v2/` (see [Result chunks](#result-chunks) for filenames), then run:
+Place the characterization CSVs in an outputs directory (see [Result chunks](#result-chunks) for filenames), then run:
 
 ```bash
-python3 scripts/build_v4_report.py outputs_v2
+python3 scripts/build_v4_report.py <outputs_dir>
 ```
 
-The report is written to `outputs_v2/summary_report_v4.html`. Chunks whose CSVs are absent degrade gracefully with amber callouts in the report rather than erroring.
+The report is written to `<outputs_dir>/summary_report_v4.html`. Chunks whose CSVs are absent degrade gracefully with amber callouts in the report rather than erroring.
 
 ## SQL dialect
 
