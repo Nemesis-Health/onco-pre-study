@@ -1188,7 +1188,7 @@ def _s00_overview(rd: Path) -> str:
                 ids = [int(x) for x in top[cid_col].dropna().astype(int).tolist()]
                 names_map = _fetch_concept_names(ids)
                 rows = []
-                for i, (_, r) in enumerate(top.iterrows(), 1):
+                for _, r in top.iterrows():
                     cid = _safe_int(r.get(cid_col))
                     cname = names_map.get(cid, "") if cid else ""
                     np_ = _safe_int(r.get(np_col))
@@ -1196,9 +1196,7 @@ def _s00_overview(rd: Path) -> str:
                     pct_ = _pct_of(np_, n_dx) if n_dx else "—"
                     nd_str = f"{nd_:,}" if nd_ and nd_ > 0 else "—"
                     rows.append(
-                        f"<tr><td>{i}</td>"
-                        f'<td><code>{_e(str(cid))}</code></td>'
-                        f"<td>{_e(cname)}</td>"
+                        f"<tr><td><code>{_e(str(cid))}</code> {_e(cname)}</td>"
                         f'<td class="num">{_fmt_n(np_)}</td>'
                         f'<td class="num">{nd_str}</td>'
                         f'<td class="num">{_e(pct_)}</td>'
@@ -1206,7 +1204,7 @@ def _s00_overview(rd: Path) -> str:
                     )
                 tbl = (
                     '<table class="rt"><thead><tr>'
-                    '<th>#</th><th>Concept ID</th><th>Concept name</th>'
+                    '<th>Concept</th>'
                     '<th class="num">Patients</th><th class="num">Patient-days</th><th class="num">% of DX cohort</th>'
                     '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
                 )
@@ -1713,7 +1711,7 @@ def _s03_treatment_timing(rd: Path) -> str:
                     return _fmt_iqr(r.get(med_first_c), r.get(lq_first_c) if lq_first_c else None, r.get(uq_first_c) if uq_first_c else None)
 
                 rows = []
-                for i, (_, r) in enumerate(top_ids_df.iterrows(), 1):
+                for _, r in top_ids_df.iterrows():
                     cid = _safe_int(r.get(cid_col))
                     cname = names_map.get(cid, "") if cid else ""
                     np_ = _safe_int(r.get(np_col))
@@ -1725,9 +1723,7 @@ def _s03_treatment_timing(rd: Path) -> str:
                     iqr_first_str = _iqr_first(cid)
                     iqr_after_str = _iqr_after(cid)
                     rows.append(
-                        f"<tr><td>{i}</td>"
-                        f'<td><code>{_e(str(cid))}</code></td>'
-                        f"<td>{_e(cname)}</td>"
+                        f"<tr><td><code>{_e(str(cid))}</code> {_e(cname)}</td>"
                         f'<td class="num">{_fmt_n(np_)}</td>'
                         f'<td class="num">{pct_met}</td>'
                         f'<td class="num">{pct_bef}</td>'
@@ -1738,7 +1734,7 @@ def _s03_treatment_timing(rd: Path) -> str:
                 n_met_lbl = f"N={n_met_s3:,}" if n_met_s3 else "MET cohort"
                 tbl = (
                     '<table class="rt"><thead><tr>'
-                    '<th>#</th><th>Concept ID</th><th>Drug</th>'
+                    '<th>Concept</th>'
                     f'<th class="num">N patients</th>'
                     f'<th class="num">% of MET cohort ({n_met_lbl})</th>'
                     '<th class="num">% with record before MET</th>'
