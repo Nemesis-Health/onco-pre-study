@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : snowflake
--- Translated     : 2026-05-07 06:29:53 BST
+-- Translated     : 2026-05-07 11:44:56 BST
 -- Source file    : sql/sql_server/chunks/02_code_counts.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -28,22 +28,22 @@ SELECT
     CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE COALESCE(ts.median_days_first,   tba.median_days_first)   END AS median_days,
     CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE COALESCE(ts.uq_days_first,       tba.uq_days_first)       END AS uq_days
 FROM (
-    SELECT 'all'    AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM u2ijfaoqevent_code_counts
+    SELECT 'all'    AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM prnpim5kevent_code_counts
     UNION ALL
-    SELECT 'before' AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM u2ijfaoqevent_code_counts_before_after         WHERE time_relative = 'BEFORE'
+    SELECT 'before' AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM prnpim5kevent_code_counts_before_after         WHERE time_relative = 'BEFORE'
     UNION ALL
-    SELECT 'after'  AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM u2ijfaoqevent_code_counts_before_after         WHERE time_relative = 'AFTER'
+    SELECT 'after'  AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM prnpim5kevent_code_counts_before_after         WHERE time_relative = 'AFTER'
     UNION ALL
-    SELECT 'before' AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM u2ijfaoqevent_code_counts_before_after_first_met WHERE time_relative = 'BEFORE'
+    SELECT 'before' AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM prnpim5kevent_code_counts_before_after_first_met WHERE time_relative = 'BEFORE'
     UNION ALL
-    SELECT 'after'  AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM u2ijfaoqevent_code_counts_before_after_first_met WHERE time_relative = 'AFTER'
+    SELECT 'after'  AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM prnpim5kevent_code_counts_before_after_first_met WHERE time_relative = 'AFTER'
 ) x
-LEFT JOIN u2ijfaoqevent_code_timing_summary ts
+LEFT JOIN prnpim5kevent_code_timing_summary ts
   ON x.time_window = 'all'
  AND x.anchor_event = ts.anchor_event
  AND x.event_family = ts.event_family
  AND x.concept_id   = ts.concept_id
-LEFT JOIN u2ijfaoqevent_code_timing_before_after_summary tba
+LEFT JOIN prnpim5kevent_code_timing_before_after_summary tba
   ON x.time_window != 'all'
  AND x.anchor_event = tba.anchor_event
  AND x.event_family = tba.event_family

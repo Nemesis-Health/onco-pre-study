@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : pdw
--- Translated     : 2026-05-07 06:29:41 BST
+-- Translated     : 2026-05-07 11:44:41 BST
 -- Source file    : sql/sql_server/chunks/11_l01_gap_deciles.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R

@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : hive
--- Translated     : 2026-05-07 06:29:50 BST
+-- Translated     : 2026-05-07 11:44:53 BST
 -- Source file    : sql/sql_server/chunks/00_setup.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -1528,7 +1528,7 @@ INNER JOIN met_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS
 INNER JOIN death_obs_status dos ON dos.person_id = c.person_id
 WHERE dos.death_date >= ms.first_met_date
 UNION ALL
-SELECT CAST(YEAR(c.index_date) AS VARCHAR(4)), day(CAST(dos.death_date AS TIMESTAMP) - CAST(ms.first_met_date AS TIMESTAMP))
+SELECT CAST(YEAR(ms.first_met_date) AS VARCHAR(4)), day(CAST(dos.death_date AS TIMESTAMP) - CAST(ms.first_met_date AS TIMESTAMP))
 FROM cohort c
 INNER JOIN met_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 INNER JOIN death_obs_status dos ON dos.person_id = c.person_id
@@ -1560,8 +1560,8 @@ GROUP BY GROUPING SETS ((), (YEAR(c.index_date)))
 INSERT INTO death_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
 SELECT
     CASE
-        WHEN GROUPING(YEAR(c.index_date)) = 1 THEN 'OVERALL'
-        ELSE CAST(YEAR(c.index_date) AS VARCHAR(4))
+        WHEN GROUPING(YEAR(ms.first_met_date)) = 1 THEN 'OVERALL'
+        ELSE CAST(YEAR(ms.first_met_date) AS VARCHAR(4))
     END,
     'FIRST_MET',
     COUNT(*),
@@ -1571,7 +1571,7 @@ SELECT
 FROM cohort c
 INNER JOIN met_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 LEFT JOIN death_obs_status dos ON dos.person_id = c.person_id
-GROUP BY GROUPING SETS ((), (YEAR(c.index_date)))
+GROUP BY GROUPING SETS ((), (YEAR(ms.first_met_date)))
 ;
 DROP TABLE IF EXISTS death_timing_long;
 CREATE TEMPORARY TABLE IF NOT EXISTS death_timing_long  (prevalence_year VARCHAR(20),
@@ -1644,14 +1644,14 @@ INNER JOIN @cdm_database_schema.observation_period op
  AND op.observation_period_end_date >= ms.first_met_date
 GROUP BY c.person_id, ms.first_met_date
 UNION ALL
-SELECT CAST(YEAR(c.index_date) AS VARCHAR(4)), 'FIRST_MET',
+SELECT CAST(YEAR(ms.first_met_date) AS VARCHAR(4)), 'FIRST_MET',
        day(CAST(MAX(op.observation_period_end_date) AS TIMESTAMP) - CAST(ms.first_met_date AS TIMESTAMP))
 FROM cohort c
 INNER JOIN met_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= ms.first_met_date
-GROUP BY c.person_id, c.index_date, ms.first_met_date, YEAR(c.index_date)
+GROUP BY c.person_id, ms.first_met_date, YEAR(ms.first_met_date)
 ;
 DROP TABLE IF EXISTS followup_quantiles;
 CREATE TEMPORARY TABLE IF NOT EXISTS followup_quantiles  (prevalence_year VARCHAR(20),

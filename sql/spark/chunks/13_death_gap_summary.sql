@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : spark
--- Translated     : 2026-05-07 06:29:47 BST
+-- Translated     : 2026-05-07 11:44:49 BST
 -- Source file    : sql/sql_server/chunks/13_death_gap_summary.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -19,7 +19,7 @@ WITH patient_obs AS (
  MIN(observation_period_start_date) AS first_obs_start,
  MAX(observation_period_end_date) AS last_obs_end
  FROM @cdm_database_schema.observation_period
- WHERE person_id IN (SELECT person_id FROM u2ijfaoqcohort)
+ WHERE person_id IN (SELECT person_id FROM prnpim5kcohort)
  GROUP BY person_id
 ),
 death_obs_gaps AS (
@@ -40,9 +40,9 @@ death_obs_gaps AS (
  THEN 1
  ELSE 0
  END AS death_before_obs
- FROM u2ijfaoqcohort c
- INNER JOIN u2ijfaoqdeath_obs_status dos ON dos.person_id = c.person_id
- LEFT JOIN u2ijfaoqmet_summary ms ON ms.person_id = c.person_id
+ FROM prnpim5kcohort c
+ INNER JOIN prnpim5kdeath_obs_status dos ON dos.person_id = c.person_id
+ LEFT JOIN prnpim5kmet_summary ms ON ms.person_id = c.person_id
  LEFT JOIN patient_obs po ON po.person_id = c.person_id
 )
 SELECT

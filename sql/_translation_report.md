@@ -1,6 +1,6 @@
 # SQL Translation Report
 
-Generated: 2026-05-07 06:29:54 BST
+Generated: 2026-05-07 11:44:57 BST
 Source: `sql/sql_server/`
 Dialects: oracle, postgresql, pdw, impala, netezza, bigquery, spark, sqlite, redshift, hive, sqlite extended, duckdb, snowflake, synapse, iris
 
@@ -76,7 +76,6 @@ Dialects requiring `tempEmulationSchema` at execution time (no native session te
 
 ### pdw/characterization_full.sql
 
-- [characterization_full.sql] TRY_CAST: TRY_CAST was left in translated SQL. SqlRender should rewrite it, but if it remains, the query will fail on dialects that don't support it. Even when rewritten to CAST, invalid values will raise errors rather than returning NULL — validate upstream data quality.
 - [characterization_full.sql] DATEFROMPARTS: DATEFROMPARTS was not rewritten by SqlRender. This function is SQL Server–specific and will fail on this dialect.
 - [characterization_full.sql] DATEDIFF_3ARG: DATEDIFF(DAY, start, end) was not rewritten. Most dialects use date subtraction or their own function instead.
 - [characterization_full.sql] YEAR_FUNC: YEAR() function may need to be rewritten as EXTRACT(YEAR FROM ...) on some dialects.
@@ -98,7 +97,6 @@ Dialects requiring `tempEmulationSchema` at execution time (no native session te
 
 ### pdw/chunks/05_timing_by_year.sql
 
-- [chunks/05_timing_by_year.sql] TRY_CAST: TRY_CAST was left in translated SQL. SqlRender should rewrite it, but if it remains, the query will fail on dialects that don't support it. Even when rewritten to CAST, invalid values will raise errors rather than returning NULL — validate upstream data quality.
 - [chunks/05_timing_by_year.sql] YEAR_FUNC: YEAR() function may need to be rewritten as EXTRACT(YEAR FROM ...) on some dialects.
 
 ### pdw/chunks/06_windowed_odx_prevalence.sql
@@ -366,7 +364,6 @@ Dialects requiring `tempEmulationSchema` at execution time (no native session te
 
 ### sqlite_extended/characterization_full.sql
 
-- [characterization_full.sql] TRY_CAST: TRY_CAST was left in translated SQL. SqlRender should rewrite it, but if it remains, the query will fail on dialects that don't support it. Even when rewritten to CAST, invalid values will raise errors rather than returning NULL — validate upstream data quality.
 - [characterization_full.sql] DATEFROMPARTS: DATEFROMPARTS was not rewritten by SqlRender. This function is SQL Server–specific and will fail on this dialect.
 - [characterization_full.sql] DATEDIFF_3ARG: DATEDIFF(DAY, start, end) was not rewritten. Most dialects use date subtraction or their own function instead.
 - [characterization_full.sql] YEAR_FUNC: YEAR() function may need to be rewritten as EXTRACT(YEAR FROM ...) on some dialects.
@@ -391,7 +388,6 @@ Dialects requiring `tempEmulationSchema` at execution time (no native session te
 
 ### sqlite_extended/chunks/05_timing_by_year.sql
 
-- [chunks/05_timing_by_year.sql] TRY_CAST: TRY_CAST was left in translated SQL. SqlRender should rewrite it, but if it remains, the query will fail on dialects that don't support it. Even when rewritten to CAST, invalid values will raise errors rather than returning NULL — validate upstream data quality.
 - [chunks/05_timing_by_year.sql] YEAR_FUNC: YEAR() function may need to be rewritten as EXTRACT(YEAR FROM ...) on some dialects.
 
 ### sqlite_extended/chunks/06_windowed_odx_prevalence.sql
@@ -523,7 +519,6 @@ Dialects requiring `tempEmulationSchema` at execution time (no native session te
 
 ### synapse/characterization_full.sql
 
-- [characterization_full.sql] TRY_CAST: TRY_CAST was left in translated SQL. SqlRender should rewrite it, but if it remains, the query will fail on dialects that don't support it. Even when rewritten to CAST, invalid values will raise errors rather than returning NULL — validate upstream data quality.
 - [characterization_full.sql] DATEFROMPARTS: DATEFROMPARTS was not rewritten by SqlRender. This function is SQL Server–specific and will fail on this dialect.
 - [characterization_full.sql] DATEDIFF_3ARG: DATEDIFF(DAY, start, end) was not rewritten. Most dialects use date subtraction or their own function instead.
 - [characterization_full.sql] YEAR_FUNC: YEAR() function may need to be rewritten as EXTRACT(YEAR FROM ...) on some dialects.
@@ -545,7 +540,6 @@ Dialects requiring `tempEmulationSchema` at execution time (no native session te
 
 ### synapse/chunks/05_timing_by_year.sql
 
-- [chunks/05_timing_by_year.sql] TRY_CAST: TRY_CAST was left in translated SQL. SqlRender should rewrite it, but if it remains, the query will fail on dialects that don't support it. Even when rewritten to CAST, invalid values will raise errors rather than returning NULL — validate upstream data quality.
 - [chunks/05_timing_by_year.sql] YEAR_FUNC: YEAR() function may need to be rewritten as EXTRACT(YEAR FROM ...) on some dialects.
 
 ### synapse/chunks/06_windowed_odx_prevalence.sql

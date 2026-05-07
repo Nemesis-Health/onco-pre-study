@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : snowflake
--- Translated     : 2026-05-07 06:29:52 BST
+-- Translated     : 2026-05-07 11:44:56 BST
 -- Source file    : sql/sql_server/characterization_full.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -57,11 +57,11 @@ Cross-dialect / SqlRender
 -- Source: cohort_definitions/UC.json — ConceptSets id 7 "UC - Malignant neoplasm"
 -- Expanded with concept_ancestor (includeDescendants / isExcluded match Atlas).
 ------------------------------------------------------------
-DROP TABLE IF EXISTS u2ijfaoqdx_anchor_include;
-CREATE TEMP TABLE u2ijfaoqdx_anchor_include  (concept_id BIGINT NOT NULL,
+DROP TABLE IF EXISTS prnpim5kdx_anchor_include;
+CREATE TEMP TABLE prnpim5kdx_anchor_include  (concept_id BIGINT NOT NULL,
     include_descendants SMALLINT NOT NULL
 );
-INSERT INTO u2ijfaoqdx_anchor_include (concept_id, include_descendants) VALUES
+INSERT INTO prnpim5kdx_anchor_include (concept_id, include_descendants) VALUES
     (197508, 1),      -- Malignant neoplasm of urinary bladder
     (4181357, 1),     -- Malignant tumor of renal pelvis
     (4177230, 1),     -- Malignant tumor of urethra
@@ -71,11 +71,11 @@ INSERT INTO u2ijfaoqdx_anchor_include (concept_id, include_descendants) VALUES
     (44501785, 0),    -- Transitional cell carcinoma, NOS, of urinary system, NOS (ICDO3)
     (37110270, 1)     -- Primary urothelial carcinoma of overlapping sites of urinary organs
 ;
-DROP TABLE IF EXISTS u2ijfaoqdx_anchor_exclude;
-CREATE TEMP TABLE u2ijfaoqdx_anchor_exclude  (concept_id BIGINT NOT NULL,
+DROP TABLE IF EXISTS prnpim5kdx_anchor_exclude;
+CREATE TEMP TABLE prnpim5kdx_anchor_exclude  (concept_id BIGINT NOT NULL,
     include_descendants SMALLINT NOT NULL
 );
-INSERT INTO u2ijfaoqdx_anchor_exclude (concept_id, include_descendants) VALUES
+INSERT INTO prnpim5kdx_anchor_exclude (concept_id, include_descendants) VALUES
     (4280899, 1),
     (4289374, 1),
     (4280900, 1),
@@ -85,22 +85,22 @@ INSERT INTO u2ijfaoqdx_anchor_exclude (concept_id, include_descendants) VALUES
     (4289376, 1),
     (4280897, 1),
     (4200889, 1);
-DROP TABLE IF EXISTS u2ijfaoqdx_anchor_concepts;
-CREATE TEMP TABLE u2ijfaoqdx_anchor_concepts  (concept_id BIGINT
+DROP TABLE IF EXISTS prnpim5kdx_anchor_concepts;
+CREATE TEMP TABLE prnpim5kdx_anchor_concepts  (concept_id BIGINT
 );
-INSERT INTO u2ijfaoqdx_anchor_concepts (concept_id)
+INSERT INTO prnpim5kdx_anchor_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
-FROM u2ijfaoqdx_anchor_include i
+FROM prnpim5kdx_anchor_include i
 JOIN @cdm_database_schema.concept_ancestor ca
   ON ca.ancestor_concept_id = i.concept_id
  AND (i.include_descendants = 1 OR ca.descendant_concept_id = i.concept_id);
-DELETE FROM u2ijfaoqdx_anchor_concepts
+DELETE FROM prnpim5kdx_anchor_concepts
 WHERE EXISTS (
     SELECT 1
-    FROM u2ijfaoqdx_anchor_exclude e
+    FROM prnpim5kdx_anchor_exclude e
     JOIN @cdm_database_schema.concept_ancestor ca
       ON ca.ancestor_concept_id = e.concept_id
-     AND u2ijfaoqdx_anchor_concepts.concept_id = ca.descendant_concept_id
+     AND prnpim5kdx_anchor_concepts.concept_id = ca.descendant_concept_id
      AND (e.include_descendants = 1 OR ca.descendant_concept_id = e.concept_id)
 );
 ------------------------------------------------------------
@@ -109,20 +109,20 @@ WHERE EXISTS (
 -- but constrained to descendants of 443392 (Malignant neoplastic disease) to avoid overly-broad ancestors.
 -- (concept_ancestor includes self-links; we only want broader/generalized codes).
 ------------------------------------------------------------
-DROP TABLE IF EXISTS u2ijfaoqgen_cancer_concepts;
-CREATE TEMP TABLE u2ijfaoqgen_cancer_concepts  (concept_id BIGINT
+DROP TABLE IF EXISTS prnpim5kgen_cancer_concepts;
+CREATE TEMP TABLE prnpim5kgen_cancer_concepts  (concept_id BIGINT
 );
-INSERT INTO u2ijfaoqgen_cancer_concepts (concept_id)
+INSERT INTO prnpim5kgen_cancer_concepts (concept_id)
 SELECT DISTINCT ca.ancestor_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
-JOIN u2ijfaoqdx_anchor_concepts d
+JOIN prnpim5kdx_anchor_concepts d
   ON ca.descendant_concept_id = d.concept_id
 JOIN @cdm_database_schema.concept_ancestor malign
   ON malign.ancestor_concept_id = 443392
  AND malign.descendant_concept_id = ca.ancestor_concept_id
 WHERE NOT EXISTS (
     SELECT 1
-    FROM u2ijfaoqdx_anchor_concepts dx
+    FROM prnpim5kdx_anchor_concepts dx
     WHERE dx.concept_id = ca.ancestor_concept_id
 )
 ;
@@ -130,25 +130,25 @@ WHERE NOT EXISTS (
 -- C) OTHER CANCER DIAGNOSIS CONCEPTS (ODX)
 -- Default: descendants of 443392 excluding DX + GDX sets.
 ------------------------------------------------------------
-DROP TABLE IF EXISTS u2ijfaoqother_dx_ancestor_concepts;
-CREATE TEMP TABLE u2ijfaoqother_dx_ancestor_concepts  (ancestor_concept_id BIGINT
+DROP TABLE IF EXISTS prnpim5kother_dx_ancestor_concepts;
+CREATE TEMP TABLE prnpim5kother_dx_ancestor_concepts  (ancestor_concept_id BIGINT
 );
 -- EDIT THIS LIST
-INSERT INTO u2ijfaoqother_dx_ancestor_concepts (ancestor_concept_id)
+INSERT INTO prnpim5kother_dx_ancestor_concepts (ancestor_concept_id)
 VALUES
     (443392) -- Malignant neoplastic disease
 ;
-DROP TABLE IF EXISTS u2ijfaoqother_dx_concepts;
-CREATE TEMP TABLE u2ijfaoqother_dx_concepts  (concept_id BIGINT
+DROP TABLE IF EXISTS prnpim5kother_dx_concepts;
+CREATE TEMP TABLE prnpim5kother_dx_concepts  (concept_id BIGINT
 );
-INSERT INTO u2ijfaoqother_dx_concepts (concept_id)
+INSERT INTO prnpim5kother_dx_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
-JOIN u2ijfaoqother_dx_ancestor_concepts a
+JOIN prnpim5kother_dx_ancestor_concepts a
   ON ca.ancestor_concept_id = a.ancestor_concept_id
-LEFT JOIN u2ijfaoqdx_anchor_concepts dx
+LEFT JOIN prnpim5kdx_anchor_concepts dx
   ON dx.concept_id = ca.descendant_concept_id
-LEFT JOIN u2ijfaoqgen_cancer_concepts gdx
+LEFT JOIN prnpim5kgen_cancer_concepts gdx
   ON gdx.concept_id = ca.descendant_concept_id
 WHERE dx.concept_id IS NULL
   AND gdx.concept_id IS NULL
@@ -157,149 +157,149 @@ WHERE dx.concept_id IS NULL
 -- D) METASTASIS CONCEPTS (MEASUREMENT)
 -- Define via ancestor IDs (descendants pulled from concept_ancestor)
 ------------------------------------------------------------
-DROP TABLE IF EXISTS u2ijfaoqmet_ancestor_concepts;
-CREATE TEMP TABLE u2ijfaoqmet_ancestor_concepts  (ancestor_concept_id BIGINT
+DROP TABLE IF EXISTS prnpim5kmet_ancestor_concepts;
+CREATE TEMP TABLE prnpim5kmet_ancestor_concepts  (ancestor_concept_id BIGINT
 );
 -- Default: concept set "Secondary malignancy" from cohort_definitions/Target_Cohort_2B.json
-INSERT INTO u2ijfaoqmet_ancestor_concepts (ancestor_concept_id)
+INSERT INTO prnpim5kmet_ancestor_concepts (ancestor_concept_id)
 VALUES
     (1633308),  -- AJCC/UICC Stage 4
     (1635142),  -- AJCC/UICC M1 Category
     (36769180)  -- Metastasis
 ;
-DROP TABLE IF EXISTS u2ijfaoqmet_concepts;
-CREATE TEMP TABLE u2ijfaoqmet_concepts  (concept_id BIGINT
+DROP TABLE IF EXISTS prnpim5kmet_concepts;
+CREATE TEMP TABLE prnpim5kmet_concepts  (concept_id BIGINT
 );
-INSERT INTO u2ijfaoqmet_concepts (concept_id)
+INSERT INTO prnpim5kmet_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
-JOIN u2ijfaoqmet_ancestor_concepts a
+JOIN prnpim5kmet_ancestor_concepts a
   ON ca.ancestor_concept_id = a.ancestor_concept_id
 ;
 ------------------------------------------------------------
 -- E) L01 TREATMENT CONCEPTS (DRUG_EXPOSURE)
 ------------------------------------------------------------
-DROP TABLE IF EXISTS u2ijfaoql01_ancestor_concepts;
-CREATE TEMP TABLE u2ijfaoql01_ancestor_concepts  (ancestor_concept_id BIGINT
+DROP TABLE IF EXISTS prnpim5kl01_ancestor_concepts;
+CREATE TEMP TABLE prnpim5kl01_ancestor_concepts  (ancestor_concept_id BIGINT
 );
 -- EDIT THIS LIST
-INSERT INTO u2ijfaoql01_ancestor_concepts (ancestor_concept_id)
+INSERT INTO prnpim5kl01_ancestor_concepts (ancestor_concept_id)
 VALUES
     (21601387)
 ;
-DROP TABLE IF EXISTS u2ijfaoql01_concepts;
-CREATE TEMP TABLE u2ijfaoql01_concepts  (concept_id BIGINT
+DROP TABLE IF EXISTS prnpim5kl01_concepts;
+CREATE TEMP TABLE prnpim5kl01_concepts  (concept_id BIGINT
 );
-INSERT INTO u2ijfaoql01_concepts (concept_id)
+INSERT INTO prnpim5kl01_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
-JOIN u2ijfaoql01_ancestor_concepts a
+JOIN prnpim5kl01_ancestor_concepts a
   ON ca.ancestor_concept_id = a.ancestor_concept_id
 ;
 ------------------------------------------------------------
 -- F) EVENT TABLES
 ------------------------------------------------------------
-DROP TABLE IF EXISTS u2ijfaoqdx_events;
-CREATE TEMP TABLE u2ijfaoqdx_events  (person_id BIGINT,
+DROP TABLE IF EXISTS prnpim5kdx_events;
+CREATE TEMP TABLE prnpim5kdx_events  (person_id BIGINT,
     event_date DATE,
     concept_id BIGINT
 );
-INSERT INTO u2ijfaoqdx_events (person_id, event_date, concept_id)
+INSERT INTO prnpim5kdx_events (person_id, event_date, concept_id)
 SELECT
     co.person_id,
     co.condition_start_date,
     co.condition_concept_id
 FROM @cdm_database_schema.condition_occurrence co
-JOIN u2ijfaoqdx_anchor_concepts d
+JOIN prnpim5kdx_anchor_concepts d
   ON co.condition_concept_id = d.concept_id
 ;
 -- Distinct anchor cohort persons; limits later F) pulls to rows that downstream joins to #cohort use anyway.
-DROP TABLE IF EXISTS u2ijfaoqanchor_person;
-CREATE TEMP TABLE u2ijfaoqanchor_person  (person_id BIGINT
+DROP TABLE IF EXISTS prnpim5kanchor_person;
+CREATE TEMP TABLE prnpim5kanchor_person  (person_id BIGINT
 );
-INSERT INTO u2ijfaoqanchor_person (person_id)
+INSERT INTO prnpim5kanchor_person (person_id)
 SELECT DISTINCT person_id
-FROM u2ijfaoqdx_events
+FROM prnpim5kdx_events
 ;
-DROP TABLE IF EXISTS u2ijfaoqother_dx_events;
-CREATE TEMP TABLE u2ijfaoqother_dx_events  (person_id BIGINT,
+DROP TABLE IF EXISTS prnpim5kother_dx_events;
+CREATE TEMP TABLE prnpim5kother_dx_events  (person_id BIGINT,
     event_date DATE,
     concept_id BIGINT
 );
-INSERT INTO u2ijfaoqother_dx_events (person_id, event_date, concept_id)
+INSERT INTO prnpim5kother_dx_events (person_id, event_date, concept_id)
 SELECT
     co.person_id,
     co.condition_start_date,
     co.condition_concept_id
 FROM @cdm_database_schema.condition_occurrence co
-JOIN u2ijfaoqanchor_person ap
+JOIN prnpim5kanchor_person ap
   ON co.person_id = ap.person_id
-JOIN u2ijfaoqother_dx_concepts d
+JOIN prnpim5kother_dx_concepts d
   ON co.condition_concept_id = d.concept_id
 ;
-DROP TABLE IF EXISTS u2ijfaoqgen_cancer_events;
-CREATE TEMP TABLE u2ijfaoqgen_cancer_events  (person_id BIGINT,
+DROP TABLE IF EXISTS prnpim5kgen_cancer_events;
+CREATE TEMP TABLE prnpim5kgen_cancer_events  (person_id BIGINT,
     event_date DATE,
     concept_id BIGINT
 );
-INSERT INTO u2ijfaoqgen_cancer_events (person_id, event_date, concept_id)
+INSERT INTO prnpim5kgen_cancer_events (person_id, event_date, concept_id)
 SELECT
     co.person_id,
     co.condition_start_date,
     co.condition_concept_id
 FROM @cdm_database_schema.condition_occurrence co
-JOIN u2ijfaoqanchor_person ap
+JOIN prnpim5kanchor_person ap
   ON co.person_id = ap.person_id
-JOIN u2ijfaoqgen_cancer_concepts g
+JOIN prnpim5kgen_cancer_concepts g
   ON co.condition_concept_id = g.concept_id
 ;
-DROP TABLE IF EXISTS u2ijfaoqmet_events;
-CREATE TEMP TABLE u2ijfaoqmet_events  (person_id BIGINT,
+DROP TABLE IF EXISTS prnpim5kmet_events;
+CREATE TEMP TABLE prnpim5kmet_events  (person_id BIGINT,
     event_date DATE,
     concept_id BIGINT
 );
-INSERT INTO u2ijfaoqmet_events (person_id, event_date, concept_id)
+INSERT INTO prnpim5kmet_events (person_id, event_date, concept_id)
 SELECT
     m.person_id,
     m.measurement_date,
     m.measurement_concept_id
 FROM @cdm_database_schema.measurement m
-JOIN u2ijfaoqanchor_person ap
+JOIN prnpim5kanchor_person ap
   ON m.person_id = ap.person_id
-JOIN u2ijfaoqmet_concepts mc
+JOIN prnpim5kmet_concepts mc
   ON m.measurement_concept_id = mc.concept_id
 ;
-DROP TABLE IF EXISTS u2ijfaoql01_events;
-CREATE TEMP TABLE u2ijfaoql01_events  (person_id BIGINT,
+DROP TABLE IF EXISTS prnpim5kl01_events;
+CREATE TEMP TABLE prnpim5kl01_events  (person_id BIGINT,
     event_date DATE,
     concept_id BIGINT
 );
-INSERT INTO u2ijfaoql01_events (person_id, event_date, concept_id)
+INSERT INTO prnpim5kl01_events (person_id, event_date, concept_id)
 SELECT
     de.person_id,
     de.drug_exposure_start_date,
     de.drug_concept_id
 FROM @cdm_database_schema.drug_exposure de
-JOIN u2ijfaoqanchor_person ap
+JOIN prnpim5kanchor_person ap
   ON de.person_id = ap.person_id
-JOIN u2ijfaoql01_concepts l
+JOIN prnpim5kl01_concepts l
   ON de.drug_concept_id = l.concept_id
 ;
 -- Ingredient-level L01 events used for concept-level code counts/timing.
-DROP TABLE IF EXISTS u2ijfaoql01_ingredient_events;
-CREATE TEMP TABLE u2ijfaoql01_ingredient_events  (person_id BIGINT,
+DROP TABLE IF EXISTS prnpim5kl01_ingredient_events;
+CREATE TEMP TABLE prnpim5kl01_ingredient_events  (person_id BIGINT,
     event_date DATE,
     concept_id BIGINT
 );
-INSERT INTO u2ijfaoql01_ingredient_events (person_id, event_date, concept_id)
+INSERT INTO prnpim5kl01_ingredient_events (person_id, event_date, concept_id)
 SELECT DISTINCT
     de.person_id,
     de.drug_exposure_start_date,
     ca.ancestor_concept_id
 FROM @cdm_database_schema.drug_exposure de
-JOIN u2ijfaoqanchor_person ap
+JOIN prnpim5kanchor_person ap
   ON de.person_id = ap.person_id
-JOIN u2ijfaoql01_concepts l
+JOIN prnpim5kl01_concepts l
   ON de.drug_concept_id = l.concept_id
 JOIN @cdm_database_schema.concept_ancestor ca
   ON ca.descendant_concept_id = de.drug_concept_id
@@ -312,197 +312,197 @@ JOIN @cdm_database_schema.concept ing
 ------------------------------------------------------------
 -- Track attrition: count all patients with a qualifying DX before the
 -- obs-period filter so the report can show how many were excluded.
-DROP TABLE IF EXISTS u2ijfaoqcohort_attrition;
-CREATE TEMP TABLE u2ijfaoqcohort_attrition  (stage      VARCHAR(50),
+DROP TABLE IF EXISTS prnpim5kcohort_attrition;
+CREATE TEMP TABLE prnpim5kcohort_attrition  (stage      VARCHAR(50),
     n_patients INT
 );
-INSERT INTO u2ijfaoqcohort_attrition (stage, n_patients)
-SELECT 'dx_any', COUNT(DISTINCT person_id) FROM u2ijfaoqdx_events;
-DROP TABLE IF EXISTS u2ijfaoqcohort;
-CREATE TEMP TABLE u2ijfaoqcohort  (person_id BIGINT,
+INSERT INTO prnpim5kcohort_attrition (stage, n_patients)
+SELECT 'dx_any', COUNT(DISTINCT person_id) FROM prnpim5kdx_events;
+DROP TABLE IF EXISTS prnpim5kcohort;
+CREATE TEMP TABLE prnpim5kcohort  (person_id BIGINT,
     index_date DATE
 );
 -- Index date = earliest qualifying DX that falls within an observation period.
 -- Patients with no obs-period-covered DX are excluded entirely.
-INSERT INTO u2ijfaoqcohort (person_id, index_date)
+INSERT INTO prnpim5kcohort (person_id, index_date)
 SELECT
     dx.person_id,
     MIN(dx.event_date) AS index_date
-FROM u2ijfaoqdx_events dx
+FROM prnpim5kdx_events dx
 INNER JOIN @cdm_database_schema.observation_period op
     ON  op.person_id = dx.person_id
     AND dx.event_date BETWEEN op.observation_period_start_date
                           AND op.observation_period_end_date
 GROUP BY dx.person_id
 ;
-INSERT INTO u2ijfaoqcohort_attrition (stage, n_patients)
-SELECT 'dx_in_obs', COUNT(*) FROM u2ijfaoqcohort;
-DROP TABLE IF EXISTS u2ijfaoqdx_summary;
-CREATE TEMP TABLE u2ijfaoqdx_summary  (person_id BIGINT,
+INSERT INTO prnpim5kcohort_attrition (stage, n_patients)
+SELECT 'dx_in_obs', COUNT(*) FROM prnpim5kcohort;
+DROP TABLE IF EXISTS prnpim5kdx_summary;
+CREATE TEMP TABLE prnpim5kdx_summary  (person_id BIGINT,
     n_dx_records INT,
     n_dx_codes INT
 );
-INSERT INTO u2ijfaoqdx_summary (person_id, n_dx_records, n_dx_codes)
+INSERT INTO prnpim5kdx_summary (person_id, n_dx_records, n_dx_codes)
 SELECT
     e.person_id,
     COUNT(*) AS n_dx_records,
     COUNT(DISTINCT e.concept_id) AS n_dx_codes
-FROM u2ijfaoqdx_events e
-JOIN u2ijfaoqcohort c
+FROM prnpim5kdx_events e
+JOIN prnpim5kcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
 ;
-DROP TABLE IF EXISTS u2ijfaoqother_dx_summary;
-CREATE TEMP TABLE u2ijfaoqother_dx_summary  (person_id BIGINT,
+DROP TABLE IF EXISTS prnpim5kother_dx_summary;
+CREATE TEMP TABLE prnpim5kother_dx_summary  (person_id BIGINT,
     first_other_dx_date DATE,
     n_other_dx_records INT,
     n_other_dx_codes INT
 );
-INSERT INTO u2ijfaoqother_dx_summary (person_id, first_other_dx_date, n_other_dx_records, n_other_dx_codes)
+INSERT INTO prnpim5kother_dx_summary (person_id, first_other_dx_date, n_other_dx_records, n_other_dx_codes)
 SELECT
     e.person_id,
     MIN(e.event_date) AS first_other_dx_date,
     COUNT(*) AS n_other_dx_records,
     COUNT(DISTINCT e.concept_id) AS n_other_dx_codes
-FROM u2ijfaoqother_dx_events e
-JOIN u2ijfaoqcohort c
+FROM prnpim5kother_dx_events e
+JOIN prnpim5kcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
 ;
-DROP TABLE IF EXISTS u2ijfaoqgen_cancer_summary;
-CREATE TEMP TABLE u2ijfaoqgen_cancer_summary  (person_id BIGINT,
+DROP TABLE IF EXISTS prnpim5kgen_cancer_summary;
+CREATE TEMP TABLE prnpim5kgen_cancer_summary  (person_id BIGINT,
     first_gen_cancer_date DATE,
     n_gen_cancer_records INT,
     n_gen_cancer_codes INT
 );
-INSERT INTO u2ijfaoqgen_cancer_summary (person_id, first_gen_cancer_date, n_gen_cancer_records, n_gen_cancer_codes)
+INSERT INTO prnpim5kgen_cancer_summary (person_id, first_gen_cancer_date, n_gen_cancer_records, n_gen_cancer_codes)
 SELECT
     e.person_id,
     MIN(e.event_date) AS first_gen_cancer_date,
     COUNT(*) AS n_gen_cancer_records,
     COUNT(DISTINCT e.concept_id) AS n_gen_cancer_codes
-FROM u2ijfaoqgen_cancer_events e
-JOIN u2ijfaoqcohort c
+FROM prnpim5kgen_cancer_events e
+JOIN prnpim5kcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
 ;
-DROP TABLE IF EXISTS u2ijfaoqmet_summary;
-CREATE TEMP TABLE u2ijfaoqmet_summary  (person_id BIGINT,
+DROP TABLE IF EXISTS prnpim5kmet_summary;
+CREATE TEMP TABLE prnpim5kmet_summary  (person_id BIGINT,
     first_met_date DATE,
     n_met_records INT
 );
-INSERT INTO u2ijfaoqmet_summary (person_id, first_met_date, n_met_records)
+INSERT INTO prnpim5kmet_summary (person_id, first_met_date, n_met_records)
 SELECT
     e.person_id,
     MIN(e.event_date) AS first_met_date,
     COUNT(*) AS n_met_records
-FROM u2ijfaoqmet_events e
-JOIN u2ijfaoqcohort c
+FROM prnpim5kmet_events e
+JOIN prnpim5kcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
 ;
-DROP TABLE IF EXISTS u2ijfaoql01_summary;
-CREATE TEMP TABLE u2ijfaoql01_summary  (person_id BIGINT,
+DROP TABLE IF EXISTS prnpim5kl01_summary;
+CREATE TEMP TABLE prnpim5kl01_summary  (person_id BIGINT,
     first_l01_date DATE,
     n_l01_exposures INT
 );
-INSERT INTO u2ijfaoql01_summary (person_id, first_l01_date, n_l01_exposures)
+INSERT INTO prnpim5kl01_summary (person_id, first_l01_date, n_l01_exposures)
 SELECT
     e.person_id,
     MIN(e.event_date) AS first_l01_date,
     COUNT(*) AS n_l01_exposures
-FROM u2ijfaoql01_events e
-JOIN u2ijfaoqcohort c
+FROM prnpim5kl01_events e
+JOIN prnpim5kcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
 ;
 -- H) EVENT CODE COUNTS (single table across event families)
 ------------------------------------------------------------
-DROP TABLE IF EXISTS u2ijfaoqevent_code_counts;
-CREATE TEMP TABLE u2ijfaoqevent_code_counts  (anchor_event VARCHAR(20), -- INDEX or FIRST_MET
+DROP TABLE IF EXISTS prnpim5kevent_code_counts;
+CREATE TEMP TABLE prnpim5kevent_code_counts  (anchor_event VARCHAR(20), -- INDEX or FIRST_MET
     event_family VARCHAR(20),
     concept_id BIGINT,
     n_records INT,
     n_patients INT
 );
-INSERT INTO u2ijfaoqevent_code_counts (anchor_event, event_family, concept_id, n_records, n_patients)
+INSERT INTO prnpim5kevent_code_counts (anchor_event, event_family, concept_id, n_records, n_patients)
 SELECT 'INDEX', 'DX', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM u2ijfaoqdx_events
-WHERE person_id IN (SELECT person_id FROM u2ijfaoqcohort)
+FROM prnpim5kdx_events
+WHERE person_id IN (SELECT person_id FROM prnpim5kcohort)
 GROUP BY concept_id
 UNION ALL
 SELECT 'INDEX', 'ODX', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM u2ijfaoqother_dx_events
-WHERE person_id IN (SELECT person_id FROM u2ijfaoqcohort)
+FROM prnpim5kother_dx_events
+WHERE person_id IN (SELECT person_id FROM prnpim5kcohort)
 GROUP BY concept_id
 UNION ALL
 SELECT 'INDEX', 'GDX', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM u2ijfaoqgen_cancer_events
-WHERE person_id IN (SELECT person_id FROM u2ijfaoqcohort)
+FROM prnpim5kgen_cancer_events
+WHERE person_id IN (SELECT person_id FROM prnpim5kcohort)
 GROUP BY concept_id
 UNION ALL
 SELECT 'INDEX', 'MET', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM u2ijfaoqmet_events
-WHERE person_id IN (SELECT person_id FROM u2ijfaoqcohort)
+FROM prnpim5kmet_events
+WHERE person_id IN (SELECT person_id FROM prnpim5kcohort)
 GROUP BY concept_id
 UNION ALL
 SELECT 'INDEX', 'L01', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM u2ijfaoql01_ingredient_events
-WHERE person_id IN (SELECT person_id FROM u2ijfaoqcohort)
+FROM prnpim5kl01_ingredient_events
+WHERE person_id IN (SELECT person_id FROM prnpim5kcohort)
 GROUP BY concept_id
 UNION ALL
 SELECT 'FIRST_MET', 'DX', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM u2ijfaoqdx_events e
-JOIN u2ijfaoqmet_summary ms
+FROM prnpim5kdx_events e
+JOIN prnpim5kmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
 UNION ALL
 SELECT 'FIRST_MET', 'ODX', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM u2ijfaoqother_dx_events e
-JOIN u2ijfaoqmet_summary ms
+FROM prnpim5kother_dx_events e
+JOIN prnpim5kmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
 UNION ALL
 SELECT 'FIRST_MET', 'GDX', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM u2ijfaoqgen_cancer_events e
-JOIN u2ijfaoqmet_summary ms
+FROM prnpim5kgen_cancer_events e
+JOIN prnpim5kmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
 UNION ALL
 SELECT 'FIRST_MET', 'MET', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM u2ijfaoqmet_events e
-JOIN u2ijfaoqmet_summary ms
+FROM prnpim5kmet_events e
+JOIN prnpim5kmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
 UNION ALL
 SELECT 'FIRST_MET', 'L01', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM u2ijfaoql01_ingredient_events e
-JOIN u2ijfaoqmet_summary ms
+FROM prnpim5kl01_ingredient_events e
+JOIN prnpim5kmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
 ;
-DROP TABLE IF EXISTS u2ijfaoqevent_code_counts_before_after;
-CREATE TEMP TABLE u2ijfaoqevent_code_counts_before_after  (anchor_event VARCHAR(20), -- INDEX
+DROP TABLE IF EXISTS prnpim5kevent_code_counts_before_after;
+CREATE TEMP TABLE prnpim5kevent_code_counts_before_after  (anchor_event VARCHAR(20), -- INDEX
     event_family VARCHAR(20),
     time_relative VARCHAR(10), -- BEFORE or AFTER (relative to index_date)
     concept_id BIGINT,
     n_records INT,
     n_patients INT
 );
-INSERT INTO u2ijfaoqevent_code_counts_before_after (anchor_event, event_family, time_relative, concept_id, n_records, n_patients)
+INSERT INTO prnpim5kevent_code_counts_before_after (anchor_event, event_family, time_relative, concept_id, n_records, n_patients)
 SELECT 'INDEX',
        'DX',
        CASE WHEN DATEDIFF(DAY, c.index_date, e.event_date) < 0 THEN 'BEFORE' ELSE 'AFTER' END AS time_relative,
        e.concept_id,
        COUNT(*) AS n_records,
        COUNT(DISTINCT e.person_id) AS n_patients
-FROM u2ijfaoqdx_events e
-JOIN u2ijfaoqcohort c
+FROM prnpim5kdx_events e
+JOIN prnpim5kcohort c
   ON e.person_id = c.person_id
 GROUP BY
     CASE WHEN DATEDIFF(DAY, c.index_date, e.event_date) < 0 THEN 'BEFORE' ELSE 'AFTER' END,
@@ -514,8 +514,8 @@ SELECT 'INDEX',
        e.concept_id,
        COUNT(*),
        COUNT(DISTINCT e.person_id)
-FROM u2ijfaoqother_dx_events e
-JOIN u2ijfaoqcohort c
+FROM prnpim5kother_dx_events e
+JOIN prnpim5kcohort c
   ON e.person_id = c.person_id
 GROUP BY
     CASE WHEN DATEDIFF(DAY, c.index_date, e.event_date) < 0 THEN 'BEFORE' ELSE 'AFTER' END,
@@ -527,8 +527,8 @@ SELECT 'INDEX',
        e.concept_id,
        COUNT(*),
        COUNT(DISTINCT e.person_id)
-FROM u2ijfaoqgen_cancer_events e
-JOIN u2ijfaoqcohort c
+FROM prnpim5kgen_cancer_events e
+JOIN prnpim5kcohort c
   ON e.person_id = c.person_id
 GROUP BY
     CASE WHEN DATEDIFF(DAY, c.index_date, e.event_date) < 0 THEN 'BEFORE' ELSE 'AFTER' END,
@@ -540,8 +540,8 @@ SELECT 'INDEX',
        e.concept_id,
        COUNT(*),
        COUNT(DISTINCT e.person_id)
-FROM u2ijfaoqmet_events e
-JOIN u2ijfaoqcohort c
+FROM prnpim5kmet_events e
+JOIN prnpim5kcohort c
   ON e.person_id = c.person_id
 GROUP BY
     CASE WHEN DATEDIFF(DAY, c.index_date, e.event_date) < 0 THEN 'BEFORE' ELSE 'AFTER' END,
@@ -553,30 +553,30 @@ SELECT 'INDEX',
        e.concept_id,
        COUNT(*),
        COUNT(DISTINCT e.person_id)
-FROM u2ijfaoql01_ingredient_events e
-JOIN u2ijfaoqcohort c
+FROM prnpim5kl01_ingredient_events e
+JOIN prnpim5kcohort c
   ON e.person_id = c.person_id
 GROUP BY
     CASE WHEN DATEDIFF(DAY, c.index_date, e.event_date) < 0 THEN 'BEFORE' ELSE 'AFTER' END,
     e.concept_id
 ;
-DROP TABLE IF EXISTS u2ijfaoqevent_code_counts_before_after_first_met;
-CREATE TEMP TABLE u2ijfaoqevent_code_counts_before_after_first_met  (anchor_event VARCHAR(20), -- FIRST_MET
+DROP TABLE IF EXISTS prnpim5kevent_code_counts_before_after_first_met;
+CREATE TEMP TABLE prnpim5kevent_code_counts_before_after_first_met  (anchor_event VARCHAR(20), -- FIRST_MET
     event_family VARCHAR(20),
     time_relative VARCHAR(10), -- BEFORE or AFTER (relative to first_met_date)
     concept_id BIGINT,
     n_records INT,
     n_patients INT
 );
-INSERT INTO u2ijfaoqevent_code_counts_before_after_first_met (anchor_event, event_family, time_relative, concept_id, n_records, n_patients)
+INSERT INTO prnpim5kevent_code_counts_before_after_first_met (anchor_event, event_family, time_relative, concept_id, n_records, n_patients)
 SELECT 'FIRST_MET',
        'DX',
        CASE WHEN DATEDIFF(DAY, ms.first_met_date, e.event_date) < 0 THEN 'BEFORE' ELSE 'AFTER' END AS time_relative,
        e.concept_id,
        COUNT(*) AS n_records,
        COUNT(DISTINCT e.person_id) AS n_patients
-FROM u2ijfaoqdx_events e
-JOIN u2ijfaoqmet_summary ms
+FROM prnpim5kdx_events e
+JOIN prnpim5kmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY
@@ -589,8 +589,8 @@ SELECT 'FIRST_MET',
        e.concept_id,
        COUNT(*),
        COUNT(DISTINCT e.person_id)
-FROM u2ijfaoqother_dx_events e
-JOIN u2ijfaoqmet_summary ms
+FROM prnpim5kother_dx_events e
+JOIN prnpim5kmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY
@@ -603,8 +603,8 @@ SELECT 'FIRST_MET',
        e.concept_id,
        COUNT(*),
        COUNT(DISTINCT e.person_id)
-FROM u2ijfaoqgen_cancer_events e
-JOIN u2ijfaoqmet_summary ms
+FROM prnpim5kgen_cancer_events e
+JOIN prnpim5kmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY
@@ -617,8 +617,8 @@ SELECT 'FIRST_MET',
        e.concept_id,
        COUNT(*),
        COUNT(DISTINCT e.person_id)
-FROM u2ijfaoqmet_events e
-JOIN u2ijfaoqmet_summary ms
+FROM prnpim5kmet_events e
+JOIN prnpim5kmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY
@@ -631,78 +631,78 @@ SELECT 'FIRST_MET',
        e.concept_id,
        COUNT(*),
        COUNT(DISTINCT e.person_id)
-FROM u2ijfaoql01_ingredient_events e
-JOIN u2ijfaoqmet_summary ms
+FROM prnpim5kl01_ingredient_events e
+JOIN prnpim5kmet_summary ms
   ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 GROUP BY
     CASE WHEN DATEDIFF(DAY, ms.first_met_date, e.event_date) < 0 THEN 'BEFORE' ELSE 'AFTER' END,
     e.concept_id
 ;
-DROP TABLE IF EXISTS u2ijfaoqevent_code_all_events;
-CREATE TEMP TABLE u2ijfaoqevent_code_all_events  (anchor_event VARCHAR(20),
+DROP TABLE IF EXISTS prnpim5kevent_code_all_events;
+CREATE TEMP TABLE prnpim5kevent_code_all_events  (anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     concept_id BIGINT,
     person_id BIGINT,
     days_diff INT,
     event_date DATE
 );
-INSERT INTO u2ijfaoqevent_code_all_events (
+INSERT INTO prnpim5kevent_code_all_events (
     anchor_event, event_family, concept_id, person_id, days_diff, event_date
 )
 SELECT 'INDEX' AS anchor_event, 'DX' AS event_family, e.concept_id, e.person_id, DATEDIFF(DAY, c.index_date, e.event_date) AS days_diff, e.event_date
-FROM u2ijfaoqdx_events e
-JOIN u2ijfaoqcohort c ON e.person_id = c.person_id
+FROM prnpim5kdx_events e
+JOIN prnpim5kcohort c ON e.person_id = c.person_id
 UNION ALL
 SELECT 'INDEX', 'ODX', e.concept_id, e.person_id, DATEDIFF(DAY, c.index_date, e.event_date), e.event_date
-FROM u2ijfaoqother_dx_events e
-JOIN u2ijfaoqcohort c ON e.person_id = c.person_id
+FROM prnpim5kother_dx_events e
+JOIN prnpim5kcohort c ON e.person_id = c.person_id
 UNION ALL
 SELECT 'INDEX', 'GDX', e.concept_id, e.person_id, DATEDIFF(DAY, c.index_date, e.event_date), e.event_date
-FROM u2ijfaoqgen_cancer_events e
-JOIN u2ijfaoqcohort c ON e.person_id = c.person_id
+FROM prnpim5kgen_cancer_events e
+JOIN prnpim5kcohort c ON e.person_id = c.person_id
 UNION ALL
 SELECT 'INDEX', 'MET', e.concept_id, e.person_id, DATEDIFF(DAY, c.index_date, e.event_date), e.event_date
-FROM u2ijfaoqmet_events e
-JOIN u2ijfaoqcohort c ON e.person_id = c.person_id
+FROM prnpim5kmet_events e
+JOIN prnpim5kcohort c ON e.person_id = c.person_id
 UNION ALL
 SELECT 'INDEX', 'L01', e.concept_id, e.person_id, DATEDIFF(DAY, c.index_date, e.event_date), e.event_date
-FROM u2ijfaoql01_ingredient_events e
-JOIN u2ijfaoqcohort c ON e.person_id = c.person_id
+FROM prnpim5kl01_ingredient_events e
+JOIN prnpim5kcohort c ON e.person_id = c.person_id
 UNION ALL
 SELECT 'FIRST_MET', 'DX', e.concept_id, e.person_id, DATEDIFF(DAY, ms.first_met_date, e.event_date), e.event_date
-FROM u2ijfaoqdx_events e
-JOIN u2ijfaoqmet_summary ms ON e.person_id = ms.person_id
+FROM prnpim5kdx_events e
+JOIN prnpim5kmet_summary ms ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 UNION ALL
 SELECT 'FIRST_MET', 'ODX', e.concept_id, e.person_id, DATEDIFF(DAY, ms.first_met_date, e.event_date), e.event_date
-FROM u2ijfaoqother_dx_events e
-JOIN u2ijfaoqmet_summary ms ON e.person_id = ms.person_id
+FROM prnpim5kother_dx_events e
+JOIN prnpim5kmet_summary ms ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 UNION ALL
 SELECT 'FIRST_MET', 'GDX', e.concept_id, e.person_id, DATEDIFF(DAY, ms.first_met_date, e.event_date), e.event_date
-FROM u2ijfaoqgen_cancer_events e
-JOIN u2ijfaoqmet_summary ms ON e.person_id = ms.person_id
+FROM prnpim5kgen_cancer_events e
+JOIN prnpim5kmet_summary ms ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 UNION ALL
 SELECT 'FIRST_MET', 'MET', e.concept_id, e.person_id, DATEDIFF(DAY, ms.first_met_date, e.event_date), e.event_date
-FROM u2ijfaoqmet_events e
-JOIN u2ijfaoqmet_summary ms ON e.person_id = ms.person_id
+FROM prnpim5kmet_events e
+JOIN prnpim5kmet_summary ms ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 UNION ALL
 SELECT 'FIRST_MET', 'L01', e.concept_id, e.person_id, DATEDIFF(DAY, ms.first_met_date, e.event_date), e.event_date
-FROM u2ijfaoql01_ingredient_events e
-JOIN u2ijfaoqmet_summary ms ON e.person_id = ms.person_id
+FROM prnpim5kl01_ingredient_events e
+JOIN prnpim5kmet_summary ms ON e.person_id = ms.person_id
 WHERE ms.first_met_date IS NOT NULL
 ;
-DROP TABLE IF EXISTS u2ijfaoqevent_code_patient_chosen_first;
-CREATE TEMP TABLE u2ijfaoqevent_code_patient_chosen_first  (anchor_event VARCHAR(20),
+DROP TABLE IF EXISTS prnpim5kevent_code_patient_chosen_first;
+CREATE TEMP TABLE prnpim5kevent_code_patient_chosen_first  (anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     concept_id BIGINT,
     person_id BIGINT,
     days_diff INT
 );
-INSERT INTO u2ijfaoqevent_code_patient_chosen_first (anchor_event, event_family, concept_id, person_id, days_diff)
+INSERT INTO prnpim5kevent_code_patient_chosen_first (anchor_event, event_family, concept_id, person_id, days_diff)
 SELECT anchor_event, event_family, concept_id, person_id, days_diff
 FROM (
     SELECT
@@ -715,18 +715,18 @@ FROM (
             PARTITION BY anchor_event, event_family, concept_id, person_id
             ORDER BY DATEDIFF(DAY, TO_DATE('1900-01-01', 'YYYYMMDD'), event_date) ASC, event_date ASC
         ) AS rn
-    FROM u2ijfaoqevent_code_all_events
+    FROM prnpim5kevent_code_all_events
 ) x
 WHERE rn = 1
 ;
-DROP TABLE IF EXISTS u2ijfaoqevent_code_patient_chosen_closest;
-CREATE TEMP TABLE u2ijfaoqevent_code_patient_chosen_closest  (anchor_event VARCHAR(20),
+DROP TABLE IF EXISTS prnpim5kevent_code_patient_chosen_closest;
+CREATE TEMP TABLE prnpim5kevent_code_patient_chosen_closest  (anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     concept_id BIGINT,
     person_id BIGINT,
     days_diff INT
 );
-INSERT INTO u2ijfaoqevent_code_patient_chosen_closest (anchor_event, event_family, concept_id, person_id, days_diff)
+INSERT INTO prnpim5kevent_code_patient_chosen_closest (anchor_event, event_family, concept_id, person_id, days_diff)
 SELECT anchor_event, event_family, concept_id, person_id, days_diff
 FROM (
     SELECT
@@ -739,12 +739,12 @@ FROM (
             PARTITION BY anchor_event, event_family, concept_id, person_id
             ORDER BY ABS(days_diff) ASC, event_date ASC
         ) AS rn
-    FROM u2ijfaoqevent_code_all_events
+    FROM prnpim5kevent_code_all_events
 ) x
 WHERE rn = 1
 ;
-DROP TABLE IF EXISTS u2ijfaoqevent_code_timing_summary;
-CREATE TEMP TABLE u2ijfaoqevent_code_timing_summary  (anchor_event VARCHAR(20),
+DROP TABLE IF EXISTS prnpim5kevent_code_timing_summary;
+CREATE TEMP TABLE prnpim5kevent_code_timing_summary  (anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     concept_id BIGINT,
     n_patients_with_code_timing INT,
@@ -755,7 +755,7 @@ CREATE TEMP TABLE u2ijfaoqevent_code_timing_summary  (anchor_event VARCHAR(20),
     median_days_closest FLOAT,
     uq_days_closest FLOAT
 );
-INSERT INTO u2ijfaoqevent_code_timing_summary (
+INSERT INTO prnpim5kevent_code_timing_summary (
     anchor_event,
     event_family,
     concept_id,
@@ -791,7 +791,7 @@ FROM (
         SELECT anchor_event, event_family, concept_id, days_diff,
             ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, concept_id ORDER BY days_diff) AS rn,
             COUNT(*)     OVER (PARTITION BY anchor_event, event_family, concept_id)                    AS cnt
-        FROM u2ijfaoqevent_code_patient_chosen_first
+        FROM prnpim5kevent_code_patient_chosen_first
     ) x
     GROUP BY anchor_event, event_family, concept_id
 ) f
@@ -807,7 +807,7 @@ INNER JOIN (
         SELECT anchor_event, event_family, concept_id, days_diff,
             ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, concept_id ORDER BY days_diff) AS rn,
             COUNT(*)     OVER (PARTITION BY anchor_event, event_family, concept_id)                    AS cnt
-        FROM u2ijfaoqevent_code_patient_chosen_closest
+        FROM prnpim5kevent_code_patient_chosen_closest
     ) x
     GROUP BY anchor_event, event_family, concept_id
 ) k
@@ -815,8 +815,8 @@ INNER JOIN (
  AND f.event_family = k.event_family
  AND f.concept_id = k.concept_id
 ;
-DROP TABLE IF EXISTS u2ijfaoqevent_code_ba_events;
-CREATE TEMP TABLE u2ijfaoqevent_code_ba_events  (anchor_event VARCHAR(20),
+DROP TABLE IF EXISTS prnpim5kevent_code_ba_events;
+CREATE TEMP TABLE prnpim5kevent_code_ba_events  (anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     time_relative VARCHAR(10),
     concept_id BIGINT,
@@ -824,7 +824,7 @@ CREATE TEMP TABLE u2ijfaoqevent_code_ba_events  (anchor_event VARCHAR(20),
     days_diff INT,
     event_date DATE
 );
-INSERT INTO u2ijfaoqevent_code_ba_events (
+INSERT INTO prnpim5kevent_code_ba_events (
     anchor_event, event_family, time_relative, concept_id, person_id, days_diff, event_date
 )
 SELECT
@@ -835,17 +835,17 @@ SELECT
     person_id,
     days_diff,
     event_date
-FROM u2ijfaoqevent_code_all_events
+FROM prnpim5kevent_code_all_events
 ;
-DROP TABLE IF EXISTS u2ijfaoqevent_code_patient_chosen_before_after_first;
-CREATE TEMP TABLE u2ijfaoqevent_code_patient_chosen_before_after_first  (anchor_event VARCHAR(20),
+DROP TABLE IF EXISTS prnpim5kevent_code_patient_chosen_before_after_first;
+CREATE TEMP TABLE prnpim5kevent_code_patient_chosen_before_after_first  (anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     time_relative VARCHAR(10),
     concept_id BIGINT,
     person_id BIGINT,
     days_diff INT
 );
-INSERT INTO u2ijfaoqevent_code_patient_chosen_before_after_first (
+INSERT INTO prnpim5kevent_code_patient_chosen_before_after_first (
     anchor_event, event_family, time_relative, concept_id, person_id, days_diff
 )
 SELECT anchor_event, event_family, time_relative, concept_id, person_id, days_diff
@@ -861,19 +861,19 @@ FROM (
             PARTITION BY anchor_event, event_family, time_relative, concept_id, person_id
             ORDER BY DATEDIFF(DAY, TO_DATE('1900-01-01', 'YYYYMMDD'), event_date) ASC, event_date ASC
         ) AS rn
-    FROM u2ijfaoqevent_code_ba_events
+    FROM prnpim5kevent_code_ba_events
 ) x
 WHERE rn = 1
 ;
-DROP TABLE IF EXISTS u2ijfaoqevent_code_patient_chosen_before_after_closest;
-CREATE TEMP TABLE u2ijfaoqevent_code_patient_chosen_before_after_closest  (anchor_event VARCHAR(20),
+DROP TABLE IF EXISTS prnpim5kevent_code_patient_chosen_before_after_closest;
+CREATE TEMP TABLE prnpim5kevent_code_patient_chosen_before_after_closest  (anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     time_relative VARCHAR(10),
     concept_id BIGINT,
     person_id BIGINT,
     days_diff INT
 );
-INSERT INTO u2ijfaoqevent_code_patient_chosen_before_after_closest (
+INSERT INTO prnpim5kevent_code_patient_chosen_before_after_closest (
     anchor_event, event_family, time_relative, concept_id, person_id, days_diff
 )
 SELECT anchor_event, event_family, time_relative, concept_id, person_id, days_diff
@@ -889,12 +889,12 @@ FROM (
             PARTITION BY anchor_event, event_family, time_relative, concept_id, person_id
             ORDER BY ABS(days_diff) ASC, event_date ASC
         ) AS rn
-    FROM u2ijfaoqevent_code_ba_events
+    FROM prnpim5kevent_code_ba_events
 ) x
 WHERE rn = 1
 ;
-DROP TABLE IF EXISTS u2ijfaoqevent_code_timing_before_after_summary;
-CREATE TEMP TABLE u2ijfaoqevent_code_timing_before_after_summary  (anchor_event VARCHAR(20),
+DROP TABLE IF EXISTS prnpim5kevent_code_timing_before_after_summary;
+CREATE TEMP TABLE prnpim5kevent_code_timing_before_after_summary  (anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     time_relative VARCHAR(10),
     concept_id BIGINT,
@@ -906,7 +906,7 @@ CREATE TEMP TABLE u2ijfaoqevent_code_timing_before_after_summary  (anchor_event 
     median_days_closest FLOAT,
     uq_days_closest FLOAT
 );
-INSERT INTO u2ijfaoqevent_code_timing_before_after_summary (
+INSERT INTO prnpim5kevent_code_timing_before_after_summary (
     anchor_event,
     event_family,
     time_relative,
@@ -945,7 +945,7 @@ FROM (
         SELECT anchor_event, event_family, time_relative, concept_id, days_diff,
             ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id ORDER BY days_diff) AS rn,
             COUNT(*)     OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id)                    AS cnt
-        FROM u2ijfaoqevent_code_patient_chosen_before_after_first
+        FROM prnpim5kevent_code_patient_chosen_before_after_first
     ) x
     GROUP BY anchor_event, event_family, time_relative, concept_id
 ) f
@@ -962,7 +962,7 @@ INNER JOIN (
         SELECT anchor_event, event_family, time_relative, concept_id, days_diff,
             ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id ORDER BY days_diff) AS rn,
             COUNT(*)     OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id)                    AS cnt
-        FROM u2ijfaoqevent_code_patient_chosen_before_after_closest
+        FROM prnpim5kevent_code_patient_chosen_before_after_closest
     ) x
     GROUP BY anchor_event, event_family, time_relative, concept_id
 ) k
@@ -974,8 +974,8 @@ INNER JOIN (
 ------------------------------------------------------------
 -- I) PATIENT-LEVEL TABLE
 ------------------------------------------------------------
-DROP TABLE IF EXISTS u2ijfaoqpatient_char;
-CREATE TEMP TABLE u2ijfaoqpatient_char  (person_id BIGINT,
+DROP TABLE IF EXISTS prnpim5kpatient_char;
+CREATE TEMP TABLE prnpim5kpatient_char  (person_id BIGINT,
     index_date DATE,
     n_dx_records INT,
     n_dx_codes INT,
@@ -995,7 +995,7 @@ CREATE TEMP TABLE u2ijfaoqpatient_char  (person_id BIGINT,
     days_dx_to_gen_cancer INT,
     days_met_to_l01 INT
 );
-INSERT INTO u2ijfaoqpatient_char (
+INSERT INTO prnpim5kpatient_char (
     person_id,
     index_date,
     n_dx_records,
@@ -1036,37 +1036,37 @@ SELECT
     CASE WHEN odx.first_other_dx_date IS NOT NULL THEN DATEDIFF(DAY, c.index_date, odx.first_other_dx_date) END AS days_dx_to_other_dx,
     CASE WHEN gdx.first_gen_cancer_date IS NOT NULL THEN DATEDIFF(DAY, c.index_date, gdx.first_gen_cancer_date) END AS days_dx_to_gen_cancer,
     CASE WHEN mt.first_met_date IS NOT NULL AND l01.first_l01_date IS NOT NULL THEN DATEDIFF(DAY, mt.first_met_date, l01.first_l01_date) END AS days_met_to_l01
-FROM u2ijfaoqcohort c
-LEFT JOIN u2ijfaoqdx_summary dx
+FROM prnpim5kcohort c
+LEFT JOIN prnpim5kdx_summary dx
        ON c.person_id = dx.person_id
-LEFT JOIN u2ijfaoqother_dx_summary odx
+LEFT JOIN prnpim5kother_dx_summary odx
        ON c.person_id = odx.person_id
-LEFT JOIN u2ijfaoqgen_cancer_summary gdx
+LEFT JOIN prnpim5kgen_cancer_summary gdx
        ON c.person_id = gdx.person_id
-LEFT JOIN u2ijfaoqmet_summary mt
+LEFT JOIN prnpim5kmet_summary mt
        ON c.person_id = mt.person_id
-LEFT JOIN u2ijfaoql01_summary l01
+LEFT JOIN prnpim5kl01_summary l01
        ON c.person_id = l01.person_id
 ;
 ------------------------------------------------------------
 -- J) FULL CROSSWISE TIMING PAIRS
 ------------------------------------------------------------
-DROP TABLE IF EXISTS u2ijfaoqpatient_timing_pairs;
-CREATE TEMP TABLE u2ijfaoqpatient_timing_pairs  (person_id BIGINT,
+DROP TABLE IF EXISTS prnpim5kpatient_timing_pairs;
+CREATE TEMP TABLE prnpim5kpatient_timing_pairs  (person_id BIGINT,
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     days_diff INT
 );
-INSERT INTO u2ijfaoqpatient_timing_pairs (person_id, from_event, to_event, days_diff)
- WITH events  AS (SELECT person_id,  CAST('DX' as TEXT) AS event_name, index_date AS event_date FROM u2ijfaoqpatient_char
+INSERT INTO prnpim5kpatient_timing_pairs (person_id, from_event, to_event, days_diff)
+ WITH events  AS (SELECT person_id,  CAST('DX' as TEXT) AS event_name, index_date AS event_date FROM prnpim5kpatient_char
     UNION ALL
-    SELECT person_id, 'ODX', first_other_dx_date FROM u2ijfaoqpatient_char
+    SELECT person_id, 'ODX', first_other_dx_date FROM prnpim5kpatient_char
     UNION ALL
-    SELECT person_id, 'GDX', first_gen_cancer_date FROM u2ijfaoqpatient_char
+    SELECT person_id, 'GDX', first_gen_cancer_date FROM prnpim5kpatient_char
     UNION ALL
-    SELECT person_id, 'MET', first_met_date FROM u2ijfaoqpatient_char
+    SELECT person_id, 'MET', first_met_date FROM prnpim5kpatient_char
     UNION ALL
-    SELECT person_id, 'L01', first_l01_date FROM u2ijfaoqpatient_char
+    SELECT person_id, 'L01', first_l01_date FROM prnpim5kpatient_char
 )
  SELECT e1.person_id,
     e1.event_name AS from_event,
@@ -1079,8 +1079,8 @@ JOIN events e2
 WHERE e1.event_date IS NOT NULL
   AND e2.event_date IS NOT NULL
 ;
-DROP TABLE IF EXISTS u2ijfaoqtiming_pair_summary;
-CREATE TEMP TABLE u2ijfaoqtiming_pair_summary  (from_event VARCHAR(10),
+DROP TABLE IF EXISTS prnpim5ktiming_pair_summary;
+CREATE TEMP TABLE prnpim5ktiming_pair_summary  (from_event VARCHAR(10),
     to_event VARCHAR(10),
     n_patients_with_pair INT,
     p05_days FLOAT,
@@ -1097,7 +1097,7 @@ CREATE TEMP TABLE u2ijfaoqtiming_pair_summary  (from_event VARCHAR(10),
     p90_days FLOAT,
     p95_days FLOAT
 );
-INSERT INTO u2ijfaoqtiming_pair_summary (
+INSERT INTO prnpim5ktiming_pair_summary (
     from_event,
     to_event,
     n_patients_with_pair,
@@ -1136,49 +1136,49 @@ FROM (
     SELECT from_event, to_event, days_diff,
         ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
         COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
-    FROM u2ijfaoqpatient_timing_pairs
+    FROM prnpim5kpatient_timing_pairs
 ) x
 GROUP BY from_event, to_event
 ;
-DROP TABLE IF EXISTS u2ijfaoqall_events_for_pairs;
-CREATE TEMP TABLE u2ijfaoqall_events_for_pairs  (person_id BIGINT,
+DROP TABLE IF EXISTS prnpim5kall_events_for_pairs;
+CREATE TEMP TABLE prnpim5kall_events_for_pairs  (person_id BIGINT,
     event_family VARCHAR(10),
     event_date DATE
 );
-INSERT INTO u2ijfaoqall_events_for_pairs (person_id, event_family, event_date)
-SELECT person_id, 'DX', event_date FROM u2ijfaoqdx_events
+INSERT INTO prnpim5kall_events_for_pairs (person_id, event_family, event_date)
+SELECT person_id, 'DX', event_date FROM prnpim5kdx_events
 UNION ALL
-SELECT person_id, 'ODX', event_date FROM u2ijfaoqother_dx_events
+SELECT person_id, 'ODX', event_date FROM prnpim5kother_dx_events
 UNION ALL
-SELECT person_id, 'GDX', event_date FROM u2ijfaoqgen_cancer_events
+SELECT person_id, 'GDX', event_date FROM prnpim5kgen_cancer_events
 UNION ALL
-SELECT person_id, 'MET', event_date FROM u2ijfaoqmet_events
+SELECT person_id, 'MET', event_date FROM prnpim5kmet_events
 UNION ALL
-SELECT person_id, 'L01', event_date FROM u2ijfaoql01_events
+SELECT person_id, 'L01', event_date FROM prnpim5kl01_events
 ;
-DROP TABLE IF EXISTS u2ijfaoqfirst_event_dates;
-CREATE TEMP TABLE u2ijfaoqfirst_event_dates  (person_id BIGINT,
+DROP TABLE IF EXISTS prnpim5kfirst_event_dates;
+CREATE TEMP TABLE prnpim5kfirst_event_dates  (person_id BIGINT,
     from_event VARCHAR(10),
     from_first_date DATE
 );
-INSERT INTO u2ijfaoqfirst_event_dates (person_id, from_event, from_first_date)
-SELECT person_id, 'DX', index_date FROM u2ijfaoqpatient_char
+INSERT INTO prnpim5kfirst_event_dates (person_id, from_event, from_first_date)
+SELECT person_id, 'DX', index_date FROM prnpim5kpatient_char
 UNION ALL
-SELECT person_id, 'ODX', first_other_dx_date FROM u2ijfaoqpatient_char WHERE first_other_dx_date IS NOT NULL
+SELECT person_id, 'ODX', first_other_dx_date FROM prnpim5kpatient_char WHERE first_other_dx_date IS NOT NULL
 UNION ALL
-SELECT person_id, 'GDX', first_gen_cancer_date FROM u2ijfaoqpatient_char WHERE first_gen_cancer_date IS NOT NULL
+SELECT person_id, 'GDX', first_gen_cancer_date FROM prnpim5kpatient_char WHERE first_gen_cancer_date IS NOT NULL
 UNION ALL
-SELECT person_id, 'MET', first_met_date FROM u2ijfaoqpatient_char WHERE first_met_date IS NOT NULL
+SELECT person_id, 'MET', first_met_date FROM prnpim5kpatient_char WHERE first_met_date IS NOT NULL
 UNION ALL
-SELECT person_id, 'L01', first_l01_date FROM u2ijfaoqpatient_char WHERE first_l01_date IS NOT NULL
+SELECT person_id, 'L01', first_l01_date FROM prnpim5kpatient_char WHERE first_l01_date IS NOT NULL
 ;
-DROP TABLE IF EXISTS u2ijfaoqpatient_timing_pairs_first_to_closest;
-CREATE TEMP TABLE u2ijfaoqpatient_timing_pairs_first_to_closest  (person_id BIGINT,
+DROP TABLE IF EXISTS prnpim5kpatient_timing_pairs_first_to_closest;
+CREATE TEMP TABLE prnpim5kpatient_timing_pairs_first_to_closest  (person_id BIGINT,
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     days_diff INT
 );
-INSERT INTO u2ijfaoqpatient_timing_pairs_first_to_closest (person_id, from_event, to_event, days_diff)
+INSERT INTO prnpim5kpatient_timing_pairs_first_to_closest (person_id, from_event, to_event, days_diff)
  WITH ranked AS (
     SELECT
         f.person_id,
@@ -1189,8 +1189,8 @@ INSERT INTO u2ijfaoqpatient_timing_pairs_first_to_closest (person_id, from_event
             PARTITION BY f.person_id, f.from_event, a.event_family
             ORDER BY ABS(DATEDIFF(DAY, f.from_first_date, a.event_date)), a.event_date
         ) AS rn
-    FROM u2ijfaoqfirst_event_dates f
-    JOIN u2ijfaoqall_events_for_pairs a
+    FROM prnpim5kfirst_event_dates f
+    JOIN prnpim5kall_events_for_pairs a
       ON f.person_id = a.person_id
      AND f.from_event <> a.event_family
 )
@@ -1201,8 +1201,8 @@ INSERT INTO u2ijfaoqpatient_timing_pairs_first_to_closest (person_id, from_event
 FROM ranked
 WHERE rn = 1
 ;
-DROP TABLE IF EXISTS u2ijfaoqtiming_pair_summary_first_to_closest;
-CREATE TEMP TABLE u2ijfaoqtiming_pair_summary_first_to_closest  (from_event VARCHAR(10),
+DROP TABLE IF EXISTS prnpim5ktiming_pair_summary_first_to_closest;
+CREATE TEMP TABLE prnpim5ktiming_pair_summary_first_to_closest  (from_event VARCHAR(10),
     to_event VARCHAR(10),
     n_patients_with_pair INT,
     p05_days FLOAT,
@@ -1219,7 +1219,7 @@ CREATE TEMP TABLE u2ijfaoqtiming_pair_summary_first_to_closest  (from_event VARC
     p90_days FLOAT,
     p95_days FLOAT
 );
-INSERT INTO u2ijfaoqtiming_pair_summary_first_to_closest (
+INSERT INTO prnpim5ktiming_pair_summary_first_to_closest (
     from_event,
     to_event,
     n_patients_with_pair,
@@ -1258,17 +1258,17 @@ FROM (
     SELECT from_event, to_event, days_diff,
         ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
         COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
-    FROM u2ijfaoqpatient_timing_pairs_first_to_closest
+    FROM prnpim5kpatient_timing_pairs_first_to_closest
 ) x
 GROUP BY from_event, to_event
 ;
-DROP TABLE IF EXISTS u2ijfaoqpatient_timing_pairs_first_to_closest_before;
-CREATE TEMP TABLE u2ijfaoqpatient_timing_pairs_first_to_closest_before  (person_id BIGINT,
+DROP TABLE IF EXISTS prnpim5kpatient_timing_pairs_first_to_closest_before;
+CREATE TEMP TABLE prnpim5kpatient_timing_pairs_first_to_closest_before  (person_id BIGINT,
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     days_diff INT
 );
-INSERT INTO u2ijfaoqpatient_timing_pairs_first_to_closest_before (person_id, from_event, to_event, days_diff)
+INSERT INTO prnpim5kpatient_timing_pairs_first_to_closest_before (person_id, from_event, to_event, days_diff)
  WITH ranked_before AS (
     SELECT
         f.person_id,
@@ -1279,8 +1279,8 @@ INSERT INTO u2ijfaoqpatient_timing_pairs_first_to_closest_before (person_id, fro
             PARTITION BY f.person_id, f.from_event, a.event_family
             ORDER BY ABS(DATEDIFF(DAY, f.from_first_date, a.event_date)), a.event_date DESC
         ) AS rn
-    FROM u2ijfaoqfirst_event_dates f
-    JOIN u2ijfaoqall_events_for_pairs a
+    FROM prnpim5kfirst_event_dates f
+    JOIN prnpim5kall_events_for_pairs a
       ON f.person_id = a.person_id
      AND f.from_event <> a.event_family
     WHERE DATEDIFF(DAY, f.from_first_date, a.event_date) < 0
@@ -1292,8 +1292,8 @@ INSERT INTO u2ijfaoqpatient_timing_pairs_first_to_closest_before (person_id, fro
 FROM ranked_before
 WHERE rn = 1
 ;
-DROP TABLE IF EXISTS u2ijfaoqtiming_pair_summary_first_to_closest_before;
-CREATE TEMP TABLE u2ijfaoqtiming_pair_summary_first_to_closest_before  (from_event VARCHAR(10),
+DROP TABLE IF EXISTS prnpim5ktiming_pair_summary_first_to_closest_before;
+CREATE TEMP TABLE prnpim5ktiming_pair_summary_first_to_closest_before  (from_event VARCHAR(10),
     to_event VARCHAR(10),
     n_patients_with_pair INT,
     p05_days FLOAT,
@@ -1310,7 +1310,7 @@ CREATE TEMP TABLE u2ijfaoqtiming_pair_summary_first_to_closest_before  (from_eve
     p90_days FLOAT,
     p95_days FLOAT
 );
-INSERT INTO u2ijfaoqtiming_pair_summary_first_to_closest_before (
+INSERT INTO prnpim5ktiming_pair_summary_first_to_closest_before (
     from_event,
     to_event,
     n_patients_with_pair,
@@ -1349,17 +1349,17 @@ FROM (
     SELECT from_event, to_event, days_diff,
         ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
         COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
-    FROM u2ijfaoqpatient_timing_pairs_first_to_closest_before
+    FROM prnpim5kpatient_timing_pairs_first_to_closest_before
 ) x
 GROUP BY from_event, to_event
 ;
-DROP TABLE IF EXISTS u2ijfaoqpatient_timing_pairs_first_to_closest_after;
-CREATE TEMP TABLE u2ijfaoqpatient_timing_pairs_first_to_closest_after  (person_id BIGINT,
+DROP TABLE IF EXISTS prnpim5kpatient_timing_pairs_first_to_closest_after;
+CREATE TEMP TABLE prnpim5kpatient_timing_pairs_first_to_closest_after  (person_id BIGINT,
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     days_diff INT
 );
-INSERT INTO u2ijfaoqpatient_timing_pairs_first_to_closest_after (person_id, from_event, to_event, days_diff)
+INSERT INTO prnpim5kpatient_timing_pairs_first_to_closest_after (person_id, from_event, to_event, days_diff)
  WITH ranked_after AS (
     SELECT
         f.person_id,
@@ -1370,8 +1370,8 @@ INSERT INTO u2ijfaoqpatient_timing_pairs_first_to_closest_after (person_id, from
             PARTITION BY f.person_id, f.from_event, a.event_family
             ORDER BY DATEDIFF(DAY, f.from_first_date, a.event_date), a.event_date
         ) AS rn
-    FROM u2ijfaoqfirst_event_dates f
-    JOIN u2ijfaoqall_events_for_pairs a
+    FROM prnpim5kfirst_event_dates f
+    JOIN prnpim5kall_events_for_pairs a
       ON f.person_id = a.person_id
      AND f.from_event <> a.event_family
     WHERE DATEDIFF(DAY, f.from_first_date, a.event_date) >= 0
@@ -1383,8 +1383,8 @@ INSERT INTO u2ijfaoqpatient_timing_pairs_first_to_closest_after (person_id, from
 FROM ranked_after
 WHERE rn = 1
 ;
-DROP TABLE IF EXISTS u2ijfaoqtiming_pair_summary_first_to_closest_after;
-CREATE TEMP TABLE u2ijfaoqtiming_pair_summary_first_to_closest_after  (from_event VARCHAR(10),
+DROP TABLE IF EXISTS prnpim5ktiming_pair_summary_first_to_closest_after;
+CREATE TEMP TABLE prnpim5ktiming_pair_summary_first_to_closest_after  (from_event VARCHAR(10),
     to_event VARCHAR(10),
     n_patients_with_pair INT,
     p05_days FLOAT,
@@ -1401,7 +1401,7 @@ CREATE TEMP TABLE u2ijfaoqtiming_pair_summary_first_to_closest_after  (from_even
     p90_days FLOAT,
     p95_days FLOAT
 );
-INSERT INTO u2ijfaoqtiming_pair_summary_first_to_closest_after (
+INSERT INTO prnpim5ktiming_pair_summary_first_to_closest_after (
     from_event,
     to_event,
     n_patients_with_pair,
@@ -1440,19 +1440,19 @@ FROM (
     SELECT from_event, to_event, days_diff,
         ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
         COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
-    FROM u2ijfaoqpatient_timing_pairs_first_to_closest_after
+    FROM prnpim5kpatient_timing_pairs_first_to_closest_after
 ) x
 GROUP BY from_event, to_event
 ;
-DROP TABLE IF EXISTS u2ijfaoqevent_presence;
-CREATE TEMP TABLE u2ijfaoqevent_presence  (person_id BIGINT,
+DROP TABLE IF EXISTS prnpim5kevent_presence;
+CREATE TEMP TABLE prnpim5kevent_presence  (person_id BIGINT,
     has_dx INT,
     has_odx INT,
     has_gdx INT,
     has_met INT,
     has_l01 INT
 );
-INSERT INTO u2ijfaoqevent_presence (
+INSERT INTO prnpim5kevent_presence (
     person_id, has_dx, has_odx, has_gdx, has_met, has_l01
 )
 SELECT
@@ -1462,19 +1462,19 @@ SELECT
     CASE WHEN first_gen_cancer_date IS NOT NULL THEN 1 ELSE 0 END,
     CASE WHEN first_met_date IS NOT NULL THEN 1 ELSE 0 END,
     CASE WHEN first_l01_date IS NOT NULL THEN 1 ELSE 0 END
-FROM u2ijfaoqpatient_char
+FROM prnpim5kpatient_char
 ;
 ------------------------------------------------------------
 -- J-bis) DEATH TIMING FROM INDEX AND FIRST_MET ANCHORS
 ------------------------------------------------------------
 -- Pre-compute each cohort patient's earliest death date and whether it
 -- falls within any of their observation periods.
-DROP TABLE IF EXISTS u2ijfaoqdeath_obs_status;
-CREATE TEMP TABLE u2ijfaoqdeath_obs_status  (person_id BIGINT,
+DROP TABLE IF EXISTS prnpim5kdeath_obs_status;
+CREATE TEMP TABLE prnpim5kdeath_obs_status  (person_id BIGINT,
     death_date DATE,
     death_in_obs SMALLINT
 );
-INSERT INTO u2ijfaoqdeath_obs_status (person_id, death_date, death_in_obs)
+INSERT INTO prnpim5kdeath_obs_status (person_id, death_date, death_in_obs)
 SELECT
     d.person_id,
     d.death_date,
@@ -1490,49 +1490,49 @@ FROM (
     FROM @cdm_database_schema.death
     GROUP BY person_id
 ) d
-WHERE d.person_id IN (SELECT person_id FROM u2ijfaoqcohort)
+WHERE d.person_id IN (SELECT person_id FROM prnpim5kcohort)
 ;
-DROP TABLE IF EXISTS u2ijfaoqdeath_index_long;
-CREATE TEMP TABLE u2ijfaoqdeath_index_long  (prevalence_year VARCHAR(20),
+DROP TABLE IF EXISTS prnpim5kdeath_index_long;
+CREATE TEMP TABLE prnpim5kdeath_index_long  (prevalence_year VARCHAR(20),
     days_to_death INT
 );
-INSERT INTO u2ijfaoqdeath_index_long (prevalence_year, days_to_death)
+INSERT INTO prnpim5kdeath_index_long (prevalence_year, days_to_death)
 SELECT 'OVERALL', DATEDIFF(DAY, c.index_date, dos.death_date)
-FROM u2ijfaoqcohort c
-INNER JOIN u2ijfaoqdeath_obs_status dos ON dos.person_id = c.person_id
+FROM prnpim5kcohort c
+INNER JOIN prnpim5kdeath_obs_status dos ON dos.person_id = c.person_id
 WHERE dos.death_date >= c.index_date
 UNION ALL
 SELECT CAST(EXTRACT(YEAR FROM c.index_date) AS VARCHAR(4)), DATEDIFF(DAY, c.index_date, dos.death_date)
-FROM u2ijfaoqcohort c
-INNER JOIN u2ijfaoqdeath_obs_status dos ON dos.person_id = c.person_id
+FROM prnpim5kcohort c
+INNER JOIN prnpim5kdeath_obs_status dos ON dos.person_id = c.person_id
 WHERE dos.death_date >= c.index_date
 ;
-DROP TABLE IF EXISTS u2ijfaoqdeath_first_met_long;
-CREATE TEMP TABLE u2ijfaoqdeath_first_met_long  (prevalence_year VARCHAR(20),
+DROP TABLE IF EXISTS prnpim5kdeath_first_met_long;
+CREATE TEMP TABLE prnpim5kdeath_first_met_long  (prevalence_year VARCHAR(20),
     days_to_death INT
 );
-INSERT INTO u2ijfaoqdeath_first_met_long (prevalence_year, days_to_death)
+INSERT INTO prnpim5kdeath_first_met_long (prevalence_year, days_to_death)
 SELECT 'OVERALL', DATEDIFF(DAY, ms.first_met_date, dos.death_date)
-FROM u2ijfaoqcohort c
-INNER JOIN u2ijfaoqmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
-INNER JOIN u2ijfaoqdeath_obs_status dos ON dos.person_id = c.person_id
+FROM prnpim5kcohort c
+INNER JOIN prnpim5kmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+INNER JOIN prnpim5kdeath_obs_status dos ON dos.person_id = c.person_id
 WHERE dos.death_date >= ms.first_met_date
 UNION ALL
-SELECT CAST(EXTRACT(YEAR FROM c.index_date) AS VARCHAR(4)), DATEDIFF(DAY, ms.first_met_date, dos.death_date)
-FROM u2ijfaoqcohort c
-INNER JOIN u2ijfaoqmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
-INNER JOIN u2ijfaoqdeath_obs_status dos ON dos.person_id = c.person_id
+SELECT CAST(EXTRACT(YEAR FROM ms.first_met_date) AS VARCHAR(4)), DATEDIFF(DAY, ms.first_met_date, dos.death_date)
+FROM prnpim5kcohort c
+INNER JOIN prnpim5kmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+INNER JOIN prnpim5kdeath_obs_status dos ON dos.person_id = c.person_id
 WHERE dos.death_date >= ms.first_met_date
 ;
-DROP TABLE IF EXISTS u2ijfaoqdeath_stratum_counts;
-CREATE TEMP TABLE u2ijfaoqdeath_stratum_counts  (prevalence_year VARCHAR(20),
+DROP TABLE IF EXISTS prnpim5kdeath_stratum_counts;
+CREATE TEMP TABLE prnpim5kdeath_stratum_counts  (prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     n_patients INT,
     n_deaths INT,
     n_deaths_in_obs INT,
     n_deaths_out_obs INT
 );
-INSERT INTO u2ijfaoqdeath_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
+INSERT INTO prnpim5kdeath_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
 SELECT
     CASE
         WHEN GROUPING(EXTRACT(YEAR FROM c.index_date)) = 1 THEN 'OVERALL'
@@ -1543,44 +1543,44 @@ SELECT
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= c.index_date THEN 1 ELSE 0 END),
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= c.index_date AND dos.death_in_obs = 1 THEN 1 ELSE 0 END),
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= c.index_date AND dos.death_in_obs = 0 THEN 1 ELSE 0 END)
-FROM u2ijfaoqcohort c
-LEFT JOIN u2ijfaoqdeath_obs_status dos ON dos.person_id = c.person_id
+FROM prnpim5kcohort c
+LEFT JOIN prnpim5kdeath_obs_status dos ON dos.person_id = c.person_id
 GROUP BY GROUPING SETS ((), (EXTRACT(YEAR FROM c.index_date)))
 ;
-INSERT INTO u2ijfaoqdeath_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
+INSERT INTO prnpim5kdeath_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
 SELECT
     CASE
-        WHEN GROUPING(EXTRACT(YEAR FROM c.index_date)) = 1 THEN 'OVERALL'
-        ELSE CAST(EXTRACT(YEAR FROM c.index_date) AS VARCHAR(4))
+        WHEN GROUPING(EXTRACT(YEAR FROM ms.first_met_date)) = 1 THEN 'OVERALL'
+        ELSE CAST(EXTRACT(YEAR FROM ms.first_met_date) AS VARCHAR(4))
     END,
     'FIRST_MET',
     COUNT(*),
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= ms.first_met_date THEN 1 ELSE 0 END),
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= ms.first_met_date AND dos.death_in_obs = 1 THEN 1 ELSE 0 END),
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= ms.first_met_date AND dos.death_in_obs = 0 THEN 1 ELSE 0 END)
-FROM u2ijfaoqcohort c
-INNER JOIN u2ijfaoqmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
-LEFT JOIN u2ijfaoqdeath_obs_status dos ON dos.person_id = c.person_id
-GROUP BY GROUPING SETS ((), (EXTRACT(YEAR FROM c.index_date)))
+FROM prnpim5kcohort c
+INNER JOIN prnpim5kmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+LEFT JOIN prnpim5kdeath_obs_status dos ON dos.person_id = c.person_id
+GROUP BY GROUPING SETS ((), (EXTRACT(YEAR FROM ms.first_met_date)))
 ;
-DROP TABLE IF EXISTS u2ijfaoqdeath_timing_long;
-CREATE TEMP TABLE u2ijfaoqdeath_timing_long  (prevalence_year VARCHAR(20),
+DROP TABLE IF EXISTS prnpim5kdeath_timing_long;
+CREATE TEMP TABLE prnpim5kdeath_timing_long  (prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     days_to_death INT
 );
-INSERT INTO u2ijfaoqdeath_timing_long (prevalence_year, anchor_event, days_to_death)
-SELECT prevalence_year, 'INDEX', days_to_death FROM u2ijfaoqdeath_index_long
+INSERT INTO prnpim5kdeath_timing_long (prevalence_year, anchor_event, days_to_death)
+SELECT prevalence_year, 'INDEX', days_to_death FROM prnpim5kdeath_index_long
 UNION ALL
-SELECT prevalence_year, 'FIRST_MET', days_to_death FROM u2ijfaoqdeath_first_met_long
+SELECT prevalence_year, 'FIRST_MET', days_to_death FROM prnpim5kdeath_first_met_long
 ;
-DROP TABLE IF EXISTS u2ijfaoqdeath_timing_quantiles;
-CREATE TEMP TABLE u2ijfaoqdeath_timing_quantiles  (prevalence_year VARCHAR(20),
+DROP TABLE IF EXISTS prnpim5kdeath_timing_quantiles;
+CREATE TEMP TABLE prnpim5kdeath_timing_quantiles  (prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     lq_days FLOAT,
     median_days FLOAT,
     uq_days FLOAT
 );
-INSERT INTO u2ijfaoqdeath_timing_quantiles (
+INSERT INTO prnpim5kdeath_timing_quantiles (
     prevalence_year,
     anchor_event,
     lq_days,
@@ -1597,21 +1597,21 @@ FROM (
     SELECT prevalence_year, anchor_event, days_to_death,
         ROW_NUMBER() OVER (PARTITION BY prevalence_year, anchor_event ORDER BY days_to_death) AS rn,
         COUNT(*)     OVER (PARTITION BY prevalence_year, anchor_event)                        AS cnt
-    FROM u2ijfaoqdeath_timing_long
+    FROM prnpim5kdeath_timing_long
 ) x
 GROUP BY prevalence_year, anchor_event
 ;
 -- Follow-up duration from anchor date to last observation period end,
 -- for all patients with at least one observation period covering or after anchor.
-DROP TABLE IF EXISTS u2ijfaoqfollowup_long;
-CREATE TEMP TABLE u2ijfaoqfollowup_long  (prevalence_year VARCHAR(20),
+DROP TABLE IF EXISTS prnpim5kfollowup_long;
+CREATE TEMP TABLE prnpim5kfollowup_long  (prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     followup_days INT
 );
-INSERT INTO u2ijfaoqfollowup_long (prevalence_year, anchor_event, followup_days)
+INSERT INTO prnpim5kfollowup_long (prevalence_year, anchor_event, followup_days)
 SELECT 'OVERALL', 'INDEX',
        DATEDIFF(DAY, c.index_date, MAX(op.observation_period_end_date))
-FROM u2ijfaoqcohort c
+FROM prnpim5kcohort c
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= c.index_date
@@ -1619,7 +1619,7 @@ GROUP BY c.person_id, c.index_date
 UNION ALL
 SELECT CAST(EXTRACT(YEAR FROM c.index_date) AS VARCHAR(4)), 'INDEX',
        DATEDIFF(DAY, c.index_date, MAX(op.observation_period_end_date))
-FROM u2ijfaoqcohort c
+FROM prnpim5kcohort c
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= c.index_date
@@ -1627,30 +1627,30 @@ GROUP BY c.person_id, c.index_date, EXTRACT(YEAR FROM c.index_date)
 UNION ALL
 SELECT 'OVERALL', 'FIRST_MET',
        DATEDIFF(DAY, ms.first_met_date, MAX(op.observation_period_end_date))
-FROM u2ijfaoqcohort c
-INNER JOIN u2ijfaoqmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+FROM prnpim5kcohort c
+INNER JOIN prnpim5kmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= ms.first_met_date
 GROUP BY c.person_id, ms.first_met_date
 UNION ALL
-SELECT CAST(EXTRACT(YEAR FROM c.index_date) AS VARCHAR(4)), 'FIRST_MET',
+SELECT CAST(EXTRACT(YEAR FROM ms.first_met_date) AS VARCHAR(4)), 'FIRST_MET',
        DATEDIFF(DAY, ms.first_met_date, MAX(op.observation_period_end_date))
-FROM u2ijfaoqcohort c
-INNER JOIN u2ijfaoqmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+FROM prnpim5kcohort c
+INNER JOIN prnpim5kmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= ms.first_met_date
-GROUP BY c.person_id, c.index_date, ms.first_met_date, EXTRACT(YEAR FROM c.index_date)
+GROUP BY c.person_id, ms.first_met_date, EXTRACT(YEAR FROM ms.first_met_date)
 ;
-DROP TABLE IF EXISTS u2ijfaoqfollowup_quantiles;
-CREATE TEMP TABLE u2ijfaoqfollowup_quantiles  (prevalence_year VARCHAR(20),
+DROP TABLE IF EXISTS prnpim5kfollowup_quantiles;
+CREATE TEMP TABLE prnpim5kfollowup_quantiles  (prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     lq_followup_days FLOAT,
     median_followup_days FLOAT,
     uq_followup_days FLOAT
 );
-INSERT INTO u2ijfaoqfollowup_quantiles (
+INSERT INTO prnpim5kfollowup_quantiles (
     prevalence_year,
     anchor_event,
     lq_followup_days,
@@ -1667,7 +1667,7 @@ FROM (
     SELECT prevalence_year, anchor_event, followup_days,
         ROW_NUMBER() OVER (PARTITION BY prevalence_year, anchor_event ORDER BY followup_days) AS rn,
         COUNT(*)     OVER (PARTITION BY prevalence_year, anchor_event)                        AS cnt
-    FROM u2ijfaoqfollowup_long
+    FROM prnpim5kfollowup_long
 ) x
 GROUP BY prevalence_year, anchor_event
 ;
@@ -1675,28 +1675,28 @@ GROUP BY prevalence_year, anchor_event
 -- L) L01 CONSECUTIVE GAP TABLES (used by chunks 11 and 12)
 ------------------------------------------------------------
 -- Deduplicated L01 event days per patient (one row per patient-day)
-DROP TABLE IF EXISTS u2ijfaoql01_event_days;
-CREATE TEMP TABLE u2ijfaoql01_event_days  (person_id  BIGINT,
+DROP TABLE IF EXISTS prnpim5kl01_event_days;
+CREATE TEMP TABLE prnpim5kl01_event_days  (person_id  BIGINT,
     event_day  DATE
 );
-INSERT INTO u2ijfaoql01_event_days (person_id, event_day)
+INSERT INTO prnpim5kl01_event_days (person_id, event_day)
 SELECT DISTINCT person_id, event_date
-FROM u2ijfaoql01_events
-WHERE person_id IN (SELECT person_id FROM u2ijfaoqcohort)
+FROM prnpim5kl01_events
+WHERE person_id IN (SELECT person_id FROM prnpim5kcohort)
 ;
 -- Consecutive gaps between L01 event days per patient
-DROP TABLE IF EXISTS u2ijfaoql01_consecutive_gaps;
-CREATE TEMP TABLE u2ijfaoql01_consecutive_gaps  (person_id  BIGINT,
+DROP TABLE IF EXISTS prnpim5kl01_consecutive_gaps;
+CREATE TEMP TABLE prnpim5kl01_consecutive_gaps  (person_id  BIGINT,
     subgroup   VARCHAR(12),
     gap_days   INT
 );
-INSERT INTO u2ijfaoql01_consecutive_gaps (person_id, subgroup, gap_days)
+INSERT INTO prnpim5kl01_consecutive_gaps (person_id, subgroup, gap_days)
  WITH ranked AS (
     SELECT
         e.person_id,
         e.event_day,
         LEAD(e.event_day) OVER (PARTITION BY e.person_id ORDER BY e.event_day) AS next_day
-    FROM u2ijfaoql01_event_days e
+    FROM prnpim5kl01_event_days e
 ),
 gaps AS (
     SELECT
@@ -1709,17 +1709,17 @@ gaps AS (
 UNION ALL
 SELECT g.person_id, 'MET_L01', g.gap_days
 FROM gaps g
-JOIN u2ijfaoqmet_summary ms ON g.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+JOIN prnpim5kmet_summary ms ON g.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 ;
 -- Max gap per patient (one row per patient; used for MAX-gap subgroups in chunks 11–12)
-INSERT INTO u2ijfaoql01_consecutive_gaps (person_id, subgroup, gap_days)
+INSERT INTO prnpim5kl01_consecutive_gaps (person_id, subgroup, gap_days)
 SELECT person_id, 'ALL_L01_MAX', MAX(gap_days)
-FROM u2ijfaoql01_consecutive_gaps
+FROM prnpim5kl01_consecutive_gaps
 WHERE subgroup = 'ALL_L01'
 GROUP BY person_id
 UNION ALL
 SELECT person_id, 'MET_L01_MAX', MAX(gap_days)
-FROM u2ijfaoql01_consecutive_gaps
+FROM prnpim5kl01_consecutive_gaps
 WHERE subgroup = 'MET_L01'
 GROUP BY person_id
 ;
@@ -1734,7 +1734,7 @@ SELECT
     SUM(CASE WHEN stage = 'dx_in_obs' THEN n_patients ELSE 0 END) AS n_dx_in_obs,
     SUM(CASE WHEN stage = 'dx_any'    THEN n_patients ELSE 0 END)
     - SUM(CASE WHEN stage = 'dx_in_obs' THEN n_patients ELSE 0 END)  AS n_excluded_no_obs_dx
-FROM u2ijfaoqcohort_attrition
+FROM prnpim5kcohort_attrition
 ;
 -- 1) Population prevalence
 WITH base  AS (SELECT CASE
@@ -1745,7 +1745,7 @@ WITH base  AS (SELECT CASE
         SUM(CASE WHEN first_gen_cancer_date IS NOT NULL THEN 1 ELSE 0 END) AS n_with_gen_cancer_dx,
         SUM(CASE WHEN first_met_date IS NOT NULL THEN 1 ELSE 0 END) AS n_with_met,
         SUM(CASE WHEN first_l01_date IS NOT NULL THEN 1 ELSE 0 END) AS n_with_l01
-    FROM u2ijfaoqpatient_char
+    FROM prnpim5kpatient_char
     GROUP BY GROUPING SETS (
         (),
         (EXTRACT(YEAR FROM index_date))
@@ -1799,22 +1799,22 @@ SELECT
     CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE COALESCE(ts.median_days_first,   tba.median_days_first)   END AS median_days,
     CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE COALESCE(ts.uq_days_first,       tba.uq_days_first)       END AS uq_days
 FROM (
-    SELECT 'all'    AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM u2ijfaoqevent_code_counts
+    SELECT 'all'    AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM prnpim5kevent_code_counts
     UNION ALL
-    SELECT 'before' AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM u2ijfaoqevent_code_counts_before_after         WHERE time_relative = 'BEFORE'
+    SELECT 'before' AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM prnpim5kevent_code_counts_before_after         WHERE time_relative = 'BEFORE'
     UNION ALL
-    SELECT 'after'  AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM u2ijfaoqevent_code_counts_before_after         WHERE time_relative = 'AFTER'
+    SELECT 'after'  AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM prnpim5kevent_code_counts_before_after         WHERE time_relative = 'AFTER'
     UNION ALL
-    SELECT 'before' AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM u2ijfaoqevent_code_counts_before_after_first_met WHERE time_relative = 'BEFORE'
+    SELECT 'before' AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM prnpim5kevent_code_counts_before_after_first_met WHERE time_relative = 'BEFORE'
     UNION ALL
-    SELECT 'after'  AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM u2ijfaoqevent_code_counts_before_after_first_met WHERE time_relative = 'AFTER'
+    SELECT 'after'  AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM prnpim5kevent_code_counts_before_after_first_met WHERE time_relative = 'AFTER'
 ) x
-LEFT JOIN u2ijfaoqevent_code_timing_summary ts
+LEFT JOIN prnpim5kevent_code_timing_summary ts
   ON x.time_window = 'all'
  AND x.anchor_event = ts.anchor_event
  AND x.event_family = ts.event_family
  AND x.concept_id   = ts.concept_id
-LEFT JOIN u2ijfaoqevent_code_timing_before_after_summary tba
+LEFT JOIN prnpim5kevent_code_timing_before_after_summary tba
   ON x.time_window != 'all'
  AND x.anchor_event = tba.anchor_event
  AND x.event_family = tba.event_family
@@ -1850,7 +1850,7 @@ WITH dx_met_base  AS (SELECT EXTRACT(YEAR FROM index_date) AS index_year_int,
             WHEN days_dx_to_met <= 365   THEN 'AFTER_91_365'
             ELSE 'AFTER_GT365'
         END AS direction
-    FROM u2ijfaoqpatient_char
+    FROM prnpim5kpatient_char
 ),
 met_l01_base AS (
     SELECT
@@ -1865,7 +1865,7 @@ met_l01_base AS (
             WHEN days_met_to_l01 <= 365  THEN 'AFTER_91_365'
             ELSE 'AFTER_GT365'
         END AS direction
-    FROM u2ijfaoqpatient_char
+    FROM prnpim5kpatient_char
     WHERE first_met_date IS NOT NULL
 )
 SELECT
@@ -1947,23 +1947,22 @@ SELECT
     CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p90_days END AS p90_days,
     CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p95_days END AS p95_days
 FROM (
-    SELECT 'first_to_first'          AS timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM u2ijfaoqtiming_pair_summary
+    SELECT 'first_to_first'          AS timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM prnpim5ktiming_pair_summary
     UNION ALL
-    SELECT 'first_to_closest'        AS timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM u2ijfaoqtiming_pair_summary_first_to_closest
+    SELECT 'first_to_closest'        AS timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM prnpim5ktiming_pair_summary_first_to_closest
     UNION ALL
-    SELECT 'first_to_closest_before' AS timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM u2ijfaoqtiming_pair_summary_first_to_closest_before
+    SELECT 'first_to_closest_before' AS timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM prnpim5ktiming_pair_summary_first_to_closest_before
     UNION ALL
-    SELECT 'first_to_closest_after'  AS timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM u2ijfaoqtiming_pair_summary_first_to_closest_after
+    SELECT 'first_to_closest_after'  AS timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM prnpim5ktiming_pair_summary_first_to_closest_after
 ) x
 ORDER BY x.timing_type, x.from_event, x.to_event
 ;
--- 5) Pairwise timing summary stratified by index year
---    Same structure as chunk 04 (final_timing_pairwise.csv) but grouped by
---    YEAR(index_date) instead of OVERALL.  Used for year-over-year plots and
---    for the per-year columns in the §06 stability matrix.
---
---    Only first_to_first timing is exported here (DX->MET, MET->L01 are the
---    primary year-over-year metrics).  Small-cell suppression applied.
+-- 5) Pairwise timing summary stratified by anchor year
+--    Same structure as chunk 04 (final_timing_pairwise.csv) but grouped by year.
+--    Year is anchored on the from_event: DX-anchored pairs use YEAR(index_date),
+--    MET-anchored pairs use YEAR(first_met_date).
+--    Used for year-over-year plots and for the per-year columns in the §06 stability matrix.
+--    Small-cell suppression applied.
 SELECT
     x.timing_type,
     x.index_year,
@@ -1974,7 +1973,7 @@ SELECT
     CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p50_days  END AS p50_days,
     CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p75_days  END AS p75_days
 FROM (
-    -- first_to_first by year
+    -- first_to_first by anchor year
     SELECT
         'first_to_first' AS timing_type,
         CAST(index_year_int AS VARCHAR(4)) AS index_year,
@@ -1986,15 +1985,16 @@ FROM (
         MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS FLOAT) END) AS p75_days
     FROM (
         SELECT p.from_event, p.to_event, p.days_diff,
-            EXTRACT(YEAR FROM pc.index_date) AS index_year_int,
-            ROW_NUMBER() OVER (PARTITION BY EXTRACT(YEAR FROM pc.index_date), p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
-            COUNT(*)     OVER (PARTITION BY EXTRACT(YEAR FROM pc.index_date), p.from_event, p.to_event)                    AS cnt
-        FROM u2ijfaoqpatient_timing_pairs p
-        JOIN u2ijfaoqpatient_char pc ON p.person_id = pc.person_id
+            CASE WHEN p.from_event = 'MET' THEN EXTRACT(YEAR FROM ms.first_met_date) ELSE EXTRACT(YEAR FROM pc.index_date) END AS index_year_int,
+            ROW_NUMBER() OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN EXTRACT(YEAR FROM ms.first_met_date) ELSE EXTRACT(YEAR FROM pc.index_date) END, p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
+            COUNT(*)     OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN EXTRACT(YEAR FROM ms.first_met_date) ELSE EXTRACT(YEAR FROM pc.index_date) END, p.from_event, p.to_event)                    AS cnt
+        FROM prnpim5kpatient_timing_pairs p
+        JOIN prnpim5kpatient_char pc    ON p.person_id = pc.person_id
+        LEFT JOIN prnpim5kmet_summary ms ON p.person_id = ms.person_id
     ) y
     GROUP BY index_year_int, from_event, to_event
     UNION ALL
-    -- first_to_closest_after by year (for MET->L01 post-MET treatment timing)
+    -- first_to_closest_after by anchor year (MET-anchored pairs use MET year)
     SELECT
         'first_to_closest_after' AS timing_type,
         CAST(index_year_int AS VARCHAR(4)) AS index_year,
@@ -2006,11 +2006,12 @@ FROM (
         MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS FLOAT) END) AS p75_days
     FROM (
         SELECT p.from_event, p.to_event, p.days_diff,
-            EXTRACT(YEAR FROM pc.index_date) AS index_year_int,
-            ROW_NUMBER() OVER (PARTITION BY EXTRACT(YEAR FROM pc.index_date), p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
-            COUNT(*)     OVER (PARTITION BY EXTRACT(YEAR FROM pc.index_date), p.from_event, p.to_event)                    AS cnt
-        FROM u2ijfaoqpatient_timing_pairs_first_to_closest_after p
-        JOIN u2ijfaoqpatient_char pc ON p.person_id = pc.person_id
+            CASE WHEN p.from_event = 'MET' THEN EXTRACT(YEAR FROM ms.first_met_date) ELSE EXTRACT(YEAR FROM pc.index_date) END AS index_year_int,
+            ROW_NUMBER() OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN EXTRACT(YEAR FROM ms.first_met_date) ELSE EXTRACT(YEAR FROM pc.index_date) END, p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
+            COUNT(*)     OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN EXTRACT(YEAR FROM ms.first_met_date) ELSE EXTRACT(YEAR FROM pc.index_date) END, p.from_event, p.to_event)                    AS cnt
+        FROM prnpim5kpatient_timing_pairs_first_to_closest_after p
+        JOIN prnpim5kpatient_char pc    ON p.person_id = pc.person_id
+        LEFT JOIN prnpim5kmet_summary ms ON p.person_id = ms.person_id
     ) y
     GROUP BY index_year_int, from_event, to_event
 ) x
@@ -2043,8 +2044,8 @@ WITH odx_gdx_events  AS (SELECT  CAST('ODX' as TEXT) AS event_family,
         e.concept_id,
         e.person_id,
         DATEDIFF(DAY, c.index_date, e.event_date) AS days_from_index
-    FROM u2ijfaoqother_dx_events e
-    JOIN u2ijfaoqcohort c ON e.person_id = c.person_id
+    FROM prnpim5kother_dx_events e
+    JOIN prnpim5kcohort c ON e.person_id = c.person_id
     UNION ALL
     -- GDX events with days relative to index_date
     SELECT
@@ -2052,8 +2053,8 @@ WITH odx_gdx_events  AS (SELECT  CAST('ODX' as TEXT) AS event_family,
         e.concept_id,
         e.person_id,
         DATEDIFF(DAY, c.index_date, e.event_date) AS days_from_index
-    FROM u2ijfaoqgen_cancer_events e
-    JOIN u2ijfaoqcohort c ON e.person_id = c.person_id
+    FROM prnpim5kgen_cancer_events e
+    JOIN prnpim5kcohort c ON e.person_id = c.person_id
 ),
 windowed AS (
     SELECT
@@ -2120,7 +2121,7 @@ WITH window_bounds  AS (SELECT  CAST('INDEX' as TEXT) AS anchor_event,
         c.person_id,
         c.index_date AS anchor_date,
         w.window_index
-    FROM u2ijfaoqcohort c
+    FROM prnpim5kcohort c
     CROSS JOIN (
         SELECT -12 AS window_index UNION ALL SELECT -11 UNION ALL SELECT -10
         UNION ALL SELECT -9  UNION ALL SELECT -8  UNION ALL SELECT -7
@@ -2149,7 +2150,7 @@ WITH window_bounds  AS (SELECT  CAST('INDEX' as TEXT) AS anchor_event,
         ms.person_id,
         ms.first_met_date AS anchor_date,
         w.window_index
-    FROM u2ijfaoqmet_summary ms
+    FROM prnpim5kmet_summary ms
     CROSS JOIN (
         SELECT -6  AS window_index UNION ALL SELECT -5  UNION ALL SELECT -4
         UNION ALL SELECT -3  UNION ALL SELECT -2  UNION ALL SELECT -1
@@ -2179,7 +2180,7 @@ window_l01 AS (
             END
         ) AS has_l01_in_window
     FROM window_bounds wb
-    LEFT JOIN u2ijfaoql01_events le
+    LEFT JOIN prnpim5kl01_events le
       ON wb.person_id = le.person_id
     GROUP BY wb.anchor_event, wb.person_id, wb.window_index, wb.anchor_date
 ),
@@ -2244,11 +2245,11 @@ SELECT
     CASE WHEN s.n_patients <= @min_cell_count THEN NULL ELSE f.lq_followup_days END AS lq_followup_days,
     CASE WHEN s.n_patients <= @min_cell_count THEN NULL ELSE f.median_followup_days END AS median_followup_days,
     CASE WHEN s.n_patients <= @min_cell_count THEN NULL ELSE f.uq_followup_days END AS uq_followup_days
-FROM u2ijfaoqdeath_stratum_counts s
-LEFT JOIN u2ijfaoqdeath_timing_quantiles q
+FROM prnpim5kdeath_stratum_counts s
+LEFT JOIN prnpim5kdeath_timing_quantiles q
   ON s.prevalence_year = q.prevalence_year
  AND s.anchor_event = q.anchor_event
-LEFT JOIN u2ijfaoqfollowup_quantiles f
+LEFT JOIN prnpim5kfollowup_quantiles f
   ON s.prevalence_year = f.prevalence_year
  AND s.anchor_event = f.anchor_event
 ORDER BY
@@ -2261,14 +2262,14 @@ ORDER BY
 WITH anchor_persons  AS (SELECT  CAST('INDEX' as TEXT) AS anchor_event,
         c.person_id,
         c.index_date AS anchor_date
-    FROM u2ijfaoqpatient_char c
+    FROM prnpim5kpatient_char c
     WHERE c.index_date IS NOT NULL
     UNION ALL
     SELECT
         'FIRST_MET' AS anchor_event,
         c.person_id,
         c.first_met_date AS anchor_date
-    FROM u2ijfaoqpatient_char c
+    FROM prnpim5kpatient_char c
     WHERE c.first_met_date IS NOT NULL
 ),
 base AS (
@@ -2344,7 +2345,7 @@ WITH dx_days AS (
         person_id,
         event_date,
         concept_id
-    FROM u2ijfaoqdx_events
+    FROM prnpim5kdx_events
 )
 SELECT
     s.concept_id,
@@ -2382,7 +2383,7 @@ FROM (
     SELECT subgroup, person_id, gap_days,
         ROW_NUMBER() OVER (PARTITION BY subgroup ORDER BY gap_days) AS rn,
         COUNT(*)     OVER (PARTITION BY subgroup)                   AS cnt
-    FROM u2ijfaoql01_consecutive_gaps
+    FROM prnpim5kl01_consecutive_gaps
 ) x
 GROUP BY subgroup
 ORDER BY subgroup
@@ -2403,7 +2404,7 @@ SELECT
         ELSE 'ge365d'
     END AS gap_bucket,
     COUNT(*) AS n_gaps
-FROM u2ijfaoql01_consecutive_gaps
+FROM prnpim5kl01_consecutive_gaps
 GROUP BY
     subgroup,
     CASE
@@ -2442,7 +2443,7 @@ WITH patient_obs AS (
         MIN(observation_period_start_date) AS first_obs_start,
         MAX(observation_period_end_date)   AS last_obs_end
     FROM @cdm_database_schema.observation_period
-    WHERE person_id IN (SELECT person_id FROM u2ijfaoqcohort)
+    WHERE person_id IN (SELECT person_id FROM prnpim5kcohort)
     GROUP BY person_id
 ),
 death_obs_gaps AS (
@@ -2463,9 +2464,9 @@ death_obs_gaps AS (
                 THEN 1
             ELSE 0
         END AS death_before_obs
-    FROM u2ijfaoqcohort c
-    INNER JOIN u2ijfaoqdeath_obs_status dos ON dos.person_id = c.person_id
-    LEFT JOIN u2ijfaoqmet_summary ms ON ms.person_id = c.person_id
+    FROM prnpim5kcohort c
+    INNER JOIN prnpim5kdeath_obs_status dos ON dos.person_id = c.person_id
+    LEFT JOIN prnpim5kmet_summary ms ON ms.person_id = c.person_id
     LEFT JOIN patient_obs po  ON po.person_id  = c.person_id
 )
 SELECT
@@ -2502,67 +2503,71 @@ FROM (
 ) x
 ;
 -- 14) Death date vs observation period — bucketed gap histogram
---     Restricted to patients where death_date > obs_period_end_date (i.e.
---     the n_death_after_obs subset summarized in chunk 13).  Binned at
---     30-day intervals up to 730 days, then a single ">=730d" bucket.
---
---     Output: one row per gap_bucket (INDEX anchor; FIRST_MET subset is a
---     proper subset whose distribution closely mirrors INDEX, so we only
---     export the INDEX histogram for the report).
+--     Restricted to patients where death_date > obs_period_end_date.
+--     Exported for both INDEX (all DX cohort) and FIRST_MET (MET subgroup)
+--     so that each can be shown as a separate figure in the report.
 WITH patient_obs AS (
     SELECT
         person_id,
         MIN(observation_period_start_date) AS first_obs_start,
         MAX(observation_period_end_date)   AS last_obs_end
     FROM @cdm_database_schema.observation_period
-    WHERE person_id IN (SELECT person_id FROM u2ijfaoqcohort)
+    WHERE person_id IN (SELECT person_id FROM prnpim5kcohort)
     GROUP BY person_id
 ),
 death_obs_gaps AS (
     SELECT
         c.person_id,
+        ms.first_met_date,
         CASE
             WHEN dos.death_date > po.last_obs_end
                 THEN DATEDIFF(DAY, po.last_obs_end, dos.death_date)
             ELSE NULL
         END AS gap_death_after_obs
-    FROM u2ijfaoqcohort c
-    INNER JOIN u2ijfaoqdeath_obs_status dos ON dos.person_id = c.person_id
-    LEFT JOIN patient_obs po  ON po.person_id  = c.person_id
+    FROM prnpim5kcohort c
+    INNER JOIN prnpim5kdeath_obs_status dos ON dos.person_id = c.person_id
+    LEFT JOIN prnpim5kmet_summary ms        ON ms.person_id  = c.person_id
+    LEFT JOIN patient_obs po         ON po.person_id  = c.person_id
+),
+bucketed AS (
+    SELECT
+        person_id,
+        first_met_date,
+        CASE
+            WHEN gap_death_after_obs <   30 THEN 'lt30d'
+            WHEN gap_death_after_obs <   60 THEN '30_59d'
+            WHEN gap_death_after_obs <   90 THEN '60_89d'
+            WHEN gap_death_after_obs <  180 THEN '90_179d'
+            WHEN gap_death_after_obs <  365 THEN '180_364d'
+            WHEN gap_death_after_obs <  730 THEN '365_729d'
+            ELSE 'ge730d'
+        END AS gap_bucket,
+        CASE
+            WHEN gap_death_after_obs <   30 THEN 1
+            WHEN gap_death_after_obs <   60 THEN 2
+            WHEN gap_death_after_obs <   90 THEN 3
+            WHEN gap_death_after_obs <  180 THEN 4
+            WHEN gap_death_after_obs <  365 THEN 5
+            WHEN gap_death_after_obs <  730 THEN 6
+            ELSE 7
+        END AS sort_key
+    FROM death_obs_gaps
+    WHERE gap_death_after_obs IS NOT NULL
 )
-SELECT
-    CASE
-        WHEN gap_death_after_obs <   30 THEN 'lt30d'
-        WHEN gap_death_after_obs <   60 THEN '30_59d'
-        WHEN gap_death_after_obs <   90 THEN '60_89d'
-        WHEN gap_death_after_obs <  180 THEN '90_179d'
-        WHEN gap_death_after_obs <  365 THEN '180_364d'
-        WHEN gap_death_after_obs <  730 THEN '365_729d'
-        ELSE 'ge730d'
-    END AS gap_bucket,
-    COUNT(*) AS n_patients
-FROM death_obs_gaps
-WHERE gap_death_after_obs IS NOT NULL
-GROUP BY
-    CASE
-        WHEN gap_death_after_obs <   30 THEN 'lt30d'
-        WHEN gap_death_after_obs <   60 THEN '30_59d'
-        WHEN gap_death_after_obs <   90 THEN '60_89d'
-        WHEN gap_death_after_obs <  180 THEN '90_179d'
-        WHEN gap_death_after_obs <  365 THEN '180_364d'
-        WHEN gap_death_after_obs <  730 THEN '365_729d'
-        ELSE 'ge730d'
-    END
+SELECT anchor_event, gap_bucket, n_patients
+FROM (
+    SELECT 'INDEX'     AS anchor_event, gap_bucket, COUNT(*) AS n_patients, MIN(sort_key) AS sort_key
+    FROM bucketed
+    GROUP BY gap_bucket
+    UNION ALL
+    SELECT 'FIRST_MET' AS anchor_event, gap_bucket, COUNT(*) AS n_patients, MIN(sort_key) AS sort_key
+    FROM bucketed
+    WHERE first_met_date IS NOT NULL
+    GROUP BY gap_bucket
+) x
 ORDER BY
-    MIN(CASE
-        WHEN gap_death_after_obs <   30 THEN 1
-        WHEN gap_death_after_obs <   60 THEN 2
-        WHEN gap_death_after_obs <   90 THEN 3
-        WHEN gap_death_after_obs <  180 THEN 4
-        WHEN gap_death_after_obs <  365 THEN 5
-        WHEN gap_death_after_obs <  730 THEN 6
-        ELSE 7
-    END)
+    CASE WHEN anchor_event = 'INDEX' THEN 0 ELSE 1 END,
+    sort_key
 ;
 -- 15) Distribution of distinct L01 event days per patient
 --     Shows how many patients have 1, 2-6, 7-11, or 12+ distinct L01 days.
@@ -2583,12 +2588,12 @@ SELECT
     COUNT(*) AS n_patients
 FROM (
     SELECT e.person_id, COUNT(*) AS n_days, 'ALL_L01' AS subgroup
-    FROM u2ijfaoql01_event_days e
+    FROM prnpim5kl01_event_days e
     GROUP BY e.person_id
     UNION ALL
     SELECT e.person_id, COUNT(*) AS n_days, 'MET_L01' AS subgroup
-    FROM u2ijfaoql01_event_days e
-    JOIN u2ijfaoqmet_summary ms ON e.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+    FROM prnpim5kl01_event_days e
+    JOIN prnpim5kmet_summary ms ON e.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
     GROUP BY e.person_id
 ) x
 GROUP BY

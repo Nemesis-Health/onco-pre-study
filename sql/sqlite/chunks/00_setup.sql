@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : sqlite
--- Translated     : 2026-05-07 06:29:48 BST
+-- Translated     : 2026-05-07 11:44:51 BST
 -- Source file    : sql/sql_server/chunks/00_setup.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -1522,7 +1522,7 @@ INNER JOIN temp.met_summary ms ON c.person_id = ms.person_id AND ms.first_met_da
 INNER JOIN temp.death_obs_status dos ON dos.person_id = c.person_id
 WHERE dos.death_date >= ms.first_met_date
 UNION ALL
-SELECT CAST(CAST(STRFTIME('%Y', c.index_date, 'unixepoch') AS INT) AS TEXT), (JULIANDAY(dos.death_date, 'unixepoch') - JULIANDAY(ms.first_met_date, 'unixepoch'))
+SELECT CAST(CAST(STRFTIME('%Y', ms.first_met_date, 'unixepoch') AS INT) AS TEXT), (JULIANDAY(dos.death_date, 'unixepoch') - JULIANDAY(ms.first_met_date, 'unixepoch'))
 FROM temp.cohort c
 INNER JOIN temp.met_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 INNER JOIN temp.death_obs_status dos ON dos.person_id = c.person_id
@@ -1554,8 +1554,8 @@ GROUP BY GROUPING SETS ((), (CAST(STRFTIME('%Y', c.index_date, 'unixepoch') AS I
 INSERT INTO temp.death_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
 SELECT
     CASE
-        WHEN GROUPING(CAST(STRFTIME('%Y', c.index_date, 'unixepoch') AS INT)) = 1 THEN 'OVERALL'
-        ELSE CAST(CAST(STRFTIME('%Y', c.index_date, 'unixepoch') AS INT) AS TEXT)
+        WHEN GROUPING(CAST(STRFTIME('%Y', ms.first_met_date, 'unixepoch') AS INT)) = 1 THEN 'OVERALL'
+        ELSE CAST(CAST(STRFTIME('%Y', ms.first_met_date, 'unixepoch') AS INT) AS TEXT)
     END,
     'FIRST_MET',
     COUNT(*),
@@ -1565,7 +1565,7 @@ SELECT
 FROM temp.cohort c
 INNER JOIN temp.met_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 LEFT JOIN temp.death_obs_status dos ON dos.person_id = c.person_id
-GROUP BY GROUPING SETS ((), (CAST(STRFTIME('%Y', c.index_date, 'unixepoch') AS INT)))
+GROUP BY GROUPING SETS ((), (CAST(STRFTIME('%Y', ms.first_met_date, 'unixepoch') AS INT)))
 ;
 DROP TABLE IF EXISTS temp.death_timing_long;
 CREATE TEMP TABLE death_timing_long  (prevalence_year TEXT,
@@ -1638,14 +1638,14 @@ INNER JOIN @cdm_database_schema.observation_period op
  AND op.observation_period_end_date >= ms.first_met_date
 GROUP BY c.person_id, ms.first_met_date
 UNION ALL
-SELECT CAST(CAST(STRFTIME('%Y', c.index_date, 'unixepoch') AS INT) AS TEXT), 'FIRST_MET',
+SELECT CAST(CAST(STRFTIME('%Y', ms.first_met_date, 'unixepoch') AS INT) AS TEXT), 'FIRST_MET',
        (JULIANDAY(MAX(op.observation_period_end_date), 'unixepoch') - JULIANDAY(ms.first_met_date, 'unixepoch'))
 FROM temp.cohort c
 INNER JOIN temp.met_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= ms.first_met_date
-GROUP BY c.person_id, c.index_date, ms.first_met_date, CAST(STRFTIME('%Y', c.index_date, 'unixepoch') AS INT)
+GROUP BY c.person_id, ms.first_met_date, CAST(STRFTIME('%Y', ms.first_met_date, 'unixepoch') AS INT)
 ;
 DROP TABLE IF EXISTS temp.followup_quantiles;
 CREATE TEMP TABLE followup_quantiles  (prevalence_year TEXT,

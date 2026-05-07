@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : snowflake
--- Translated     : 2026-05-07 06:29:53 BST
+-- Translated     : 2026-05-07 11:44:56 BST
 -- Source file    : sql/sql_server/chunks/11_l01_gap_deciles.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -30,7 +30,7 @@ FROM (
     SELECT subgroup, person_id, gap_days,
         ROW_NUMBER() OVER (PARTITION BY subgroup ORDER BY gap_days) AS rn,
         COUNT(*)     OVER (PARTITION BY subgroup)                   AS cnt
-    FROM u2ijfaoql01_consecutive_gaps
+    FROM prnpim5kl01_consecutive_gaps
 ) x
 GROUP BY subgroup
 ORDER BY subgroup

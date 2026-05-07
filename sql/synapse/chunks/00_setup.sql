@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : synapse
--- Translated     : 2026-05-07 06:29:53 BST
+-- Translated     : 2026-05-07 11:44:56 BST
 -- Source file    : sql/sql_server/chunks/00_setup.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -1573,7 +1573,7 @@ INNER JOIN #met_summary ms ON c.person_id = ms.person_id AND ms.first_met_date I
 INNER JOIN #death_obs_status dos ON dos.person_id = c.person_id
 WHERE dos.death_date >= ms.first_met_date
 UNION ALL
-SELECT CAST(YEAR(c.index_date) AS VARCHAR(4)), DATEDIFF(DAY, ms.first_met_date, dos.death_date)
+SELECT CAST(YEAR(ms.first_met_date) AS VARCHAR(4)), DATEDIFF(DAY, ms.first_met_date, dos.death_date)
 FROM #cohort c
 INNER JOIN #met_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 INNER JOIN #death_obs_status dos ON dos.person_id = c.person_id
@@ -1606,8 +1606,8 @@ GROUP BY GROUPING SETS ((), (YEAR(c.index_date)))
 INSERT INTO #death_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
 SELECT
     CASE
-        WHEN GROUPING(YEAR(c.index_date)) = 1 THEN 'OVERALL'
-        ELSE CAST(YEAR(c.index_date) AS VARCHAR(4))
+        WHEN GROUPING(YEAR(ms.first_met_date)) = 1 THEN 'OVERALL'
+        ELSE CAST(YEAR(ms.first_met_date) AS VARCHAR(4))
     END,
     'FIRST_MET',
     COUNT(*),
@@ -1617,7 +1617,7 @@ SELECT
 FROM #cohort c
 INNER JOIN #met_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 LEFT JOIN #death_obs_status dos ON dos.person_id = c.person_id
-GROUP BY GROUPING SETS ((), (YEAR(c.index_date)))
+GROUP BY GROUPING SETS ((), (YEAR(ms.first_met_date)))
 ;
 IF OBJECT_ID('tempdb..#death_timing_long', 'U') IS NOT NULL DROP TABLE #death_timing_long;
 CREATE TABLE #death_timing_long (
@@ -1693,14 +1693,14 @@ INNER JOIN @cdm_database_schema.observation_period op
  AND op.observation_period_end_date >= ms.first_met_date
 GROUP BY c.person_id, ms.first_met_date
 UNION ALL
-SELECT CAST(YEAR(c.index_date) AS VARCHAR(4)), 'FIRST_MET',
+SELECT CAST(YEAR(ms.first_met_date) AS VARCHAR(4)), 'FIRST_MET',
        DATEDIFF(DAY, ms.first_met_date, MAX(op.observation_period_end_date))
 FROM #cohort c
 INNER JOIN #met_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= ms.first_met_date
-GROUP BY c.person_id, c.index_date, ms.first_met_date, YEAR(c.index_date)
+GROUP BY c.person_id, ms.first_met_date, YEAR(ms.first_met_date)
 ;
 IF OBJECT_ID('tempdb..#followup_quantiles', 'U') IS NOT NULL DROP TABLE #followup_quantiles;
 CREATE TABLE #followup_quantiles (

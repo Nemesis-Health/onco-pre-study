@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-07 06:29:46 BST
+-- Translated     : 2026-05-07 11:44:47 BST
 -- Source file    : sql/sql_server/chunks/06_windowed_odx_prevalence.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -39,8 +39,8 @@ with odx_gdx_events as (
         e.concept_id,
         e.person_id,
         DATE_DIFF(IF(SAFE_CAST(e.event_date  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(e.event_date  AS STRING)),SAFE_CAST(e.event_date  AS DATE)), IF(SAFE_CAST(c.index_date  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(c.index_date  AS STRING)),SAFE_CAST(c.index_date  AS DATE)), DAY) as days_from_index
-    from u2ijfaoqother_dx_events e
-    join u2ijfaoqcohort c on e.person_id = c.person_id
+    from prnpim5kother_dx_events e
+    join prnpim5kcohort c on e.person_id = c.person_id
     union all
     -- GDX events with days relative to index_date
     select
@@ -48,8 +48,8 @@ with odx_gdx_events as (
         e.concept_id,
         e.person_id,
         DATE_DIFF(IF(SAFE_CAST(e.event_date  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(e.event_date  AS STRING)),SAFE_CAST(e.event_date  AS DATE)), IF(SAFE_CAST(c.index_date  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(c.index_date  AS STRING)),SAFE_CAST(c.index_date  AS DATE)), DAY) as days_from_index
-    from u2ijfaoqgen_cancer_events e
-    join u2ijfaoqcohort c on e.person_id = c.person_id
+    from prnpim5kgen_cancer_events e
+    join prnpim5kcohort c on e.person_id = c.person_id
 ),
 windowed as (
      select event_family,

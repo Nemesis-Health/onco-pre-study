@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : sqlite
--- Translated     : 2026-05-07 06:29:48 BST
+-- Translated     : 2026-05-07 11:44:50 BST
 -- Source file    : sql/sql_server/characterization_full.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -1522,7 +1522,7 @@ INNER JOIN temp.met_summary ms ON c.person_id = ms.person_id AND ms.first_met_da
 INNER JOIN temp.death_obs_status dos ON dos.person_id = c.person_id
 WHERE dos.death_date >= ms.first_met_date
 UNION ALL
-SELECT CAST(CAST(STRFTIME('%Y', c.index_date, 'unixepoch') AS INT) AS TEXT), (JULIANDAY(dos.death_date, 'unixepoch') - JULIANDAY(ms.first_met_date, 'unixepoch'))
+SELECT CAST(CAST(STRFTIME('%Y', ms.first_met_date, 'unixepoch') AS INT) AS TEXT), (JULIANDAY(dos.death_date, 'unixepoch') - JULIANDAY(ms.first_met_date, 'unixepoch'))
 FROM temp.cohort c
 INNER JOIN temp.met_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 INNER JOIN temp.death_obs_status dos ON dos.person_id = c.person_id
@@ -1554,8 +1554,8 @@ GROUP BY GROUPING SETS ((), (CAST(STRFTIME('%Y', c.index_date, 'unixepoch') AS I
 INSERT INTO temp.death_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
 SELECT
     CASE
-        WHEN GROUPING(CAST(STRFTIME('%Y', c.index_date, 'unixepoch') AS INT)) = 1 THEN 'OVERALL'
-        ELSE CAST(CAST(STRFTIME('%Y', c.index_date, 'unixepoch') AS INT) AS TEXT)
+        WHEN GROUPING(CAST(STRFTIME('%Y', ms.first_met_date, 'unixepoch') AS INT)) = 1 THEN 'OVERALL'
+        ELSE CAST(CAST(STRFTIME('%Y', ms.first_met_date, 'unixepoch') AS INT) AS TEXT)
     END,
     'FIRST_MET',
     COUNT(*),
@@ -1565,7 +1565,7 @@ SELECT
 FROM temp.cohort c
 INNER JOIN temp.met_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 LEFT JOIN temp.death_obs_status dos ON dos.person_id = c.person_id
-GROUP BY GROUPING SETS ((), (CAST(STRFTIME('%Y', c.index_date, 'unixepoch') AS INT)))
+GROUP BY GROUPING SETS ((), (CAST(STRFTIME('%Y', ms.first_met_date, 'unixepoch') AS INT)))
 ;
 DROP TABLE IF EXISTS temp.death_timing_long;
 CREATE TEMP TABLE death_timing_long  (prevalence_year TEXT,
@@ -1638,14 +1638,14 @@ INNER JOIN @cdm_database_schema.observation_period op
  AND op.observation_period_end_date >= ms.first_met_date
 GROUP BY c.person_id, ms.first_met_date
 UNION ALL
-SELECT CAST(CAST(STRFTIME('%Y', c.index_date, 'unixepoch') AS INT) AS TEXT), 'FIRST_MET',
+SELECT CAST(CAST(STRFTIME('%Y', ms.first_met_date, 'unixepoch') AS INT) AS TEXT), 'FIRST_MET',
        (JULIANDAY(MAX(op.observation_period_end_date), 'unixepoch') - JULIANDAY(ms.first_met_date, 'unixepoch'))
 FROM temp.cohort c
 INNER JOIN temp.met_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= ms.first_met_date
-GROUP BY c.person_id, c.index_date, ms.first_met_date, CAST(STRFTIME('%Y', c.index_date, 'unixepoch') AS INT)
+GROUP BY c.person_id, ms.first_met_date, CAST(STRFTIME('%Y', ms.first_met_date, 'unixepoch') AS INT)
 ;
 DROP TABLE IF EXISTS temp.followup_quantiles;
 CREATE TEMP TABLE followup_quantiles  (prevalence_year TEXT,
@@ -1961,13 +1961,12 @@ FROM (
 ) x
 ORDER BY x.timing_type, x.from_event, x.to_event
 ;
--- 5) Pairwise timing summary stratified by index year
---    Same structure as chunk 04 (final_timing_pairwise.csv) but grouped by
---    YEAR(index_date) instead of OVERALL.  Used for year-over-year plots and
---    for the per-year columns in the §06 stability matrix.
---
---    Only first_to_first timing is exported here (DX->MET, MET->L01 are the
---    primary year-over-year metrics).  Small-cell suppression applied.
+-- 5) Pairwise timing summary stratified by anchor year
+--    Same structure as chunk 04 (final_timing_pairwise.csv) but grouped by year.
+--    Year is anchored on the from_event: DX-anchored pairs use YEAR(index_date),
+--    MET-anchored pairs use YEAR(first_met_date).
+--    Used for year-over-year plots and for the per-year columns in the §06 stability matrix.
+--    Small-cell suppression applied.
 SELECT
     x.timing_type,
     x.index_year,
@@ -1978,7 +1977,7 @@ SELECT
     CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p50_days  END AS p50_days,
     CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p75_days  END AS p75_days
 FROM (
-    -- first_to_first by year
+    -- first_to_first by anchor year
     SELECT
         'first_to_first' AS timing_type,
         CAST(index_year_int AS TEXT) AS index_year,
@@ -1990,15 +1989,16 @@ FROM (
         MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS REAL) END) AS p75_days
     FROM (
         SELECT p.from_event, p.to_event, p.days_diff,
-            CAST(STRFTIME('%Y', pc.index_date, 'unixepoch') AS INT) AS index_year_int,
-            ROW_NUMBER() OVER (PARTITION BY CAST(STRFTIME('%Y', pc.index_date, 'unixepoch') AS INT), p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
-            COUNT(*)     OVER (PARTITION BY CAST(STRFTIME('%Y', pc.index_date, 'unixepoch') AS INT), p.from_event, p.to_event)                    AS cnt
+            CASE WHEN p.from_event = 'MET' THEN CAST(STRFTIME('%Y', ms.first_met_date, 'unixepoch') AS INT) ELSE CAST(STRFTIME('%Y', pc.index_date, 'unixepoch') AS INT) END AS index_year_int,
+            ROW_NUMBER() OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN CAST(STRFTIME('%Y', ms.first_met_date, 'unixepoch') AS INT) ELSE CAST(STRFTIME('%Y', pc.index_date, 'unixepoch') AS INT) END, p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
+            COUNT(*)     OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN CAST(STRFTIME('%Y', ms.first_met_date, 'unixepoch') AS INT) ELSE CAST(STRFTIME('%Y', pc.index_date, 'unixepoch') AS INT) END, p.from_event, p.to_event)                    AS cnt
         FROM temp.patient_timing_pairs p
-        JOIN temp.patient_char pc ON p.person_id = pc.person_id
+        JOIN temp.patient_char pc    ON p.person_id = pc.person_id
+        LEFT JOIN temp.met_summary ms ON p.person_id = ms.person_id
     ) y
     GROUP BY index_year_int, from_event, to_event
     UNION ALL
-    -- first_to_closest_after by year (for MET->L01 post-MET treatment timing)
+    -- first_to_closest_after by anchor year (MET-anchored pairs use MET year)
     SELECT
         'first_to_closest_after' AS timing_type,
         CAST(index_year_int AS TEXT) AS index_year,
@@ -2010,11 +2010,12 @@ FROM (
         MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS REAL) END) AS p75_days
     FROM (
         SELECT p.from_event, p.to_event, p.days_diff,
-            CAST(STRFTIME('%Y', pc.index_date, 'unixepoch') AS INT) AS index_year_int,
-            ROW_NUMBER() OVER (PARTITION BY CAST(STRFTIME('%Y', pc.index_date, 'unixepoch') AS INT), p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
-            COUNT(*)     OVER (PARTITION BY CAST(STRFTIME('%Y', pc.index_date, 'unixepoch') AS INT), p.from_event, p.to_event)                    AS cnt
+            CASE WHEN p.from_event = 'MET' THEN CAST(STRFTIME('%Y', ms.first_met_date, 'unixepoch') AS INT) ELSE CAST(STRFTIME('%Y', pc.index_date, 'unixepoch') AS INT) END AS index_year_int,
+            ROW_NUMBER() OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN CAST(STRFTIME('%Y', ms.first_met_date, 'unixepoch') AS INT) ELSE CAST(STRFTIME('%Y', pc.index_date, 'unixepoch') AS INT) END, p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
+            COUNT(*)     OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN CAST(STRFTIME('%Y', ms.first_met_date, 'unixepoch') AS INT) ELSE CAST(STRFTIME('%Y', pc.index_date, 'unixepoch') AS INT) END, p.from_event, p.to_event)                    AS cnt
         FROM temp.patient_timing_pairs_first_to_closest_after p
-        JOIN temp.patient_char pc ON p.person_id = pc.person_id
+        JOIN temp.patient_char pc    ON p.person_id = pc.person_id
+        LEFT JOIN temp.met_summary ms ON p.person_id = ms.person_id
     ) y
     GROUP BY index_year_int, from_event, to_event
 ) x
@@ -2506,13 +2507,9 @@ FROM (
 ) x
 ;
 -- 14) Death date vs observation period — bucketed gap histogram
---     Restricted to patients where death_date > obs_period_end_date (i.e.
---     the n_death_after_obs subset summarized in chunk 13).  Binned at
---     30-day intervals up to 730 days, then a single ">=730d" bucket.
---
---     Output: one row per gap_bucket (INDEX anchor; FIRST_MET subset is a
---     proper subset whose distribution closely mirrors INDEX, so we only
---     export the INDEX histogram for the report).
+--     Restricted to patients where death_date > obs_period_end_date.
+--     Exported for both INDEX (all DX cohort) and FIRST_MET (MET subgroup)
+--     so that each can be shown as a separate figure in the report.
 WITH patient_obs AS (
     SELECT
         person_id,
@@ -2525,6 +2522,7 @@ WITH patient_obs AS (
 death_obs_gaps AS (
     SELECT
         c.person_id,
+        ms.first_met_date,
         CASE
             WHEN dos.death_date > po.last_obs_end
                 THEN (JULIANDAY(dos.death_date, 'unixepoch') - JULIANDAY(po.last_obs_end, 'unixepoch'))
@@ -2532,41 +2530,48 @@ death_obs_gaps AS (
         END AS gap_death_after_obs
     FROM temp.cohort c
     INNER JOIN temp.death_obs_status dos ON dos.person_id = c.person_id
-    LEFT JOIN patient_obs po  ON po.person_id  = c.person_id
+    LEFT JOIN temp.met_summary ms        ON ms.person_id  = c.person_id
+    LEFT JOIN patient_obs po         ON po.person_id  = c.person_id
+),
+bucketed AS (
+    SELECT
+        person_id,
+        first_met_date,
+        CASE
+            WHEN gap_death_after_obs <   30 THEN 'lt30d'
+            WHEN gap_death_after_obs <   60 THEN '30_59d'
+            WHEN gap_death_after_obs <   90 THEN '60_89d'
+            WHEN gap_death_after_obs <  180 THEN '90_179d'
+            WHEN gap_death_after_obs <  365 THEN '180_364d'
+            WHEN gap_death_after_obs <  730 THEN '365_729d'
+            ELSE 'ge730d'
+        END AS gap_bucket,
+        CASE
+            WHEN gap_death_after_obs <   30 THEN 1
+            WHEN gap_death_after_obs <   60 THEN 2
+            WHEN gap_death_after_obs <   90 THEN 3
+            WHEN gap_death_after_obs <  180 THEN 4
+            WHEN gap_death_after_obs <  365 THEN 5
+            WHEN gap_death_after_obs <  730 THEN 6
+            ELSE 7
+        END AS sort_key
+    FROM death_obs_gaps
+    WHERE gap_death_after_obs IS NOT NULL
 )
-SELECT
-    CASE
-        WHEN gap_death_after_obs <   30 THEN 'lt30d'
-        WHEN gap_death_after_obs <   60 THEN '30_59d'
-        WHEN gap_death_after_obs <   90 THEN '60_89d'
-        WHEN gap_death_after_obs <  180 THEN '90_179d'
-        WHEN gap_death_after_obs <  365 THEN '180_364d'
-        WHEN gap_death_after_obs <  730 THEN '365_729d'
-        ELSE 'ge730d'
-    END AS gap_bucket,
-    COUNT(*) AS n_patients
-FROM death_obs_gaps
-WHERE gap_death_after_obs IS NOT NULL
-GROUP BY
-    CASE
-        WHEN gap_death_after_obs <   30 THEN 'lt30d'
-        WHEN gap_death_after_obs <   60 THEN '30_59d'
-        WHEN gap_death_after_obs <   90 THEN '60_89d'
-        WHEN gap_death_after_obs <  180 THEN '90_179d'
-        WHEN gap_death_after_obs <  365 THEN '180_364d'
-        WHEN gap_death_after_obs <  730 THEN '365_729d'
-        ELSE 'ge730d'
-    END
+SELECT anchor_event, gap_bucket, n_patients
+FROM (
+    SELECT 'INDEX'     AS anchor_event, gap_bucket, COUNT(*) AS n_patients, MIN(sort_key) AS sort_key
+    FROM bucketed
+    GROUP BY gap_bucket
+    UNION ALL
+    SELECT 'FIRST_MET' AS anchor_event, gap_bucket, COUNT(*) AS n_patients, MIN(sort_key) AS sort_key
+    FROM bucketed
+    WHERE first_met_date IS NOT NULL
+    GROUP BY gap_bucket
+) x
 ORDER BY
-    MIN(CASE
-        WHEN gap_death_after_obs <   30 THEN 1
-        WHEN gap_death_after_obs <   60 THEN 2
-        WHEN gap_death_after_obs <   90 THEN 3
-        WHEN gap_death_after_obs <  180 THEN 4
-        WHEN gap_death_after_obs <  365 THEN 5
-        WHEN gap_death_after_obs <  730 THEN 6
-        ELSE 7
-    END)
+    CASE WHEN anchor_event = 'INDEX' THEN 0 ELSE 1 END,
+    sort_key
 ;
 -- 15) Distribution of distinct L01 event days per patient
 --     Shows how many patients have 1, 2-6, 7-11, or 12+ distinct L01 days.

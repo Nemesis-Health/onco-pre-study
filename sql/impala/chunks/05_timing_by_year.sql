@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : impala
--- Translated     : 2026-05-07 06:29:42 BST
+-- Translated     : 2026-05-07 11:44:43 BST
 -- Source file    : sql/sql_server/chunks/05_timing_by_year.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -13,13 +13,12 @@
 --   Without it, #temp table references become permanent tables and
 --   may cause permission errors or name collisions.
 
--- 5) Pairwise timing summary stratified by index year
---    Same structure as chunk 04 (final_timing_pairwise.csv) but grouped by
---    YEAR(index_date) instead of OVERALL.  Used for year-over-year plots and
---    for the per-year columns in the §06 stability matrix.
---
---    Only first_to_first timing is exported here (DX->MET, MET->L01 are the
---    primary year-over-year metrics).  Small-cell suppression applied.
+-- 5) Pairwise timing summary stratified by anchor year
+--    Same structure as chunk 04 (final_timing_pairwise.csv) but grouped by year.
+--    Year is anchored on the from_event: DX-anchored pairs use YEAR(index_date),
+--    MET-anchored pairs use YEAR(first_met_date).
+--    Used for year-over-year plots and for the per-year columns in the §06 stability matrix.
+--    Small-cell suppression applied.
 SELECT
     x.timing_type,
     x.index_year,
@@ -30,7 +29,7 @@ SELECT
     CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p50_days  END AS p50_days,
     CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p75_days  END AS p75_days
 FROM (
-    -- first_to_first by year
+    -- first_to_first by anchor year
     SELECT
         'first_to_first' AS timing_type,
         CAST(index_year_int AS VARCHAR(4)) AS index_year,
@@ -42,15 +41,16 @@ FROM (
         MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS FLOAT) END) AS p75_days
     FROM (
         SELECT p.from_event, p.to_event, p.days_diff,
-            YEAR(CASE TYPEOF(pc.index_date ) WHEN 'TIMESTAMP' THEN CAST(pc.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(pc.index_date  AS STRING), 1, 4), SUBSTR(CAST(pc.index_date  AS STRING), 5, 2), SUBSTR(CAST(pc.index_date  AS STRING), 7, 2)), 'UTC') END) AS index_year_int,
-            ROW_NUMBER() OVER (PARTITION BY YEAR(CASE TYPEOF(pc.index_date ) WHEN 'TIMESTAMP' THEN CAST(pc.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(pc.index_date  AS STRING), 1, 4), SUBSTR(CAST(pc.index_date  AS STRING), 5, 2), SUBSTR(CAST(pc.index_date  AS STRING), 7, 2)), 'UTC') END), p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
-            COUNT(*)     OVER (PARTITION BY YEAR(CASE TYPEOF(pc.index_date ) WHEN 'TIMESTAMP' THEN CAST(pc.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(pc.index_date  AS STRING), 1, 4), SUBSTR(CAST(pc.index_date  AS STRING), 5, 2), SUBSTR(CAST(pc.index_date  AS STRING), 7, 2)), 'UTC') END), p.from_event, p.to_event)                    AS cnt
-        FROM u2ijfaoqpatient_timing_pairs p
-        JOIN u2ijfaoqpatient_char pc ON p.person_id = pc.person_id
+            CASE WHEN p.from_event = 'MET' THEN YEAR(CASE TYPEOF(ms.first_met_date ) WHEN 'TIMESTAMP' THEN CAST(ms.first_met_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(ms.first_met_date  AS STRING), 1, 4), SUBSTR(CAST(ms.first_met_date  AS STRING), 5, 2), SUBSTR(CAST(ms.first_met_date  AS STRING), 7, 2)), 'UTC') END) ELSE YEAR(CASE TYPEOF(pc.index_date ) WHEN 'TIMESTAMP' THEN CAST(pc.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(pc.index_date  AS STRING), 1, 4), SUBSTR(CAST(pc.index_date  AS STRING), 5, 2), SUBSTR(CAST(pc.index_date  AS STRING), 7, 2)), 'UTC') END) END AS index_year_int,
+            ROW_NUMBER() OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN YEAR(CASE TYPEOF(ms.first_met_date ) WHEN 'TIMESTAMP' THEN CAST(ms.first_met_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(ms.first_met_date  AS STRING), 1, 4), SUBSTR(CAST(ms.first_met_date  AS STRING), 5, 2), SUBSTR(CAST(ms.first_met_date  AS STRING), 7, 2)), 'UTC') END) ELSE YEAR(CASE TYPEOF(pc.index_date ) WHEN 'TIMESTAMP' THEN CAST(pc.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(pc.index_date  AS STRING), 1, 4), SUBSTR(CAST(pc.index_date  AS STRING), 5, 2), SUBSTR(CAST(pc.index_date  AS STRING), 7, 2)), 'UTC') END) END, p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
+            COUNT(*)     OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN YEAR(CASE TYPEOF(ms.first_met_date ) WHEN 'TIMESTAMP' THEN CAST(ms.first_met_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(ms.first_met_date  AS STRING), 1, 4), SUBSTR(CAST(ms.first_met_date  AS STRING), 5, 2), SUBSTR(CAST(ms.first_met_date  AS STRING), 7, 2)), 'UTC') END) ELSE YEAR(CASE TYPEOF(pc.index_date ) WHEN 'TIMESTAMP' THEN CAST(pc.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(pc.index_date  AS STRING), 1, 4), SUBSTR(CAST(pc.index_date  AS STRING), 5, 2), SUBSTR(CAST(pc.index_date  AS STRING), 7, 2)), 'UTC') END) END, p.from_event, p.to_event)                    AS cnt
+        FROM prnpim5kpatient_timing_pairs p
+        JOIN prnpim5kpatient_char pc    ON p.person_id = pc.person_id
+        LEFT JOIN prnpim5kmet_summary ms ON p.person_id = ms.person_id
     ) y
     GROUP BY index_year_int, from_event, to_event
     UNION ALL
-    -- first_to_closest_after by year (for MET->L01 post-MET treatment timing)
+    -- first_to_closest_after by anchor year (MET-anchored pairs use MET year)
     SELECT
         'first_to_closest_after' AS timing_type,
         CAST(index_year_int AS VARCHAR(4)) AS index_year,
@@ -62,11 +62,12 @@ FROM (
         MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS FLOAT) END) AS p75_days
     FROM (
         SELECT p.from_event, p.to_event, p.days_diff,
-            YEAR(CASE TYPEOF(pc.index_date ) WHEN 'TIMESTAMP' THEN CAST(pc.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(pc.index_date  AS STRING), 1, 4), SUBSTR(CAST(pc.index_date  AS STRING), 5, 2), SUBSTR(CAST(pc.index_date  AS STRING), 7, 2)), 'UTC') END) AS index_year_int,
-            ROW_NUMBER() OVER (PARTITION BY YEAR(CASE TYPEOF(pc.index_date ) WHEN 'TIMESTAMP' THEN CAST(pc.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(pc.index_date  AS STRING), 1, 4), SUBSTR(CAST(pc.index_date  AS STRING), 5, 2), SUBSTR(CAST(pc.index_date  AS STRING), 7, 2)), 'UTC') END), p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
-            COUNT(*)     OVER (PARTITION BY YEAR(CASE TYPEOF(pc.index_date ) WHEN 'TIMESTAMP' THEN CAST(pc.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(pc.index_date  AS STRING), 1, 4), SUBSTR(CAST(pc.index_date  AS STRING), 5, 2), SUBSTR(CAST(pc.index_date  AS STRING), 7, 2)), 'UTC') END), p.from_event, p.to_event)                    AS cnt
-        FROM u2ijfaoqpatient_timing_pairs_first_to_closest_after p
-        JOIN u2ijfaoqpatient_char pc ON p.person_id = pc.person_id
+            CASE WHEN p.from_event = 'MET' THEN YEAR(CASE TYPEOF(ms.first_met_date ) WHEN 'TIMESTAMP' THEN CAST(ms.first_met_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(ms.first_met_date  AS STRING), 1, 4), SUBSTR(CAST(ms.first_met_date  AS STRING), 5, 2), SUBSTR(CAST(ms.first_met_date  AS STRING), 7, 2)), 'UTC') END) ELSE YEAR(CASE TYPEOF(pc.index_date ) WHEN 'TIMESTAMP' THEN CAST(pc.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(pc.index_date  AS STRING), 1, 4), SUBSTR(CAST(pc.index_date  AS STRING), 5, 2), SUBSTR(CAST(pc.index_date  AS STRING), 7, 2)), 'UTC') END) END AS index_year_int,
+            ROW_NUMBER() OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN YEAR(CASE TYPEOF(ms.first_met_date ) WHEN 'TIMESTAMP' THEN CAST(ms.first_met_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(ms.first_met_date  AS STRING), 1, 4), SUBSTR(CAST(ms.first_met_date  AS STRING), 5, 2), SUBSTR(CAST(ms.first_met_date  AS STRING), 7, 2)), 'UTC') END) ELSE YEAR(CASE TYPEOF(pc.index_date ) WHEN 'TIMESTAMP' THEN CAST(pc.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(pc.index_date  AS STRING), 1, 4), SUBSTR(CAST(pc.index_date  AS STRING), 5, 2), SUBSTR(CAST(pc.index_date  AS STRING), 7, 2)), 'UTC') END) END, p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
+            COUNT(*)     OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN YEAR(CASE TYPEOF(ms.first_met_date ) WHEN 'TIMESTAMP' THEN CAST(ms.first_met_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(ms.first_met_date  AS STRING), 1, 4), SUBSTR(CAST(ms.first_met_date  AS STRING), 5, 2), SUBSTR(CAST(ms.first_met_date  AS STRING), 7, 2)), 'UTC') END) ELSE YEAR(CASE TYPEOF(pc.index_date ) WHEN 'TIMESTAMP' THEN CAST(pc.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(pc.index_date  AS STRING), 1, 4), SUBSTR(CAST(pc.index_date  AS STRING), 5, 2), SUBSTR(CAST(pc.index_date  AS STRING), 7, 2)), 'UTC') END) END, p.from_event, p.to_event)                    AS cnt
+        FROM prnpim5kpatient_timing_pairs_first_to_closest_after p
+        JOIN prnpim5kpatient_char pc    ON p.person_id = pc.person_id
+        LEFT JOIN prnpim5kmet_summary ms ON p.person_id = ms.person_id
     ) y
     GROUP BY index_year_int, from_event, to_event
 ) x
