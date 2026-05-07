@@ -535,7 +535,13 @@ def _gap_bucket_chart(df: pd.DataFrame, *, n_col: str = "n_gaps", group_col: str
     bucket_order = ["lt30d", "30_59d", "60_89d", "90_179d", "180_364d", "365_729d", "ge365d", "ge730d"]
 
     fig = go.Figure()
-    colors = {"ALL_L01": "#1a3a5c", "MET_L01": "#b45309", None: "#1a3a5c"}
+    colors = {
+        "ALL_L01":     "#1a3a5c",
+        "MET_L01":     "#b45309",
+        "ALL_L01_MAX": "#4e86b8",
+        "MET_L01_MAX": "#f0a030",
+        None:          "#1a3a5c",
+    }
 
     if group_col and _col(df, group_col):
         gc = _col(df, group_col)
@@ -567,9 +573,46 @@ def _gap_bucket_chart(df: pd.DataFrame, *, n_col: str = "n_gaps", group_col: str
     return fig
 
 
+# ── Chart: L01 distinct treatment day count ─────────────────────────────────────
+
+def _day_count_chart(df: pd.DataFrame, subgroup: str) -> go.Figure | None:
+    sc = _col(df, "subgroup")
+    bc = _col(df, "days_bucket")
+    nc = _col(df, "n_patients")
+    if not sc or not bc or not nc:
+        return None
+    sub = df[df[sc].astype(str).str.upper() == subgroup.upper()].copy()
+    if sub.empty:
+        return None
+
+    bucket_order = ["1", "2_6", "7_11", "12plus"]
+    bucket_labels = {"1": "1 day", "2_6": "2–6 days", "7_11": "7–11 days", "12plus": "≥12 days"}
+    color = "#1a3a5c" if subgroup.upper() == "ALL_L01" else "#b45309"
+
+    vals_map = {
+        str(r.get(bc, "")): max(0, int(pd.to_numeric(r.get(nc, 0), errors="coerce") or 0))
+        for _, r in sub.iterrows()
+    }
+    xs = [bucket_labels.get(b, b) for b in bucket_order if b in vals_map]
+    ys = [vals_map[b] for b in bucket_order if b in vals_map]
+    if not xs:
+        return None
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(x=xs, y=ys, marker_color=color, opacity=0.85, showlegend=False))
+    layout = _plotly_base_layout()
+    layout.update({
+        "xaxis": dict(title="Distinct L01 treatment days"),
+        "yaxis": dict(title="N patients", gridcolor="#e5e7eb"),
+        "height": 280,
+    })
+    fig.update_layout(**layout)
+    return fig
+
+
 # ── Chart: deaths inside vs outside obs period ───────────────────────────────────
 
-def _death_obs_chart(df: pd.DataFrame) -> go.Figure | None:
+def _death_obs_chart(df: pd.DataFrame, anchor: str = "INDEX") -> go.Figure | None:
     yc = _col(df, "prevalence_year")
     ac = _col(df, "anchor_event")
     nc = _col(df, "n_patients")
@@ -579,28 +622,33 @@ def _death_obs_chart(df: pd.DataFrame) -> go.Figure | None:
     if not yc or not ac or not nd or not nc:
         return None
 
-    idx_sub = df[(df[ac].astype(str).str.upper() == "INDEX") & (df[yc].astype(str).str.upper() != "OVERALL")].copy()
-    if idx_sub.empty:
+    sub = df[(df[ac].astype(str).str.upper() == anchor.upper()) & (df[yc].astype(str).str.upper() != "OVERALL")].copy()
+    if sub.empty:
         return None
-    idx_sub["__y"] = pd.to_numeric(idx_sub[yc].astype(str), errors="coerce")
-    idx_sub = idx_sub.dropna(subset=["__y"]).sort_values("__y")
-    idx_sub = idx_sub[idx_sub["__y"] >= PREVALENCE_YEAR_MIN]
-    years = idx_sub["__y"].astype(int)
+    sub["__y"] = pd.to_numeric(sub[yc].astype(str), errors="coerce")
+    sub = sub.dropna(subset=["__y"]).sort_values("__y")
+    sub = sub[sub["__y"] >= PREVALENCE_YEAR_MIN]
+    years = sub["__y"].astype(int)
 
-    ndeath = pd.to_numeric(idx_sub[nd], errors="coerce")
-    npat = pd.to_numeric(idx_sub[nc], errors="coerce")
+    ndeath = pd.to_numeric(sub[nd], errors="coerce")
+    npat = pd.to_numeric(sub[nc], errors="coerce")
     pct_dead = (ndeath / npat * 100).where((ndeath >= 0) & (npat > 0))
 
+    is_met = anchor.upper() == "FIRST_MET"
+    bar_color = "#4e86b8" if is_met else "#1a3a5c"
+    n_label = "N MET" if is_met else "N DX"
+    x_label = "Year of first MET" if is_met else "Year of first DX"
+
     fig = go.Figure()
-    fig.add_trace(go.Bar(x=years, y=npat, name="N DX", marker_color="#1a3a5c", opacity=0.6))
+    fig.add_trace(go.Bar(x=years, y=npat, name=n_label, marker_color=bar_color, opacity=0.6))
     fig.add_trace(go.Scatter(x=years, y=pct_dead, name="% Deceased",
                              mode="lines+markers", yaxis="y2",
                              line=dict(color="#991b1b", width=2),
                              marker=dict(size=6, color="#991b1b")))
 
     if nio and noo:
-        nin = pd.to_numeric(idx_sub[nio], errors="coerce")
-        nout = pd.to_numeric(idx_sub[noo], errors="coerce")
+        nin = pd.to_numeric(sub[nio], errors="coerce")
+        nout = pd.to_numeric(sub[noo], errors="coerce")
         pct_in = (nin / ndeath * 100).where((nin >= 0) & (ndeath > 0))
         pct_out = (nout / ndeath * 100).where((nout >= 0) & (ndeath > 0))
         fig.add_trace(go.Scatter(x=years, y=pct_in, name="% Deaths in obs. period",
@@ -616,7 +664,7 @@ def _death_obs_chart(df: pd.DataFrame) -> go.Figure | None:
     layout.update({
         "yaxis": dict(title="N patients", gridcolor="#e5e7eb"),
         "yaxis2": dict(title="%", overlaying="y", side="right", showgrid=False, rangemode="tozero"),
-        "xaxis": dict(title="Index year", dtick=2),
+        "xaxis": dict(title=x_label, dtick=2),
         "hovermode": "x unified",
         "height": 360,
     })
@@ -1793,6 +1841,7 @@ def _s04_longitudinal(rd: Path) -> str:
     windows = _read(rd, "final_l01_treatment_windows.csv")
     gap_deciles = _read(rd, "final_l01_gap_deciles.csv")
     gap_buckets = _read(rd, "final_l01_gap_buckets.csv")
+    day_count = _read(rd, "final_l01_day_count_buckets.csv")
 
     parts: list[str] = []
 
@@ -1808,13 +1857,33 @@ def _s04_longitudinal(rd: Path) -> str:
                 + "</div>"
             )
 
-    # Figure 4.3 — gap bucket distribution
+    # Figures 4.4a/b — distinct L01 treatment days per patient (DX cohort / MET subgroup)
+    if day_count is not None:
+        fig_44a = _day_count_chart(day_count, "ALL_L01")
+        fig_44b = _day_count_chart(day_count, "MET_L01")
+        if fig_44a or fig_44b:
+            parts.append(
+                f'<div class="card-grid card-grid-2" style="margin-bottom:16px;">'
+                + (_plot_box(
+                    "Figure 4.4a — Distinct L01 treatment days per patient (DX cohort)",
+                    _fig_div(fig_44a),
+                    sub="Patients with exactly 1 distinct day have no consecutive gap to measure",
+                ) if fig_44a else "")
+                + (_plot_box(
+                    "Figure 4.4b — Distinct L01 treatment days per patient (MET subgroup)",
+                    _fig_div(fig_44b),
+                    sub="Patients with exactly 1 distinct day have no consecutive gap to measure",
+                ) if fig_44b else "")
+                + "</div>"
+            )
+
+    # Figure 4.3 — gap bucket distribution (all four subgroups)
     if gap_buckets is not None:
         fig = _gap_bucket_chart(gap_buckets)
         if fig:
             parts.append(_plot_box(
                 "Figure 4.3 — Distribution of gaps between consecutive L01 records", _fig_div(fig),
-                sub="All L01 patients vs MET subgroup · bimodal shape = empirical episode boundary",
+                sub="All gaps (dark) vs largest gap per patient (light) · DX cohort (blue) and MET subgroup (amber)",
             ))
 
     # Fixed-row gap summary table (Table 4.1)
@@ -1929,199 +1998,240 @@ def _s05_obs_death(rd: Path) -> str:
 
     parts: list[str] = []
 
-    # Stat boxes — deaths focus
-    if death is not None:
-        ac = _col(death, "anchor_event")
-        nc = _col(death, "n_patients")
-        nd = _col(death, "n_deaths")
-        nio = _col(death, "n_deaths_in_obs")
-        noo = _col(death, "n_deaths_out_obs")
-        if ac and nc and nd:
-            yc_death = _col(death, "prevalence_year")
-            if yc_death:
-                o = death[(death[ac].astype(str).str.upper() == "INDEX") & (death[yc_death].astype(str).str.upper() == "OVERALL")]
-            else:
-                o = death[death[ac].astype(str).str.upper() == "INDEX"].head(1)
-            if not o.empty:
-                r = o.iloc[0]
-                np_val = _safe_int(r.get(nc))
-                nd_val = _safe_int(r.get(nd))
-                nio_val = _safe_int(r.get(nio)) if nio else None
-                noo_val = _safe_int(r.get(noo)) if noo else None
-                pct_in = f"{100.0 * nio_val / nd_val:.1f}%" if nio_val and nd_val and nd_val > 0 else "—"
-                pct_out = f"{100.0 * noo_val / nd_val:.1f}%" if noo_val and nd_val and nd_val > 0 else "—"
-                pct_dead = f"{100.0 * nd_val / np_val:.1f}%" if nd_val and np_val and np_val > 0 else "—"
-                # Infer deaths before obs: total - in - out (rough)
-                nd_before_val: int | None = None
-                if nd_val and nio_val is not None and noo_val is not None:
-                    nd_before_val = max(0, nd_val - nio_val - noo_val)
-                pct_before = f"{100.0 * nd_before_val / nd_val:.1f}%" if nd_before_val and nd_val and nd_val > 0 else "—"
-                parts.append(_card_grid(
-                    _stat_box(_fmt_n(nd_val), "Deaths recorded", pct=pct_dead),
-                    _stat_box(_fmt_n(nio_val) if nio_val else "—", "Death within obs. period", pct=pct_in, cls="highlight"),
-                    _stat_box(_fmt_n(noo_val) if noo_val else "—", "Death AFTER obs. period end", pct=pct_out, cls="alert"),
-                    _stat_box(_fmt_n(nd_before_val) if nd_before_val else "—", "Death BEFORE obs. period start", pct=pct_before, cls="warn"),
-                    cols=4,
-                ))
+    # ── Column handles ─────────────────────────────────────────────────────────
+    ac_col  = _col(death, "anchor_event")       if death is not None else None
+    yc_col  = _col(death, "prevalence_year")    if death is not None else None
+    nc_col  = _col(death, "n_patients")         if death is not None else None
+    nd_col  = _col(death, "n_deaths")           if death is not None else None
+    nio_col = _col(death, "n_deaths_in_obs")    if death is not None else None
+    noo_col = _col(death, "n_deaths_out_obs")   if death is not None else None
+    medf_col = _col(death, "median_followup_days") if death is not None else None
+    lqf_col  = _col(death, "lq_followup_days")    if death is not None else None
+    uqf_col  = _col(death, "uq_followup_days")    if death is not None else None
 
-    # Table 5.1 — category breakdown with implication
-    if death is not None:
-        ac = _col(death, "anchor_event")
-        yc = _col(death, "prevalence_year")
-        nc = _col(death, "n_patients")
-        nd = _col(death, "n_deaths")
-        nio = _col(death, "n_deaths_in_obs")
-        noo = _col(death, "n_deaths_out_obs")
-        med_d = _col(death, "median_days")
-        lq_d = _col(death, "lq_days")
-        uq_d = _col(death, "uq_days")
-        if ac and yc and nc and nd:
-            overall = death[
-                (death[ac].astype(str).str.upper() == "INDEX") &
-                (death[yc].astype(str).str.upper() == "OVERALL")
-            ]
-            if not overall.empty:
-                r = overall.iloc[0]
-                np_ = _safe_int(r.get(nc))
-                nd_ = _safe_int(r.get(nd))
-                nio_ = _safe_int(r.get(nio)) if nio else None
-                noo_ = _safe_int(r.get(noo)) if noo else None
-                gap_iqr = _fmt_iqr(r.get(med_d) if med_d else None,
-                                   r.get(lq_d) if lq_d else None,
-                                   r.get(uq_d) if uq_d else None)
-                nd_bef = max(0, nd_ - (nio_ or 0) - (noo_ or 0)) if nd_ else None
+    def _death_overall(anchor: str) -> Any | None:
+        if death is None or not ac_col or not yc_col:
+            return None
+        rows = death[
+            (death[ac_col].astype(str).str.upper() == anchor.upper()) &
+            (death[yc_col].astype(str).str.upper() == "OVERALL")
+        ]
+        return rows.iloc[0] if not rows.empty else None
 
-                cat_rows = [
-                    (
-                        "Death within obs. period", "highlight",
-                        _fmt_n(nio_), _pct_of(nio_, np_),
-                        "—", "Correctly censored; obs. period end is a valid study end point",
-                    ),
-                    (
-                        "Death AFTER obs. period end", "warn",
-                        _fmt_n(noo_), _pct_of(noo_, np_),
-                        gap_iqr, "Death missed by observation window — inflates apparent survival",
-                    ),
-                    (
-                        "Death BEFORE obs. period start", "",
-                        _fmt_n(nd_bef), _pct_of(nd_bef, np_),
-                        "—", "Likely data entry error or retro-coded death date",
-                    ),
-                ]
-                def _cat_row(cat: str, cls: str, n: str, pct: str, gap: str, imp: str) -> str:
-                    row_cls = ' class="highlight"' if cls == "highlight" else ""
-                    return (
-                        f'<tr{row_cls}>'
-                        f'<td>{cat}</td>'
-                        f'<td class="num">{n}</td>'
-                        f'<td class="num">{pct}</td>'
-                        f'<td class="num">{gap}</td>'
-                        f'<td>{imp}</td>'
-                        f'</tr>'
-                    )
-                rows_html = "".join(_cat_row(*row) for row in cat_rows)
-                tbl = (
-                    '<table class="rt"><thead><tr>'
-                    f'<th>Category</th>'
-                    f'<th class="num">N (DX cohort, N={_fmt_n(np_)})</th>'
-                    '<th class="num">%</th>'
-                    '<th class="num">Gap: median days (IQR)</th>'
-                    '<th>Implication</th>'
-                    '</tr></thead><tbody>' + rows_html + '</tbody></table>'
+    def _obs_gap_iqr(anchor: str) -> str:
+        if gap_summary is None:
+            return "—"
+        ac_gs = _col(gap_summary, "anchor_event")
+        if not ac_gs:
+            return "—"
+        rows = gap_summary[gap_summary[ac_gs].astype(str).str.upper() == anchor.upper()]
+        if rows.empty:
+            return "—"
+        gs_r = rows.iloc[0]
+        return _fmt_iqr(
+            gs_r.get(_col(gap_summary, "median_gap_days")),
+            gs_r.get(_col(gap_summary, "lq_gap_days")),
+            gs_r.get(_col(gap_summary, "uq_gap_days")),
+        )
+
+    # ── Stat boxes — DX cohort (4 boxes) ──────────────────────────────────────
+    if death is not None and ac_col and nc_col and nd_col:
+        r = _death_overall("INDEX")
+        if r is not None:
+            np_val  = _safe_int(r.get(nc_col))
+            nd_val  = _safe_int(r.get(nd_col))
+            nio_val = _safe_int(r.get(nio_col)) if nio_col else None
+            noo_val = _safe_int(r.get(noo_col)) if noo_col else None
+            pct_dead   = f"{100.0 * nd_val / np_val:.1f}%"   if nd_val  and np_val  and np_val  > 0 else "—"
+            pct_in     = f"{100.0 * nio_val / nd_val:.1f}%"  if nio_val and nd_val  and nd_val  > 0 else "—"
+            pct_out    = f"{100.0 * noo_val / nd_val:.1f}%"  if noo_val and nd_val  and nd_val  > 0 else "—"
+            nd_bef_val = max(0, nd_val - (nio_val or 0) - (noo_val or 0)) if nd_val else None
+            pct_before = f"{100.0 * nd_bef_val / nd_val:.1f}%" if nd_bef_val and nd_val and nd_val > 0 else "—"
+            parts.append(_card_grid(
+                _stat_box(_fmt_n(nd_val), "Deaths recorded (DX cohort)", pct=pct_dead),
+                _stat_box(_fmt_n(nio_val) if nio_val else "—", "Death within obs. period", pct=pct_in, cls="highlight"),
+                _stat_box(_fmt_n(noo_val) if noo_val else "—", "Death AFTER obs. period end", pct=pct_out, cls="alert"),
+                _stat_box(_fmt_n(nd_bef_val) if nd_bef_val else "—", "Death BEFORE obs. period start", pct=pct_before, cls="warn"),
+                cols=4,
+            ))
+
+    # ── Stat boxes — MET subgroup (3 boxes) ───────────────────────────────────
+    if death is not None and ac_col and nc_col and nd_col:
+        r = _death_overall("FIRST_MET")
+        if r is not None:
+            np_val_m  = _safe_int(r.get(nc_col))
+            nd_val_m  = _safe_int(r.get(nd_col))
+            nio_val_m = _safe_int(r.get(nio_col)) if nio_col else None
+            noo_val_m = _safe_int(r.get(noo_col)) if noo_col else None
+            pct_dead_m = f"{100.0 * nd_val_m / np_val_m:.1f}%" if nd_val_m and np_val_m and np_val_m > 0 else "—"
+            pct_in_m   = f"{100.0 * nio_val_m / nd_val_m:.1f}%" if nio_val_m and nd_val_m and nd_val_m > 0 else "—"
+            pct_out_m  = f"{100.0 * noo_val_m / nd_val_m:.1f}%" if noo_val_m and nd_val_m and nd_val_m > 0 else "—"
+            parts.append(_card_grid(
+                _stat_box(_fmt_n(nd_val_m), "Deaths recorded (MET subgroup)", pct=pct_dead_m),
+                _stat_box(_fmt_n(nio_val_m) if nio_val_m else "—", "Death within obs. period", pct=pct_in_m, cls="highlight"),
+                _stat_box(_fmt_n(noo_val_m) if noo_val_m else "—", "Death AFTER obs. period end", pct=pct_out_m, cls="alert"),
+                cols=3,
+            ))
+
+    # ── Table 5.1 — death vs obs alignment, both anchors ──────────────────────
+    if death is not None and ac_col and yc_col and nc_col and nd_col:
+        r_i = _death_overall("INDEX")
+        r_m = _death_overall("FIRST_MET")
+        if r_i is not None:
+            def _row_vals(r: Any | None) -> tuple:
+                if r is None:
+                    return None, None, None, None, None
+                np_ = _safe_int(r.get(nc_col))
+                nd_ = _safe_int(r.get(nd_col))
+                nio_ = _safe_int(r.get(nio_col)) if nio_col else None
+                noo_ = _safe_int(r.get(noo_col)) if noo_col else None
+                return np_, nd_, nio_, noo_, max(0, nd_ - (nio_ or 0) - (noo_ or 0)) if nd_ else None
+
+            np_i, nd_i, nio_i, noo_i, nbef_i = _row_vals(r_i)
+            np_m, nd_m, nio_m, noo_m, nbef_m = _row_vals(r_m)
+
+            def _dual_row(cat: str, cls: str,
+                          n_i: str, pct_i: str, gap_i: str,
+                          n_m: str, pct_m: str, gap_m: str,
+                          imp: str) -> str:
+                row_cls = ' class="highlight"' if cls == "highlight" else ""
+                return (
+                    f'<tr{row_cls}><td>{_e(cat)}</td>'
+                    f'<td class="num">{n_i}</td><td class="num">{pct_i}</td><td class="num">{gap_i}</td>'
+                    f'<td class="num">{n_m}</td><td class="num">{pct_m}</td><td class="num">{gap_m}</td>'
+                    f'<td>{imp}</td></tr>'
                 )
-                parts.append(_card(
-                    f"Table 5.1 — Death vs observation period alignment",
-                    _tbl_wrap(tbl),
-                ))
 
-    # Table 5.2 — year-by-year deaths
-    if death is not None:
-        ac = _col(death, "anchor_event")
-        yc = _col(death, "prevalence_year")
-        nc = _col(death, "n_patients")
-        nd = _col(death, "n_deaths")
-        nio = _col(death, "n_deaths_in_obs")
-        noo = _col(death, "n_deaths_out_obs")
-        med_g = _col(death, "median_days")
-        lq_g = _col(death, "lq_days")
-        uq_g = _col(death, "uq_days")
-        med_f = _col(death, "median_followup_days")
-        lq_f = _col(death, "lq_followup_days")
-        uq_f = _col(death, "uq_followup_days")
-        if ac and yc and nc and nd:
-            yearly = death[
-                (death[ac].astype(str).str.upper() == "INDEX") &
-                (death[yc].astype(str).str.upper() != "OVERALL")
+            rows_51 = [
+                _dual_row("Death within obs. period", "highlight",
+                          _fmt_n(nio_i), _pct_of(nio_i, np_i), "—",
+                          _fmt_n(nio_m), _pct_of(nio_m, np_m), "—",
+                          "Correctly censored; obs. period end is a valid study end point"),
+                _dual_row("Death AFTER obs. period end", "warn",
+                          _fmt_n(noo_i), _pct_of(noo_i, np_i), _obs_gap_iqr("INDEX"),
+                          _fmt_n(noo_m), _pct_of(noo_m, np_m), _obs_gap_iqr("FIRST_MET"),
+                          "Death missed by observation window — inflates apparent survival"),
+                _dual_row("Death BEFORE obs. period start", "",
+                          _fmt_n(nbef_i), _pct_of(nbef_i, np_i), "—",
+                          _fmt_n(nbef_m), _pct_of(nbef_m, np_m), "—",
+                          "Likely data entry error or retro-coded death date"),
+            ]
+            n_i_lbl = f"N (DX cohort, N={_fmt_n(np_i)})"
+            n_m_lbl = f"N (MET subgroup, N={_fmt_n(np_m)})" if np_m else "N (MET subgroup)"
+            tbl = (
+                '<table class="rt"><thead><tr>'
+                f'<th>Category</th>'
+                f'<th class="num">{_e(n_i_lbl)}</th><th class="num">%</th><th class="num">Gap IQR (DX)</th>'
+                f'<th class="num">{_e(n_m_lbl)}</th><th class="num">%</th><th class="num">Gap IQR (MET)</th>'
+                f'<th>Implication</th>'
+                '</tr></thead><tbody>' + "".join(rows_51) + '</tbody></table>'
+            )
+            parts.append(_card("Table 5.1 — Death vs observation period alignment", _tbl_wrap(tbl)))
+
+    # ── Table 5.2 — year-by-year deaths, both anchors interleaved ─────────────
+    if death is not None and ac_col and yc_col and nc_col and nd_col:
+        def _yearly(anchor: str) -> pd.DataFrame:
+            df_ = death[
+                (death[ac_col].astype(str).str.upper() == anchor.upper()) &
+                (death[yc_col].astype(str).str.upper() != "OVERALL")
             ].copy()
-            yearly["__y"] = pd.to_numeric(yearly[yc].astype(str), errors="coerce")
-            yearly = yearly.dropna(subset=["__y"]).sort_values("__y")
-            yearly = yearly[yearly["__y"] >= PREVALENCE_YEAR_MIN]
-            if not yearly.empty:
-                overall_row = death[
-                    (death[ac].astype(str).str.upper() == "INDEX") &
-                    (death[yc].astype(str).str.upper() == "OVERALL")
-                ]
-                rows = []
-                all_rows = ([("Overall", overall_row.iloc[0] if not overall_row.empty else None)] +
-                            [("", r) for _, r in yearly.iterrows()])
-                for yr_lbl_override, r in all_rows:
-                    if r is None:
-                        continue
-                    yr_val = yr_lbl_override or str(int(_safe_int(r.get(yc)) or 0))
-                    np_ = _safe_int(r.get(nc))
-                    nd_ = _safe_int(r.get(nd))
-                    nio_ = _safe_int(r.get(nio)) if nio else None
-                    noo_ = _safe_int(r.get(noo)) if noo else None
-                    pct_dead = f"{100.0 * nd_ / np_:.1f}%" if nd_ and np_ and np_ > 0 else "—"
-                    pct_out = f"{100.0 * noo_ / nd_:.1f}%" if noo_ and nd_ and nd_ > 0 else "—"
-                    fup = _fmt_iqr(r.get(med_f) if med_f else None,
-                                   r.get(lq_f) if lq_f else None,
-                                   r.get(uq_f) if uq_f else None)
-                    row_cls = ' class="highlight"' if yr_lbl_override == "Overall" else ""
-                    anchor_lbl = "Index DX"
-                    rows.append(
-                        f'<tr{row_cls}>'
-                        f'<td>{_e(yr_val)}</td>'
-                        f'<td>{_e(anchor_lbl)}</td>'
-                        f'<td class="num">{_fmt_n(np_)}</td>'
-                        f'<td class="num">{_fmt_n(nd_)} ({pct_dead})</td>'
-                        f'<td class="num">{_fmt_n(nio_)}</td>'
-                        f'<td class="num">{_fmt_n(noo_)} ({pct_out}) {_badge("new") if yr_lbl_override == "Overall" else ""}</td>'
-                        f'<td class="num">{_e(fup)}</td>'
-                        f'</tr>'
-                    )
-                if rows:
-                    tbl = (
-                        '<table class="rt"><thead><tr>'
-                        '<th>Year</th><th>Anchor</th><th class="num">N</th>'
-                        '<th class="num">Deaths (%)</th>'
-                        '<th class="num">Deaths in obs. period</th>'
-                        f'<th class="num">Deaths outside obs. period {_badge("new")}</th>'
-                        '<th class="num">Days to death (IQR)</th>'
-                        '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
-                    )
-                    parts.append(_card(
-                        "Table 5.2 — Deaths by year: inside vs outside observation period (DX cohort)",
-                        _tbl_wrap(tbl),
-                    ))
+            df_["__y"] = pd.to_numeric(df_[yc_col].astype(str), errors="coerce")
+            df_ = df_.dropna(subset=["__y"]).sort_values("__y")
+            return df_[df_["__y"] >= PREVALENCE_YEAR_MIN]
 
+        yi = _yearly("INDEX")
+        ym = _yearly("FIRST_MET")
+
+        if not yi.empty:
+            ov_i = _death_overall("INDEX")
+            ov_m = _death_overall("FIRST_MET")
+            all_years = sorted(set(yi["__y"].tolist()) | set(ym["__y"].tolist()))
+
+            all_52: list[tuple] = []
+            if ov_i is not None:
+                all_52.append(("Overall", ov_i, "INDEX", True))
+            if ov_m is not None:
+                all_52.append(("", ov_m, "FIRST_MET", True))
+            for y in all_years:
+                ri = yi[yi["__y"] == y]
+                rm = ym[ym["__y"] == y]
+                if not ri.empty:
+                    all_52.append((str(int(y)), ri.iloc[0], "INDEX", False))
+                if not rm.empty:
+                    all_52.append(("", rm.iloc[0], "FIRST_MET", False))
+
+            rows_52 = []
+            for yr_lbl, r, anch, is_overall in all_52:
+                anchor_lbl = "Index DX" if anch == "INDEX" else "First MET"
+                np_ = _safe_int(r.get(nc_col))
+                nd_ = _safe_int(r.get(nd_col))
+                nio_ = _safe_int(r.get(nio_col)) if nio_col else None
+                noo_ = _safe_int(r.get(noo_col)) if noo_col else None
+                pct_dead = f"{100.0 * nd_ / np_:.1f}%" if nd_ and np_ and np_ > 0 else "—"
+                pct_out  = f"{100.0 * noo_ / nd_:.1f}%" if noo_ and nd_ and nd_ > 0 else "—"
+                fup = _fmt_iqr(r.get(medf_col) if medf_col else None,
+                               r.get(lqf_col)  if lqf_col  else None,
+                               r.get(uqf_col)  if uqf_col  else None)
+                row_cls = ' class="highlight"' if is_overall and anch == "INDEX" else ""
+                rows_52.append(
+                    f'<tr{row_cls}>'
+                    f'<td>{_e(yr_lbl)}</td><td>{_e(anchor_lbl)}</td>'
+                    f'<td class="num">{_fmt_n(np_)}</td>'
+                    f'<td class="num">{_fmt_n(nd_)} ({pct_dead})</td>'
+                    f'<td class="num">{_fmt_n(nio_)}</td>'
+                    f'<td class="num">{_fmt_n(noo_)} ({pct_out})</td>'
+                    f'<td class="num">{_e(fup)}</td>'
+                    f'</tr>'
+                )
+
+            tbl = (
+                '<table class="rt"><thead><tr>'
+                '<th>Year</th><th>Anchor</th><th class="num">N</th>'
+                '<th class="num">Deaths (%)</th>'
+                '<th class="num">Deaths in obs. period</th>'
+                '<th class="num">Deaths outside obs. period</th>'
+                '<th class="num">Follow-up days (IQR)</th>'
+                '</tr></thead><tbody>' + "\n".join(rows_52) + '</tbody></table>'
+            )
+            parts.append(_card(
+                "Table 5.2 — Deaths by year: inside vs outside observation period",
+                _tbl_wrap(tbl),
+            ))
+
+    # ── Figures 5.1a/b — death gap bucket histograms ──────────────────────────
     if gap_buckets is not None:
-        fig = _gap_bucket_chart(gap_buckets, n_col="n_patients", group_col=None)
-        if fig:
-            parts.append(_plot_box(
-                "Figure 5.1 — Gap distribution: death date − obs. period end", _fig_div(fig),
-                sub="Patients whose death date falls outside their observation window",
-            ))
+        ac_gb = _col(gap_buckets, "anchor_event")
+        if ac_gb:
+            gb_i = gap_buckets[gap_buckets[ac_gb].astype(str).str.upper() == "INDEX"]
+            gb_m = gap_buckets[gap_buckets[ac_gb].astype(str).str.upper() == "FIRST_MET"]
+        else:
+            gb_i = gap_buckets
+            gb_m = pd.DataFrame()
+        fig_51a = _gap_bucket_chart(gb_i, n_col="n_patients", group_col=None) if not gb_i.empty else None
+        fig_51b = _gap_bucket_chart(gb_m, n_col="n_patients", group_col=None) if not gb_m.empty else None
+        if fig_51a or fig_51b:
+            parts.append(
+                f'<div class="card-grid card-grid-2" style="margin-bottom:16px;">'
+                + (_plot_box("Figure 5.1a — Death gap: DX cohort", _fig_div(fig_51a),
+                             sub="Days from obs. period end to death · DX cohort") if fig_51a else "")
+                + (_plot_box("Figure 5.1b — Death gap: MET subgroup", _fig_div(fig_51b),
+                             sub="Days from obs. period end to death · MET subgroup") if fig_51b else "")
+                + "</div>"
+            )
 
-    # Deaths by year chart
+    # ── Figures 5.2a/b — deaths by calendar year ──────────────────────────────
     if death is not None:
-        fig = _death_obs_chart(death)
-        if fig:
-            parts.append(_plot_box(
-                "Figure 5.2 — Deaths by calendar year: inside vs outside obs. period",
-                _fig_div(fig), badge="expanded",
-                sub="% deaths outside obs. period is the key data quality signal",
-            ))
+        fig_52a = _death_obs_chart(death, anchor="INDEX")
+        fig_52b = _death_obs_chart(death, anchor="FIRST_MET")
+        if fig_52a or fig_52b:
+            parts.append(
+                f'<div class="card-grid card-grid-2" style="margin-bottom:16px;">'
+                + (_plot_box("Figure 5.2a — Deaths by calendar year: DX cohort", _fig_div(fig_52a),
+                             sub="% deaths outside obs. period is the key data quality signal") if fig_52a else "")
+                + (_plot_box("Figure 5.2b — Deaths by calendar year: MET subgroup", _fig_div(fig_52b),
+                             sub="% deaths outside obs. period is the key data quality signal") if fig_52b else "")
+                + "</div>"
+            )
 
     if not parts:
         parts.append('<p style="color:var(--text-3);font-style:italic;">Death/obs data not yet available.</p>')
