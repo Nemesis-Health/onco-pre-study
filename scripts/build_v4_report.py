@@ -1597,7 +1597,6 @@ def _s03_treatment_timing(rd: Path) -> str:
     prev = _read(rd, "final_population_prevalence.csv")
     n_dx = None
     n_met_s3: int | None = None
-    n_l01_s3: int | None = None
     if prev is not None:
         oc = _col(prev, "prevalence_year")
         if oc:
@@ -1605,7 +1604,24 @@ def _s03_treatment_timing(rd: Path) -> str:
             if not o.empty:
                 n_dx = _safe_int(o.iloc[0].get(_col(prev, "n_dx")))
                 n_met_s3 = _safe_int(o.iloc[0].get(_col(prev, "n_met")))
-                n_l01_s3 = _safe_int(o.iloc[0].get(_col(prev, "n_l01")))
+
+    # MET patients with L01 = sum of non-NO_EVENT rows for MET_L01 OVERALL
+    n_met_l01: int | None = None
+    if directionality is not None:
+        pc = _col(directionality, "pair")
+        yc = _col(directionality, "index_year")
+        dc = _col(directionality, "direction")
+        nc = _col(directionality, "n_patients")
+        if pc and yc and dc and nc:
+            sub = directionality[
+                (directionality[pc].astype(str).str.upper() == "MET_L01") &
+                (directionality[yc].astype(str).str.upper() == "OVERALL") &
+                (directionality[dc].astype(str).str.upper() != "NO_EVENT")
+            ]
+            vals = pd.to_numeric(sub[nc], errors="coerce").dropna()
+            total = int(vals[vals > 0].sum())
+            if total > 0:
+                n_met_l01 = total
 
     parts: list[str] = []
 
@@ -1613,10 +1629,10 @@ def _s03_treatment_timing(rd: Path) -> str:
     if directionality is not None:
         tbl = _directionality_table(
             directionality, "MET_L01", _MET_L01_DIR_LABELS,
-            n_total=n_l01_s3, interp=_MET_L01_IMPLICATION, col4_header="Phenotype implication",
+            n_total=n_met_l01, interp=_MET_L01_IMPLICATION, col4_header="Phenotype implication",
         )
         if tbl:
-            n_lbl = f"N={n_l01_s3:,}" if n_l01_s3 else "MET+L01 subgroup"
+            n_lbl = f"N={n_met_l01:,}" if n_met_l01 else "MET+L01 subgroup"
             parts.append(_card(
                 f"Table 3.1 — MET ↔ L01 temporal directionality (first to first)",
                 tbl + f'<p class="tbl-note">MET patients with L01 only ({n_lbl}). % denominated on MET+L01 subgroup. NO_EVENT = patients with MET but no L01 ever.</p>',
