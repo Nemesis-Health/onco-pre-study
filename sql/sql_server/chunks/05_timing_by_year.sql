@@ -62,5 +62,5 @@ ORDER BY
     x.timing_type,
     x.from_event,
     x.to_event,
-    TRY_CAST(x.index_year AS INT)
+    CAST(x.index_year AS INT)
 ;
