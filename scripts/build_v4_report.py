@@ -1562,7 +1562,7 @@ def _s02_gdx_odx(rd: Path) -> str:
                     iqr2 = f" (IQR {int(round(p25v2))}–{int(round(p75v2))})" if p25v2 and p75v2 else ""
                     sub2 = f"Anchored on DX · days positive = ODX after DX · median {int(round(med2))}d{iqr2}"
             parts.append(_plot_box(
-                "Figure 2.2 — ODX timing relative to DX index (full distribution, not zoomed)",
+                "Figure 2.2 — ODX timing relative to DX index (first to first)",
                 _fig_div(fig2), sub=sub2,
             ))
 
