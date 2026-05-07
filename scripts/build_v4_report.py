@@ -1471,21 +1471,19 @@ def _s02_gdx_odx(rd: Path) -> str:
                 ids = [int(x) for x in gdx[cid_col].dropna().astype(int).tolist()]
                 names_map = _fetch_concept_names(ids)
                 rows = []
-                for i, (_, r) in enumerate(gdx.iterrows(), 1):
+                for _, r in gdx.iterrows():
                     cid = _safe_int(r.get(cid_col))
                     cname = names_map.get(cid, "") if cid else ""
                     np_ = _safe_int(r.get(np_col))
                     pct_ = _pct_of(np_, n_dx) if n_dx else "—"
                     rows.append(
-                        f"<tr><td>{i}</td>"
-                        f'<td><code>{_e(str(cid))}</code></td>'
-                        f"<td>{_e(cname)}</td>"
+                        f"<tr><td><code>{_e(str(cid))}</code> {_e(cname)}</td>"
                         f'<td class="num">{_fmt_n(np_)}</td>'
                         f'<td class="num">{pct_}</td></tr>'
                     )
                 tbl = (
                     '<table class="rt"><thead><tr>'
-                    '<th>#</th><th>Concept ID</th><th>Concept name</th>'
+                    '<th>Concept</th>'
                     '<th class="num">Patients (any time)</th><th class="num">% DX cohort</th>'
                     '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
                 )
