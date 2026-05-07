@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-07 11:54:00 BST
+-- Translated     : 2026-05-07 11:58:18 BST
 -- Source file    : sql/sql_server/chunks/09_demographics.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -20,14 +20,14 @@ with anchor_persons as (
         'INDEX' as anchor_event,
         c.person_id,
         c.index_date as anchor_date
-    from ctxb0wompatient_char c
+    from y8hp12zkpatient_char c
     where c.index_date is not null
     union all
     select
         'FIRST_MET' as anchor_event,
         c.person_id,
         c.first_met_date as anchor_date
-    from ctxb0wompatient_char c
+    from y8hp12zkpatient_char c
     where c.first_met_date is not null
 ),
 base as (

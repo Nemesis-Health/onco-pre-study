@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : spark
--- Translated     : 2026-05-07 11:54:01 BST
+-- Translated     : 2026-05-07 11:58:19 BST
 -- Source file    : sql/sql_server/chunks/06_windowed_odx_prevalence.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -13,39 +13,55 @@
 --   Without it, #temp table references become permanent tables and
 --   may cause permission errors or name collisions.
 
-WITH odx_gdx_events  AS (SELECT  CAST('ODX' as STRING) AS event_family,
- e.concept_id,
- e.person_id,
- DATEDIFF(DAY, c.index_date, e.event_date) AS days_from_index
- FROM ctxb0womother_dx_events e
- JOIN ctxb0womcohort c ON e.person_id = c.person_id
+WITH index_events  AS (SELECT  CAST('INDEX' as STRING) AS anchor_event, 'ODX' AS event_family, e.concept_id, e.person_id,
+ DATEDIFF(DAY, c.index_date, e.event_date) AS days_from_anchor
+ FROM y8hp12zkother_dx_events e
+ JOIN y8hp12zkcohort c ON e.person_id = c.person_id
  UNION ALL
- -- GDX events with days relative to index_date
- SELECT
- 'GDX' AS event_family,
- e.concept_id,
- e.person_id,
- DATEDIFF(DAY, c.index_date, e.event_date) AS days_from_index
- FROM ctxb0womgen_cancer_events e
- JOIN ctxb0womcohort c ON e.person_id = c.person_id
+ SELECT 'INDEX' AS anchor_event, 'GDX' AS event_family, e.concept_id, e.person_id,
+ DATEDIFF(DAY, c.index_date, e.event_date) AS days_from_anchor
+ FROM y8hp12zkgen_cancer_events e
+ JOIN y8hp12zkcohort c ON e.person_id = c.person_id
+),
+met_events AS (
+ SELECT 'FIRST_MET' AS anchor_event, 'ODX' AS event_family, e.concept_id, e.person_id,
+ DATEDIFF(DAY, ms.first_met_date, e.event_date) AS days_from_anchor
+ FROM y8hp12zkother_dx_events e
+ JOIN y8hp12zkcohort c ON e.person_id = c.person_id
+ JOIN y8hp12zkmet_summary ms ON ms.person_id = c.person_id
+ WHERE ms.first_met_date IS NOT NULL
+ UNION ALL
+ SELECT 'FIRST_MET' AS anchor_event, 'GDX' AS event_family, e.concept_id, e.person_id,
+ DATEDIFF(DAY, ms.first_met_date, e.event_date) AS days_from_anchor
+ FROM y8hp12zkgen_cancer_events e
+ JOIN y8hp12zkcohort c ON e.person_id = c.person_id
+ JOIN y8hp12zkmet_summary ms ON ms.person_id = c.person_id
+ WHERE ms.first_met_date IS NOT NULL
+),
+all_events AS (
+ SELECT * FROM index_events
+ UNION ALL
+ SELECT * FROM met_events
 ),
 windowed AS (
  SELECT
+ anchor_event,
  event_family,
  concept_id,
  person_id,
- MAX(CASE WHEN days_from_index >= -30 AND days_from_index <= 30 THEN 1 ELSE 0 END) AS in_pm30d,
- MAX(CASE WHEN days_from_index >= -90 AND days_from_index <= 90 THEN 1 ELSE 0 END) AS in_pm90d,
- MAX(CASE WHEN days_from_index >= -180 AND days_from_index <= 180 THEN 1 ELSE 0 END) AS in_pm180d,
- MAX(CASE WHEN days_from_index >= -365 AND days_from_index <= 365 THEN 1 ELSE 0 END) AS in_pm1yr,
- MAX(CASE WHEN days_from_index < 0 THEN 1 ELSE 0 END) AS in_ever_before,
- MAX(CASE WHEN days_from_index >= 0 THEN 1 ELSE 0 END) AS in_ever_after,
+ MAX(CASE WHEN days_from_anchor >= -30 AND days_from_anchor <= 30 THEN 1 ELSE 0 END) AS in_pm30d,
+ MAX(CASE WHEN days_from_anchor >= -90 AND days_from_anchor <= 90 THEN 1 ELSE 0 END) AS in_pm90d,
+ MAX(CASE WHEN days_from_anchor >= -180 AND days_from_anchor <= 180 THEN 1 ELSE 0 END) AS in_pm180d,
+ MAX(CASE WHEN days_from_anchor >= -365 AND days_from_anchor <= 365 THEN 1 ELSE 0 END) AS in_pm1yr,
+ MAX(CASE WHEN days_from_anchor < 0 THEN 1 ELSE 0 END) AS in_ever_before,
+ MAX(CASE WHEN days_from_anchor >= 0 THEN 1 ELSE 0 END) AS in_ever_after,
  1 AS in_ever
- FROM odx_gdx_events
- GROUP BY event_family, concept_id, person_id
+ FROM all_events
+ GROUP BY anchor_event, event_family, concept_id, person_id
 ),
 agg AS (
  SELECT
+ anchor_event,
  event_family,
  concept_id,
  COUNT(*) AS n_ever,
@@ -56,9 +72,10 @@ agg AS (
  SUM(in_ever_before) AS n_ever_before,
  SUM(in_ever_after) AS n_ever_after
  FROM windowed
- GROUP BY event_family, concept_id
+ GROUP BY anchor_event, event_family, concept_id
 )
 SELECT
+ a.anchor_event,
  a.event_family,
  a.concept_id,
  CASE WHEN a.n_ever <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever END AS n_ever,
@@ -69,4 +86,8 @@ SELECT
  CASE WHEN a.n_ever_before <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_before END AS n_ever_before,
  CASE WHEN a.n_ever_after <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_after END AS n_ever_after
 FROM agg a
-ORDER BY a.event_family, a.n_ever DESC, a.concept_id;
+ORDER BY
+ CASE WHEN a.anchor_event = 'INDEX' THEN 0 ELSE 1 END,
+ a.event_family,
+ a.n_ever DESC,
+ a.concept_id;

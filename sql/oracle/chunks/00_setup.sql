@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : oracle
--- Translated     : 2026-05-07 11:53:52 BST
+-- Translated     : 2026-05-07 11:58:10 BST
 -- Source file    : sql/sql_server/chunks/00_setup.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -63,8 +63,8 @@ Cross-dialect / SqlRender
 -- Expanded with concept_ancestor (includeDescendants / isExcluded match Atlas).
 ------------------------------------------------------------
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdx_anchor_include';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdx_anchor_include';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdx_anchor_include';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdx_anchor_include';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -72,37 +72,37 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdx_anchor_include';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdx_anchor_include';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdx_anchor_include';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdx_anchor_include';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womdx_anchor_include (
+CREATE TABLE y8hp12zkdx_anchor_include (
     concept_id NUMBER(19) NOT NULL,
     include_descendants SMALLINT NOT NULL
 );
 INSERT ALL
-INTO ctxb0womdx_anchor_include        (concept_id, include_descendants) VALUES (INTO ctxb0womdx_anchor_include      (concept_id, include_descendants) VALUES (INTO ctxb0womdx_anchor_include    (concept_id, include_descendants) VALUES (INTO ctxb0womdx_anchor_include  (concept_id, include_descendants) VALUES (197508, 1)
- INTO ctxb0womdx_anchor_include  (concept_id, include_descendants) VALUES (4181357, 1)
+INTO y8hp12zkdx_anchor_include        (concept_id, include_descendants) VALUES (INTO y8hp12zkdx_anchor_include      (concept_id, include_descendants) VALUES (INTO y8hp12zkdx_anchor_include    (concept_id, include_descendants) VALUES (INTO y8hp12zkdx_anchor_include  (concept_id, include_descendants) VALUES (197508, 1)
+ INTO y8hp12zkdx_anchor_include  (concept_id, include_descendants) VALUES (4181357, 1)
 )
- INTO ctxb0womdx_anchor_include   (concept_id, include_descendants) VALUES (4177230, 1)
+ INTO y8hp12zkdx_anchor_include   (concept_id, include_descendants) VALUES (4177230, 1)
 )
- INTO ctxb0womdx_anchor_include    (concept_id, include_descendants) VALUES (37163176, 1)
+ INTO y8hp12zkdx_anchor_include    (concept_id, include_descendants) VALUES (37163176, 1)
 )
- INTO ctxb0womdx_anchor_include     (concept_id, include_descendants) VALUES (4178972, 1)
+ INTO y8hp12zkdx_anchor_include     (concept_id, include_descendants) VALUES (4178972, 1)
 )
- INTO ctxb0womdx_anchor_include      (concept_id, include_descendants) VALUES (4091486, 0)
+ INTO y8hp12zkdx_anchor_include      (concept_id, include_descendants) VALUES (4091486, 0)
 )
- INTO ctxb0womdx_anchor_include       (concept_id, include_descendants) VALUES (44501785, 0)
+ INTO y8hp12zkdx_anchor_include       (concept_id, include_descendants) VALUES (44501785, 0)
 )
- INTO ctxb0womdx_anchor_include        (concept_id, include_descendants) VALUES (37110270, 1)
+ INTO y8hp12zkdx_anchor_include        (concept_id, include_descendants) VALUES (37110270, 1)
 SELECT *   FROM DUAL;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdx_anchor_exclude';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdx_anchor_exclude';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdx_anchor_exclude';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdx_anchor_exclude';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -110,39 +110,39 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdx_anchor_exclude';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdx_anchor_exclude';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdx_anchor_exclude';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdx_anchor_exclude';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womdx_anchor_exclude (
+CREATE TABLE y8hp12zkdx_anchor_exclude (
     concept_id NUMBER(19) NOT NULL,
     include_descendants SMALLINT NOT NULL
 );
 INSERT ALL
-INTO ctxb0womdx_anchor_exclude         (concept_id, include_descendants) VALUES (INTO ctxb0womdx_anchor_exclude       (concept_id, include_descendants) VALUES (INTO ctxb0womdx_anchor_exclude     (concept_id, include_descendants) VALUES (INTO ctxb0womdx_anchor_exclude   (concept_id, include_descendants) VALUES (4280899, 1)
- INTO ctxb0womdx_anchor_exclude  (concept_id, include_descendants) VALUES (4289374, 1)
+INTO y8hp12zkdx_anchor_exclude         (concept_id, include_descendants) VALUES (INTO y8hp12zkdx_anchor_exclude       (concept_id, include_descendants) VALUES (INTO y8hp12zkdx_anchor_exclude     (concept_id, include_descendants) VALUES (INTO y8hp12zkdx_anchor_exclude   (concept_id, include_descendants) VALUES (4280899, 1)
+ INTO y8hp12zkdx_anchor_exclude  (concept_id, include_descendants) VALUES (4289374, 1)
 )
- INTO ctxb0womdx_anchor_exclude   (concept_id, include_descendants) VALUES (4280900, 1)
+ INTO y8hp12zkdx_anchor_exclude   (concept_id, include_descendants) VALUES (4280900, 1)
 )
- INTO ctxb0womdx_anchor_exclude    (concept_id, include_descendants) VALUES (4283614, 1)
+ INTO y8hp12zkdx_anchor_exclude    (concept_id, include_descendants) VALUES (4283614, 1)
 )
- INTO ctxb0womdx_anchor_exclude     (concept_id, include_descendants) VALUES (4289097, 1)
+ INTO y8hp12zkdx_anchor_exclude     (concept_id, include_descendants) VALUES (4289097, 1)
 )
- INTO ctxb0womdx_anchor_exclude      (concept_id, include_descendants) VALUES (4280901, 1)
+ INTO y8hp12zkdx_anchor_exclude      (concept_id, include_descendants) VALUES (4280901, 1)
 )
- INTO ctxb0womdx_anchor_exclude       (concept_id, include_descendants) VALUES (4289376, 1)
+ INTO y8hp12zkdx_anchor_exclude       (concept_id, include_descendants) VALUES (4289376, 1)
 )
- INTO ctxb0womdx_anchor_exclude        (concept_id, include_descendants) VALUES (4280897, 1)
+ INTO y8hp12zkdx_anchor_exclude        (concept_id, include_descendants) VALUES (4280897, 1)
 )
- INTO ctxb0womdx_anchor_exclude         (concept_id, include_descendants) VALUES (4200889, 1)
+ INTO y8hp12zkdx_anchor_exclude         (concept_id, include_descendants) VALUES (4200889, 1)
 SELECT *   FROM DUAL;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdx_anchor_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdx_anchor_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdx_anchor_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdx_anchor_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -150,29 +150,29 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdx_anchor_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdx_anchor_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdx_anchor_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdx_anchor_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womdx_anchor_concepts (
+CREATE TABLE y8hp12zkdx_anchor_concepts (
     concept_id NUMBER(19)
 );
-INSERT INTO ctxb0womdx_anchor_concepts (concept_id)
+INSERT INTO y8hp12zkdx_anchor_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
-FROM ctxb0womdx_anchor_include i
+FROM y8hp12zkdx_anchor_include i
 JOIN @cdm_database_schema.concept_ancestor ca
   ON ca.ancestor_concept_id = i.concept_id
  AND (i.include_descendants = 1 OR ca.descendant_concept_id = i.concept_id) ;
-DELETE FROM ctxb0womdx_anchor_concepts
+DELETE FROM y8hp12zkdx_anchor_concepts
 WHERE EXISTS (SELECT 1
-    FROM ctxb0womdx_anchor_exclude e
+    FROM y8hp12zkdx_anchor_exclude e
     JOIN @cdm_database_schema.concept_ancestor ca
       ON ca.ancestor_concept_id = e.concept_id
-     AND ctxb0womdx_anchor_concepts.concept_id = ca.descendant_concept_id
+     AND y8hp12zkdx_anchor_concepts.concept_id = ca.descendant_concept_id
      AND (e.include_descendants = 1 OR ca.descendant_concept_id = e.concept_id)
  );
 ------------------------------------------------------------
@@ -182,8 +182,8 @@ WHERE EXISTS (SELECT 1
 -- (concept_ancestor includes self-links; we only want broader/generalized codes).
 ------------------------------------------------------------
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womgen_cancer_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womgen_cancer_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkgen_cancer_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkgen_cancer_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -191,27 +191,27 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womgen_cancer_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womgen_cancer_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkgen_cancer_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkgen_cancer_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womgen_cancer_concepts (
+CREATE TABLE y8hp12zkgen_cancer_concepts (
     concept_id NUMBER(19)
 );
-INSERT INTO ctxb0womgen_cancer_concepts (concept_id)
+INSERT INTO y8hp12zkgen_cancer_concepts (concept_id)
 SELECT DISTINCT ca.ancestor_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
-JOIN ctxb0womdx_anchor_concepts d
+JOIN y8hp12zkdx_anchor_concepts d
   ON ca.descendant_concept_id = d.concept_id
 JOIN @cdm_database_schema.concept_ancestor malign
   ON malign.ancestor_concept_id = 443392
  AND malign.descendant_concept_id = ca.ancestor_concept_id
   WHERE NOT EXISTS (SELECT 1
-    FROM ctxb0womdx_anchor_concepts dx
+    FROM y8hp12zkdx_anchor_concepts dx
       WHERE dx.concept_id = ca.ancestor_concept_id
  )
  ;
@@ -220,8 +220,8 @@ JOIN @cdm_database_schema.concept_ancestor malign
 -- Default: descendants of 443392 excluding DX + GDX sets.
 ------------------------------------------------------------
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womother_dx_ancestor_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womother_dx_ancestor_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkother_dx_ancestor_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkother_dx_ancestor_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -229,25 +229,25 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womother_dx_ancestor_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womother_dx_ancestor_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkother_dx_ancestor_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkother_dx_ancestor_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womother_dx_ancestor_concepts (
+CREATE TABLE y8hp12zkother_dx_ancestor_concepts (
     ancestor_concept_id NUMBER(19)
 );
 -- EDIT THIS LIST
-INSERT INTO ctxb0womother_dx_ancestor_concepts (ancestor_concept_id)
+INSERT INTO y8hp12zkother_dx_ancestor_concepts (ancestor_concept_id)
 VALUES
     (443392) -- Malignant neoplastic disease
 ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womother_dx_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womother_dx_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkother_dx_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkother_dx_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -255,25 +255,25 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womother_dx_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womother_dx_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkother_dx_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkother_dx_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womother_dx_concepts (
+CREATE TABLE y8hp12zkother_dx_concepts (
     concept_id NUMBER(19)
 );
-INSERT INTO ctxb0womother_dx_concepts (concept_id)
+INSERT INTO y8hp12zkother_dx_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
-JOIN ctxb0womother_dx_ancestor_concepts a
+JOIN y8hp12zkother_dx_ancestor_concepts a
   ON ca.ancestor_concept_id = a.ancestor_concept_id
-LEFT JOIN ctxb0womdx_anchor_concepts dx
+LEFT JOIN y8hp12zkdx_anchor_concepts dx
   ON dx.concept_id = ca.descendant_concept_id
-LEFT JOIN ctxb0womgen_cancer_concepts gdx
+LEFT JOIN y8hp12zkgen_cancer_concepts gdx
   ON gdx.concept_id = ca.descendant_concept_id
   WHERE dx.concept_id IS NULL
   AND gdx.concept_id IS NULL
@@ -283,8 +283,8 @@ LEFT JOIN ctxb0womgen_cancer_concepts gdx
 -- Define via ancestor IDs (descendants pulled from concept_ancestor)
 ------------------------------------------------------------
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0wommet_ancestor_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0wommet_ancestor_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkmet_ancestor_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkmet_ancestor_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -292,27 +292,27 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0wommet_ancestor_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0wommet_ancestor_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkmet_ancestor_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkmet_ancestor_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0wommet_ancestor_concepts (
+CREATE TABLE y8hp12zkmet_ancestor_concepts (
     ancestor_concept_id NUMBER(19)
 );
 -- Default: concept set "Secondary malignancy" from cohort_definitions/Target_Cohort_2B.json
 INSERT ALL
-INTO ctxb0wommet_ancestor_concepts   (ancestor_concept_id) VALUES (1633308)
- INTO ctxb0wommet_ancestor_concepts  (ancestor_concept_id) VALUES (1635142)
+INTO y8hp12zkmet_ancestor_concepts   (ancestor_concept_id) VALUES (1633308)
+ INTO y8hp12zkmet_ancestor_concepts  (ancestor_concept_id) VALUES (1635142)
 )
- INTO ctxb0wommet_ancestor_concepts   (ancestor_concept_id) VALUES (36769180)
+ INTO y8hp12zkmet_ancestor_concepts   (ancestor_concept_id) VALUES (36769180)
 SELECT *   FROM DUAL;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0wommet_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0wommet_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkmet_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkmet_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -320,29 +320,29 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0wommet_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0wommet_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkmet_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkmet_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0wommet_concepts (
+CREATE TABLE y8hp12zkmet_concepts (
     concept_id NUMBER(19)
 );
-INSERT INTO ctxb0wommet_concepts (concept_id)
+INSERT INTO y8hp12zkmet_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
-JOIN ctxb0wommet_ancestor_concepts a
+JOIN y8hp12zkmet_ancestor_concepts a
   ON ca.ancestor_concept_id = a.ancestor_concept_id
  ;
 ------------------------------------------------------------
 -- E) L01 TREATMENT CONCEPTS (DRUG_EXPOSURE)
 ------------------------------------------------------------
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0woml01_ancestor_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0woml01_ancestor_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkl01_ancestor_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkl01_ancestor_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -350,25 +350,25 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0woml01_ancestor_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0woml01_ancestor_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkl01_ancestor_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkl01_ancestor_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0woml01_ancestor_concepts (
+CREATE TABLE y8hp12zkl01_ancestor_concepts (
     ancestor_concept_id NUMBER(19)
 );
 -- EDIT THIS LIST
-INSERT INTO ctxb0woml01_ancestor_concepts (ancestor_concept_id)
+INSERT INTO y8hp12zkl01_ancestor_concepts (ancestor_concept_id)
 VALUES
     (21601387)
 ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0woml01_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0woml01_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkl01_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkl01_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -376,29 +376,29 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0woml01_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0woml01_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkl01_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkl01_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0woml01_concepts (
+CREATE TABLE y8hp12zkl01_concepts (
     concept_id NUMBER(19)
 );
-INSERT INTO ctxb0woml01_concepts (concept_id)
+INSERT INTO y8hp12zkl01_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
-JOIN ctxb0woml01_ancestor_concepts a
+JOIN y8hp12zkl01_ancestor_concepts a
   ON ca.ancestor_concept_id = a.ancestor_concept_id
  ;
 ------------------------------------------------------------
 -- F) EVENT TABLES
 ------------------------------------------------------------
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdx_events';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdx_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdx_events';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdx_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -406,31 +406,31 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdx_events';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdx_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdx_events';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdx_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womdx_events (
+CREATE TABLE y8hp12zkdx_events (
     person_id NUMBER(19),
     event_date DATE,
     concept_id NUMBER(19)
 );
-INSERT INTO ctxb0womdx_events (person_id, event_date, concept_id)
+INSERT INTO y8hp12zkdx_events (person_id, event_date, concept_id)
 SELECT co.person_id,
     co.condition_start_date,
     co.condition_concept_id
 FROM @cdm_database_schema.condition_occurrence co
-JOIN ctxb0womdx_anchor_concepts d
+JOIN y8hp12zkdx_anchor_concepts d
   ON co.condition_concept_id = d.concept_id
  ;
 -- Distinct anchor cohort persons; limits later F) pulls to rows that downstream joins to #cohort use anyway.
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womanchor_person';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womanchor_person';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkanchor_person';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkanchor_person';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -438,24 +438,24 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womanchor_person';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womanchor_person';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkanchor_person';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkanchor_person';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womanchor_person (
+CREATE TABLE y8hp12zkanchor_person (
     person_id NUMBER(19)
 );
-INSERT INTO ctxb0womanchor_person (person_id)
+INSERT INTO y8hp12zkanchor_person (person_id)
 SELECT DISTINCT person_id
-FROM ctxb0womdx_events
+FROM y8hp12zkdx_events
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womother_dx_events';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womother_dx_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkother_dx_events';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkother_dx_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -463,32 +463,32 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womother_dx_events';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womother_dx_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkother_dx_events';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkother_dx_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womother_dx_events (
+CREATE TABLE y8hp12zkother_dx_events (
     person_id NUMBER(19),
     event_date DATE,
     concept_id NUMBER(19)
 );
-INSERT INTO ctxb0womother_dx_events (person_id, event_date, concept_id)
+INSERT INTO y8hp12zkother_dx_events (person_id, event_date, concept_id)
 SELECT co.person_id,
     co.condition_start_date,
     co.condition_concept_id
 FROM @cdm_database_schema.condition_occurrence co
-JOIN ctxb0womanchor_person ap
+JOIN y8hp12zkanchor_person ap
   ON co.person_id = ap.person_id
-JOIN ctxb0womother_dx_concepts d
+JOIN y8hp12zkother_dx_concepts d
   ON co.condition_concept_id = d.concept_id
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womgen_cancer_events';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womgen_cancer_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkgen_cancer_events';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkgen_cancer_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -496,32 +496,32 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womgen_cancer_events';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womgen_cancer_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkgen_cancer_events';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkgen_cancer_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womgen_cancer_events (
+CREATE TABLE y8hp12zkgen_cancer_events (
     person_id NUMBER(19),
     event_date DATE,
     concept_id NUMBER(19)
 );
-INSERT INTO ctxb0womgen_cancer_events (person_id, event_date, concept_id)
+INSERT INTO y8hp12zkgen_cancer_events (person_id, event_date, concept_id)
 SELECT co.person_id,
     co.condition_start_date,
     co.condition_concept_id
 FROM @cdm_database_schema.condition_occurrence co
-JOIN ctxb0womanchor_person ap
+JOIN y8hp12zkanchor_person ap
   ON co.person_id = ap.person_id
-JOIN ctxb0womgen_cancer_concepts g
+JOIN y8hp12zkgen_cancer_concepts g
   ON co.condition_concept_id = g.concept_id
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0wommet_events';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0wommet_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkmet_events';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkmet_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -529,32 +529,32 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0wommet_events';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0wommet_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkmet_events';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkmet_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0wommet_events (
+CREATE TABLE y8hp12zkmet_events (
     person_id NUMBER(19),
     event_date DATE,
     concept_id NUMBER(19)
 );
-INSERT INTO ctxb0wommet_events (person_id, event_date, concept_id)
+INSERT INTO y8hp12zkmet_events (person_id, event_date, concept_id)
 SELECT m.person_id,
     m.measurement_date,
     m.measurement_concept_id
 FROM @cdm_database_schema.measurement m
-JOIN ctxb0womanchor_person ap
+JOIN y8hp12zkanchor_person ap
   ON m.person_id = ap.person_id
-JOIN ctxb0wommet_concepts mc
+JOIN y8hp12zkmet_concepts mc
   ON m.measurement_concept_id = mc.concept_id
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0woml01_events';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0woml01_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkl01_events';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkl01_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -562,33 +562,33 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0woml01_events';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0woml01_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkl01_events';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkl01_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0woml01_events (
+CREATE TABLE y8hp12zkl01_events (
     person_id NUMBER(19),
     event_date DATE,
     concept_id NUMBER(19)
 );
-INSERT INTO ctxb0woml01_events (person_id, event_date, concept_id)
+INSERT INTO y8hp12zkl01_events (person_id, event_date, concept_id)
 SELECT de.person_id,
     de.drug_exposure_start_date,
     de.drug_concept_id
 FROM @cdm_database_schema.drug_exposure de
-JOIN ctxb0womanchor_person ap
+JOIN y8hp12zkanchor_person ap
   ON de.person_id = ap.person_id
-JOIN ctxb0woml01_concepts l
+JOIN y8hp12zkl01_concepts l
   ON de.drug_concept_id = l.concept_id
  ;
 -- Ingredient-level L01 events used for concept-level code counts/timing.
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0woml01_ingredient_events';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0woml01_ingredient_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkl01_ingredient_events';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkl01_ingredient_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -596,28 +596,28 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0woml01_ingredient_events';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0woml01_ingredient_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkl01_ingredient_events';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkl01_ingredient_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0woml01_ingredient_events (
+CREATE TABLE y8hp12zkl01_ingredient_events (
     person_id NUMBER(19),
     event_date DATE,
     concept_id NUMBER(19)
 );
-INSERT INTO ctxb0woml01_ingredient_events (person_id, event_date, concept_id)
+INSERT INTO y8hp12zkl01_ingredient_events (person_id, event_date, concept_id)
 SELECT DISTINCT
     de.person_id,
     de.drug_exposure_start_date,
     ca.ancestor_concept_id
 FROM @cdm_database_schema.drug_exposure de
-JOIN ctxb0womanchor_person ap
+JOIN y8hp12zkanchor_person ap
   ON de.person_id = ap.person_id
-JOIN ctxb0woml01_concepts l
+JOIN y8hp12zkl01_concepts l
   ON de.drug_concept_id = l.concept_id
 JOIN @cdm_database_schema.concept_ancestor ca
   ON ca.descendant_concept_id = de.drug_concept_id
@@ -631,8 +631,8 @@ JOIN @cdm_database_schema.concept ing
 -- Track attrition: count all patients with a qualifying DX before the
 -- obs-period filter so the report can show how many were excluded.
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womcohort_attrition';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womcohort_attrition';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkcohort_attrition';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkcohort_attrition';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -640,23 +640,23 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womcohort_attrition';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womcohort_attrition';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkcohort_attrition';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkcohort_attrition';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womcohort_attrition (
+CREATE TABLE y8hp12zkcohort_attrition (
     stage      VARCHAR(50),
     n_patients INT
 );
-INSERT INTO ctxb0womcohort_attrition (stage, n_patients)
-SELECT 'dx_any', COUNT(DISTINCT person_id) FROM ctxb0womdx_events ;
+INSERT INTO y8hp12zkcohort_attrition (stage, n_patients)
+SELECT 'dx_any', COUNT(DISTINCT person_id) FROM y8hp12zkdx_events ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womcohort';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womcohort';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkcohort';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkcohort';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -664,35 +664,35 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womcohort';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womcohort';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkcohort';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkcohort';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womcohort (
+CREATE TABLE y8hp12zkcohort (
     person_id NUMBER(19),
     index_date DATE
 );
 -- Index date = earliest qualifying DX that falls within an observation period.
 -- Patients with no obs-period-covered DX are excluded entirely.
-INSERT INTO ctxb0womcohort (person_id, index_date)
+INSERT INTO y8hp12zkcohort (person_id, index_date)
 SELECT dx.person_id,
     MIN(dx.event_date) AS index_date
-FROM ctxb0womdx_events dx
+FROM y8hp12zkdx_events dx
 INNER JOIN @cdm_database_schema.observation_period op
     ON  op.person_id = dx.person_id
     AND dx.event_date BETWEEN op.observation_period_start_date
                           AND op.observation_period_end_date
 GROUP BY dx.person_id
  ;
-INSERT INTO ctxb0womcohort_attrition (stage, n_patients)
-SELECT 'dx_in_obs', COUNT(*) FROM ctxb0womcohort ;
+INSERT INTO y8hp12zkcohort_attrition (stage, n_patients)
+SELECT 'dx_in_obs', COUNT(*) FROM y8hp12zkcohort ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdx_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdx_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdx_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdx_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -700,31 +700,31 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdx_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdx_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdx_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdx_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womdx_summary (
+CREATE TABLE y8hp12zkdx_summary (
     person_id NUMBER(19),
     n_dx_records INT,
     n_dx_codes INT
 );
-INSERT INTO ctxb0womdx_summary (person_id, n_dx_records, n_dx_codes)
+INSERT INTO y8hp12zkdx_summary (person_id, n_dx_records, n_dx_codes)
 SELECT e.person_id,
     COUNT(*) AS n_dx_records,
     COUNT(DISTINCT e.concept_id) AS n_dx_codes
-FROM ctxb0womdx_events e
-JOIN ctxb0womcohort c
+FROM y8hp12zkdx_events e
+JOIN y8hp12zkcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womother_dx_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womother_dx_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkother_dx_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkother_dx_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -732,33 +732,33 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womother_dx_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womother_dx_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkother_dx_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkother_dx_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womother_dx_summary (
+CREATE TABLE y8hp12zkother_dx_summary (
     person_id NUMBER(19),
     first_other_dx_date DATE,
     n_other_dx_records INT,
     n_other_dx_codes INT
 );
-INSERT INTO ctxb0womother_dx_summary (person_id, first_other_dx_date, n_other_dx_records, n_other_dx_codes)
+INSERT INTO y8hp12zkother_dx_summary (person_id, first_other_dx_date, n_other_dx_records, n_other_dx_codes)
 SELECT e.person_id,
     MIN(e.event_date) AS first_other_dx_date,
     COUNT(*) AS n_other_dx_records,
     COUNT(DISTINCT e.concept_id) AS n_other_dx_codes
-FROM ctxb0womother_dx_events e
-JOIN ctxb0womcohort c
+FROM y8hp12zkother_dx_events e
+JOIN y8hp12zkcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womgen_cancer_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womgen_cancer_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkgen_cancer_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkgen_cancer_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -766,33 +766,33 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womgen_cancer_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womgen_cancer_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkgen_cancer_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkgen_cancer_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womgen_cancer_summary (
+CREATE TABLE y8hp12zkgen_cancer_summary (
     person_id NUMBER(19),
     first_gen_cancer_date DATE,
     n_gen_cancer_records INT,
     n_gen_cancer_codes INT
 );
-INSERT INTO ctxb0womgen_cancer_summary (person_id, first_gen_cancer_date, n_gen_cancer_records, n_gen_cancer_codes)
+INSERT INTO y8hp12zkgen_cancer_summary (person_id, first_gen_cancer_date, n_gen_cancer_records, n_gen_cancer_codes)
 SELECT e.person_id,
     MIN(e.event_date) AS first_gen_cancer_date,
     COUNT(*) AS n_gen_cancer_records,
     COUNT(DISTINCT e.concept_id) AS n_gen_cancer_codes
-FROM ctxb0womgen_cancer_events e
-JOIN ctxb0womcohort c
+FROM y8hp12zkgen_cancer_events e
+JOIN y8hp12zkcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0wommet_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0wommet_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkmet_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkmet_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -800,31 +800,31 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0wommet_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0wommet_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkmet_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkmet_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0wommet_summary (
+CREATE TABLE y8hp12zkmet_summary (
     person_id NUMBER(19),
     first_met_date DATE,
     n_met_records INT
 );
-INSERT INTO ctxb0wommet_summary (person_id, first_met_date, n_met_records)
+INSERT INTO y8hp12zkmet_summary (person_id, first_met_date, n_met_records)
 SELECT e.person_id,
     MIN(e.event_date) AS first_met_date,
     COUNT(*) AS n_met_records
-FROM ctxb0wommet_events e
-JOIN ctxb0womcohort c
+FROM y8hp12zkmet_events e
+JOIN y8hp12zkcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0woml01_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0woml01_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkl01_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkl01_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -832,33 +832,33 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0woml01_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0woml01_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkl01_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkl01_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0woml01_summary (
+CREATE TABLE y8hp12zkl01_summary (
     person_id NUMBER(19),
     first_l01_date DATE,
     n_l01_exposures INT
 );
-INSERT INTO ctxb0woml01_summary (person_id, first_l01_date, n_l01_exposures)
+INSERT INTO y8hp12zkl01_summary (person_id, first_l01_date, n_l01_exposures)
 SELECT e.person_id,
     MIN(e.event_date) AS first_l01_date,
     COUNT(*) AS n_l01_exposures
-FROM ctxb0woml01_events e
-JOIN ctxb0womcohort c
+FROM y8hp12zkl01_events e
+JOIN y8hp12zkcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
  ;
 -- H) EVENT CODE COUNTS (single table across event families)
 ------------------------------------------------------------
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_counts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_counts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_counts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_counts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -866,85 +866,85 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_counts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_counts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_counts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_counts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womevent_code_counts (
+CREATE TABLE y8hp12zkevent_code_counts (
     anchor_event VARCHAR(20), -- INDEX or FIRST_MET
     event_family VARCHAR(20),
     concept_id NUMBER(19),
     n_records INT,
     n_patients INT
 );
-INSERT INTO ctxb0womevent_code_counts (anchor_event, event_family, concept_id, n_records, n_patients)
+INSERT INTO y8hp12zkevent_code_counts (anchor_event, event_family, concept_id, n_records, n_patients)
 SELECT 'INDEX', 'DX', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM ctxb0womdx_events
-    WHERE person_id IN (SELECT person_id FROM ctxb0womcohort )
+FROM y8hp12zkdx_events
+    WHERE person_id IN (SELECT person_id FROM y8hp12zkcohort )
 GROUP BY concept_id
    UNION ALL
 SELECT 'INDEX', 'ODX', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM ctxb0womother_dx_events
-    WHERE person_id IN (SELECT person_id FROM ctxb0womcohort )
+FROM y8hp12zkother_dx_events
+    WHERE person_id IN (SELECT person_id FROM y8hp12zkcohort )
 GROUP BY concept_id
    UNION ALL
 SELECT 'INDEX', 'GDX', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM ctxb0womgen_cancer_events
-    WHERE person_id IN (SELECT person_id FROM ctxb0womcohort )
+FROM y8hp12zkgen_cancer_events
+    WHERE person_id IN (SELECT person_id FROM y8hp12zkcohort )
 GROUP BY concept_id
    UNION ALL
 SELECT 'INDEX', 'MET', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM ctxb0wommet_events
-    WHERE person_id IN (SELECT person_id FROM ctxb0womcohort )
+FROM y8hp12zkmet_events
+    WHERE person_id IN (SELECT person_id FROM y8hp12zkcohort )
 GROUP BY concept_id
    UNION ALL
 SELECT 'INDEX', 'L01', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM ctxb0woml01_ingredient_events
-    WHERE person_id IN (SELECT person_id FROM ctxb0womcohort )
+FROM y8hp12zkl01_ingredient_events
+    WHERE person_id IN (SELECT person_id FROM y8hp12zkcohort )
 GROUP BY concept_id
    UNION ALL
 SELECT 'FIRST_MET', 'DX', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM ctxb0womdx_events e
-JOIN ctxb0wommet_summary ms
+FROM y8hp12zkdx_events e
+JOIN y8hp12zkmet_summary ms
   ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
    UNION ALL
 SELECT 'FIRST_MET', 'ODX', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM ctxb0womother_dx_events e
-JOIN ctxb0wommet_summary ms
+FROM y8hp12zkother_dx_events e
+JOIN y8hp12zkmet_summary ms
   ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
    UNION ALL
 SELECT 'FIRST_MET', 'GDX', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM ctxb0womgen_cancer_events e
-JOIN ctxb0wommet_summary ms
+FROM y8hp12zkgen_cancer_events e
+JOIN y8hp12zkmet_summary ms
   ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
    UNION ALL
 SELECT 'FIRST_MET', 'MET', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM ctxb0wommet_events e
-JOIN ctxb0wommet_summary ms
+FROM y8hp12zkmet_events e
+JOIN y8hp12zkmet_summary ms
   ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
    UNION ALL
 SELECT 'FIRST_MET', 'L01', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM ctxb0woml01_ingredient_events e
-JOIN ctxb0wommet_summary ms
+FROM y8hp12zkl01_ingredient_events e
+JOIN y8hp12zkmet_summary ms
   ON e.person_id = ms.person_id
   WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
                    ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_counts_before_after';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_counts_before_after';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_counts_before_after';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_counts_before_after';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -952,15 +952,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_counts_before_after';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_counts_before_after';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_counts_before_after';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_counts_before_after';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womevent_code_counts_before_after (
+CREATE TABLE y8hp12zkevent_code_counts_before_after (
     anchor_event VARCHAR(20), -- INDEX
     event_family VARCHAR(20),
     time_relative VARCHAR(10), -- BEFORE or AFTER (relative to index_date)
@@ -968,15 +968,15 @@ CREATE TABLE ctxb0womevent_code_counts_before_after (
     n_records INT,
     n_patients INT
 );
-INSERT INTO ctxb0womevent_code_counts_before_after (anchor_event, event_family, time_relative, concept_id, n_records, n_patients)
+INSERT INTO y8hp12zkevent_code_counts_before_after (anchor_event, event_family, time_relative, concept_id, n_records, n_patients)
 SELECT 'INDEX',
        'DX',
         CASE WHEN CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)) < 0 THEN 'BEFORE' ELSE 'AFTER' END AS time_relative,
        e.concept_id,
         COUNT(*) AS n_records,
        COUNT(DISTINCT e.person_id) AS n_patients
-FROM ctxb0womdx_events e
-JOIN ctxb0womcohort c
+FROM y8hp12zkdx_events e
+JOIN y8hp12zkcohort c
   ON e.person_id = c.person_id
 GROUP BY
     CASE WHEN CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)) < 0 THEN 'BEFORE' ELSE 'AFTER'  END ,
@@ -988,8 +988,8 @@ SELECT 'INDEX',
        e.concept_id,
         COUNT(*) ,
        COUNT(DISTINCT e.person_id)
-FROM ctxb0womother_dx_events e
-JOIN ctxb0womcohort c
+FROM y8hp12zkother_dx_events e
+JOIN y8hp12zkcohort c
   ON e.person_id = c.person_id
 GROUP BY
     CASE WHEN CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)) < 0 THEN 'BEFORE' ELSE 'AFTER'  END ,
@@ -1001,8 +1001,8 @@ SELECT 'INDEX',
        e.concept_id,
         COUNT(*) ,
        COUNT(DISTINCT e.person_id)
-FROM ctxb0womgen_cancer_events e
-JOIN ctxb0womcohort c
+FROM y8hp12zkgen_cancer_events e
+JOIN y8hp12zkcohort c
   ON e.person_id = c.person_id
 GROUP BY
     CASE WHEN CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)) < 0 THEN 'BEFORE' ELSE 'AFTER'  END ,
@@ -1014,8 +1014,8 @@ SELECT 'INDEX',
        e.concept_id,
         COUNT(*) ,
        COUNT(DISTINCT e.person_id)
-FROM ctxb0wommet_events e
-JOIN ctxb0womcohort c
+FROM y8hp12zkmet_events e
+JOIN y8hp12zkcohort c
   ON e.person_id = c.person_id
 GROUP BY
     CASE WHEN CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)) < 0 THEN 'BEFORE' ELSE 'AFTER'  END ,
@@ -1027,15 +1027,15 @@ SELECT 'INDEX',
        e.concept_id,
         COUNT(*) ,
        COUNT(DISTINCT e.person_id)
-FROM ctxb0woml01_ingredient_events e
-JOIN ctxb0womcohort c
+FROM y8hp12zkl01_ingredient_events e
+JOIN y8hp12zkcohort c
   ON e.person_id = c.person_id
 GROUP BY CASE WHEN CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)) < 0 THEN 'BEFORE' ELSE 'AFTER'  END ,
     e.concept_id
              GROUP BY 1 ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_counts_before_after_first_met';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_counts_before_after_first_met';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_counts_before_after_first_met';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_counts_before_after_first_met';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1043,15 +1043,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_counts_before_after_first_met';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_counts_before_after_first_met';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_counts_before_after_first_met';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_counts_before_after_first_met';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womevent_code_counts_before_after_first_met (
+CREATE TABLE y8hp12zkevent_code_counts_before_after_first_met (
     anchor_event VARCHAR(20), -- FIRST_MET
     event_family VARCHAR(20),
     time_relative VARCHAR(10), -- BEFORE or AFTER (relative to first_met_date)
@@ -1059,15 +1059,15 @@ CREATE TABLE ctxb0womevent_code_counts_before_after_first_met (
     n_records INT,
     n_patients INT
 );
-INSERT INTO ctxb0womevent_code_counts_before_after_first_met (anchor_event, event_family, time_relative, concept_id, n_records, n_patients)
+INSERT INTO y8hp12zkevent_code_counts_before_after_first_met (anchor_event, event_family, time_relative, concept_id, n_records, n_patients)
 SELECT 'FIRST_MET',
        'DX',
         CASE WHEN CEIL(CAST(e.event_date AS DATE) - CAST(ms.first_met_date AS DATE)) < 0 THEN 'BEFORE' ELSE 'AFTER' END AS time_relative,
        e.concept_id,
         COUNT(*) AS n_records,
        COUNT(DISTINCT e.person_id) AS n_patients
-FROM ctxb0womdx_events e
-JOIN ctxb0wommet_summary ms
+FROM y8hp12zkdx_events e
+JOIN y8hp12zkmet_summary ms
   ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
 GROUP BY
@@ -1080,8 +1080,8 @@ SELECT 'FIRST_MET',
        e.concept_id,
         COUNT(*) ,
        COUNT(DISTINCT e.person_id)
-FROM ctxb0womother_dx_events e
-JOIN ctxb0wommet_summary ms
+FROM y8hp12zkother_dx_events e
+JOIN y8hp12zkmet_summary ms
   ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
 GROUP BY
@@ -1094,8 +1094,8 @@ SELECT 'FIRST_MET',
        e.concept_id,
         COUNT(*) ,
        COUNT(DISTINCT e.person_id)
-FROM ctxb0womgen_cancer_events e
-JOIN ctxb0wommet_summary ms
+FROM y8hp12zkgen_cancer_events e
+JOIN y8hp12zkmet_summary ms
   ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
 GROUP BY
@@ -1108,8 +1108,8 @@ SELECT 'FIRST_MET',
        e.concept_id,
         COUNT(*) ,
        COUNT(DISTINCT e.person_id)
-FROM ctxb0wommet_events e
-JOIN ctxb0wommet_summary ms
+FROM y8hp12zkmet_events e
+JOIN y8hp12zkmet_summary ms
   ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
 GROUP BY
@@ -1122,16 +1122,16 @@ SELECT 'FIRST_MET',
        e.concept_id,
         COUNT(*) ,
        COUNT(DISTINCT e.person_id)
-FROM ctxb0woml01_ingredient_events e
-JOIN ctxb0wommet_summary ms
+FROM y8hp12zkl01_ingredient_events e
+JOIN y8hp12zkmet_summary ms
   ON e.person_id = ms.person_id
   WHERE ms.first_met_date IS NOT NULL
 GROUP BY CASE WHEN CEIL(CAST(e.event_date AS DATE) - CAST(ms.first_met_date AS DATE)) < 0 THEN 'BEFORE' ELSE 'AFTER'  END ,
     e.concept_id
              GROUP BY 1 ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_all_events';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_all_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_all_events';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_all_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1139,15 +1139,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_all_events';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_all_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_all_events';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_all_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womevent_code_all_events (
+CREATE TABLE y8hp12zkevent_code_all_events (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     concept_id NUMBER(19),
@@ -1155,57 +1155,57 @@ CREATE TABLE ctxb0womevent_code_all_events (
     days_diff INT,
     event_date DATE
 );
-INSERT INTO ctxb0womevent_code_all_events (
+INSERT INTO y8hp12zkevent_code_all_events (
     anchor_event, event_family, concept_id, person_id, days_diff, event_date
 )
 SELECT 'INDEX' AS anchor_event, 'DX' AS event_family, e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)) AS days_diff, e.event_date
-FROM ctxb0womdx_events e
-JOIN ctxb0womcohort c ON e.person_id = c.person_id
+FROM y8hp12zkdx_events e
+JOIN y8hp12zkcohort c ON e.person_id = c.person_id
   UNION ALL
 SELECT 'INDEX', 'ODX', e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)), e.event_date
-FROM ctxb0womother_dx_events e
-JOIN ctxb0womcohort c ON e.person_id = c.person_id
+FROM y8hp12zkother_dx_events e
+JOIN y8hp12zkcohort c ON e.person_id = c.person_id
   UNION ALL
 SELECT 'INDEX', 'GDX', e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)), e.event_date
-FROM ctxb0womgen_cancer_events e
-JOIN ctxb0womcohort c ON e.person_id = c.person_id
+FROM y8hp12zkgen_cancer_events e
+JOIN y8hp12zkcohort c ON e.person_id = c.person_id
   UNION ALL
 SELECT 'INDEX', 'MET', e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)), e.event_date
-FROM ctxb0wommet_events e
-JOIN ctxb0womcohort c ON e.person_id = c.person_id
+FROM y8hp12zkmet_events e
+JOIN y8hp12zkcohort c ON e.person_id = c.person_id
   UNION ALL
 SELECT 'INDEX', 'L01', e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)), e.event_date
-FROM ctxb0woml01_ingredient_events e
-JOIN ctxb0womcohort c ON e.person_id = c.person_id
+FROM y8hp12zkl01_ingredient_events e
+JOIN y8hp12zkcohort c ON e.person_id = c.person_id
   UNION ALL
 SELECT 'FIRST_MET', 'DX', e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(ms.first_met_date AS DATE)), e.event_date
-FROM ctxb0womdx_events e
-JOIN ctxb0wommet_summary ms ON e.person_id = ms.person_id
+FROM y8hp12zkdx_events e
+JOIN y8hp12zkmet_summary ms ON e.person_id = ms.person_id
                         WHERE ms.first_met_date IS NOT NULL
         UNION ALL
 SELECT 'FIRST_MET', 'ODX', e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(ms.first_met_date AS DATE)), e.event_date
-FROM ctxb0womother_dx_events e
-JOIN ctxb0wommet_summary ms ON e.person_id = ms.person_id
+FROM y8hp12zkother_dx_events e
+JOIN y8hp12zkmet_summary ms ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
    UNION ALL
 SELECT 'FIRST_MET', 'GDX', e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(ms.first_met_date AS DATE)), e.event_date
-FROM ctxb0womgen_cancer_events e
-JOIN ctxb0wommet_summary ms ON e.person_id = ms.person_id
+FROM y8hp12zkgen_cancer_events e
+JOIN y8hp12zkmet_summary ms ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
    UNION ALL
 SELECT 'FIRST_MET', 'MET', e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(ms.first_met_date AS DATE)), e.event_date
-FROM ctxb0wommet_events e
-JOIN ctxb0wommet_summary ms ON e.person_id = ms.person_id
+FROM y8hp12zkmet_events e
+JOIN y8hp12zkmet_summary ms ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
    UNION ALL
 SELECT 'FIRST_MET', 'L01', e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(ms.first_met_date AS DATE)), e.event_date
-FROM ctxb0woml01_ingredient_events e
-JOIN ctxb0wommet_summary ms ON e.person_id = ms.person_id
+FROM y8hp12zkl01_ingredient_events e
+JOIN y8hp12zkmet_summary ms ON e.person_id = ms.person_id
   WHERE ms.first_met_date IS NOT NULL
                    ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_patient_chosen_first';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_patient_chosen_first';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_patient_chosen_first';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_patient_chosen_first';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1213,22 +1213,22 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_patient_chosen_first';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_patient_chosen_first';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_patient_chosen_first';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_patient_chosen_first';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womevent_code_patient_chosen_first (
+CREATE TABLE y8hp12zkevent_code_patient_chosen_first (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     concept_id NUMBER(19),
     person_id NUMBER(19),
     days_diff INT
 );
-INSERT INTO ctxb0womevent_code_patient_chosen_first (anchor_event, event_family, concept_id, person_id, days_diff)
+INSERT INTO y8hp12zkevent_code_patient_chosen_first (anchor_event, event_family, concept_id, person_id, days_diff)
 SELECT anchor_event, event_family, concept_id, person_id, days_diff
 FROM (SELECT anchor_event,
         event_family,
@@ -1239,13 +1239,13 @@ FROM (SELECT anchor_event,
             PARTITION BY anchor_event, event_family, concept_id, person_id
             ORDER BY CEIL(CAST(event_date AS DATE) - CAST(TO_DATE('1900-01-01', 'YYYYMMDD') AS DATE)) ASC, event_date ASC
         ) AS rn
-    FROM ctxb0womevent_code_all_events
+    FROM y8hp12zkevent_code_all_events
  ) x
   WHERE rn = 1
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_patient_chosen_closest';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_patient_chosen_closest';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_patient_chosen_closest';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_patient_chosen_closest';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1253,22 +1253,22 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_patient_chosen_closest';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_patient_chosen_closest';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_patient_chosen_closest';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_patient_chosen_closest';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womevent_code_patient_chosen_closest (
+CREATE TABLE y8hp12zkevent_code_patient_chosen_closest (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     concept_id NUMBER(19),
     person_id NUMBER(19),
     days_diff INT
 );
-INSERT INTO ctxb0womevent_code_patient_chosen_closest (anchor_event, event_family, concept_id, person_id, days_diff)
+INSERT INTO y8hp12zkevent_code_patient_chosen_closest (anchor_event, event_family, concept_id, person_id, days_diff)
 SELECT anchor_event, event_family, concept_id, person_id, days_diff
 FROM (SELECT anchor_event,
         event_family,
@@ -1279,13 +1279,13 @@ FROM (SELECT anchor_event,
             PARTITION BY anchor_event, event_family, concept_id, person_id
             ORDER BY ABS(days_diff) ASC, event_date ASC
         ) AS rn
-    FROM ctxb0womevent_code_all_events
+    FROM y8hp12zkevent_code_all_events
  ) x
   WHERE rn = 1
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_timing_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_timing_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_timing_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_timing_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1293,15 +1293,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_timing_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_timing_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_timing_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_timing_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womevent_code_timing_summary (
+CREATE TABLE y8hp12zkevent_code_timing_summary (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     concept_id NUMBER(19),
@@ -1313,7 +1313,7 @@ CREATE TABLE ctxb0womevent_code_timing_summary (
     median_days_closest FLOAT,
     uq_days_closest FLOAT
 );
-INSERT INTO ctxb0womevent_code_timing_summary (
+INSERT INTO y8hp12zkevent_code_timing_summary (
     anchor_event,
     event_family,
     concept_id,
@@ -1345,7 +1345,7 @@ FROM (SELECT anchor_event,
     FROM (SELECT anchor_event, event_family, concept_id, days_diff,
             ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, concept_id ORDER BY days_diff) AS rn,
             COUNT(*)     OVER (PARTITION BY anchor_event, event_family, concept_id)                    AS cnt
-        FROM ctxb0womevent_code_patient_chosen_first
+        FROM y8hp12zkevent_code_patient_chosen_first
      ) x
     GROUP BY anchor_event, event_family, concept_id
  ) f
@@ -1358,7 +1358,7 @@ INNER JOIN (SELECT anchor_event,
     FROM (SELECT anchor_event, event_family, concept_id, days_diff,
             ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, concept_id ORDER BY days_diff) AS rn,
             COUNT(*)     OVER (PARTITION BY anchor_event, event_family, concept_id)                    AS cnt
-        FROM ctxb0womevent_code_patient_chosen_closest
+        FROM y8hp12zkevent_code_patient_chosen_closest
      ) x
     GROUP BY anchor_event, event_family, concept_id
  ) k
@@ -1367,8 +1367,8 @@ INNER JOIN (SELECT anchor_event,
  AND f.concept_id = k.concept_id
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_ba_events';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_ba_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_ba_events';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_ba_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1376,15 +1376,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_ba_events';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_ba_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_ba_events';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_ba_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womevent_code_ba_events (
+CREATE TABLE y8hp12zkevent_code_ba_events (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     time_relative VARCHAR(10),
@@ -1393,7 +1393,7 @@ CREATE TABLE ctxb0womevent_code_ba_events (
     days_diff INT,
     event_date DATE
 );
-INSERT INTO ctxb0womevent_code_ba_events (
+INSERT INTO y8hp12zkevent_code_ba_events (
     anchor_event, event_family, time_relative, concept_id, person_id, days_diff, event_date
 )
 SELECT anchor_event,
@@ -1403,11 +1403,11 @@ SELECT anchor_event,
     person_id,
     days_diff,
     event_date
-FROM ctxb0womevent_code_all_events
+FROM y8hp12zkevent_code_all_events
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_patient_chosen_before_after_first';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_patient_chosen_before_after_first';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_patient_chosen_before_after_first';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_patient_chosen_before_after_first';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1415,15 +1415,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_patient_chosen_before_after_first';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_patient_chosen_before_after_first';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_patient_chosen_before_after_first';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_patient_chosen_before_after_first';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womevent_code_patient_chosen_before_after_first (
+CREATE TABLE y8hp12zkevent_code_patient_chosen_before_after_first (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     time_relative VARCHAR(10),
@@ -1431,7 +1431,7 @@ CREATE TABLE ctxb0womevent_code_patient_chosen_before_after_first (
     person_id NUMBER(19),
     days_diff INT
 );
-INSERT INTO ctxb0womevent_code_patient_chosen_before_after_first (
+INSERT INTO y8hp12zkevent_code_patient_chosen_before_after_first (
     anchor_event, event_family, time_relative, concept_id, person_id, days_diff
 )
 SELECT anchor_event, event_family, time_relative, concept_id, person_id, days_diff
@@ -1445,13 +1445,13 @@ FROM (SELECT anchor_event,
             PARTITION BY anchor_event, event_family, time_relative, concept_id, person_id
             ORDER BY CEIL(CAST(event_date AS DATE) - CAST(TO_DATE('1900-01-01', 'YYYYMMDD') AS DATE)) ASC, event_date ASC
         ) AS rn
-    FROM ctxb0womevent_code_ba_events
+    FROM y8hp12zkevent_code_ba_events
  ) x
   WHERE rn = 1
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_patient_chosen_before_after_closest';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_patient_chosen_before_after_closest';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_patient_chosen_before_after_closest';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_patient_chosen_before_after_closest';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1459,15 +1459,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_patient_chosen_before_after_closest';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_patient_chosen_before_after_closest';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_patient_chosen_before_after_closest';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_patient_chosen_before_after_closest';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womevent_code_patient_chosen_before_after_closest (
+CREATE TABLE y8hp12zkevent_code_patient_chosen_before_after_closest (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     time_relative VARCHAR(10),
@@ -1475,7 +1475,7 @@ CREATE TABLE ctxb0womevent_code_patient_chosen_before_after_closest (
     person_id NUMBER(19),
     days_diff INT
 );
-INSERT INTO ctxb0womevent_code_patient_chosen_before_after_closest (
+INSERT INTO y8hp12zkevent_code_patient_chosen_before_after_closest (
     anchor_event, event_family, time_relative, concept_id, person_id, days_diff
 )
 SELECT anchor_event, event_family, time_relative, concept_id, person_id, days_diff
@@ -1489,13 +1489,13 @@ FROM (SELECT anchor_event,
             PARTITION BY anchor_event, event_family, time_relative, concept_id, person_id
             ORDER BY ABS(days_diff) ASC, event_date ASC
         ) AS rn
-    FROM ctxb0womevent_code_ba_events
+    FROM y8hp12zkevent_code_ba_events
  ) x
   WHERE rn = 1
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_timing_before_after_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_timing_before_after_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_timing_before_after_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_timing_before_after_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1503,15 +1503,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_code_timing_before_after_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_code_timing_before_after_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_code_timing_before_after_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_code_timing_before_after_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womevent_code_timing_before_after_summary (
+CREATE TABLE y8hp12zkevent_code_timing_before_after_summary (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     time_relative VARCHAR(10),
@@ -1524,7 +1524,7 @@ CREATE TABLE ctxb0womevent_code_timing_before_after_summary (
     median_days_closest FLOAT,
     uq_days_closest FLOAT
 );
-INSERT INTO ctxb0womevent_code_timing_before_after_summary (
+INSERT INTO y8hp12zkevent_code_timing_before_after_summary (
     anchor_event,
     event_family,
     time_relative,
@@ -1559,7 +1559,7 @@ FROM (SELECT anchor_event,
     FROM (SELECT anchor_event, event_family, time_relative, concept_id, days_diff,
             ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id ORDER BY days_diff) AS rn,
             COUNT(*)     OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id)                    AS cnt
-        FROM ctxb0womevent_code_patient_chosen_before_after_first
+        FROM y8hp12zkevent_code_patient_chosen_before_after_first
      ) x
     GROUP BY anchor_event, event_family, time_relative, concept_id
  ) f
@@ -1573,7 +1573,7 @@ INNER JOIN (SELECT anchor_event,
     FROM (SELECT anchor_event, event_family, time_relative, concept_id, days_diff,
             ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id ORDER BY days_diff) AS rn,
             COUNT(*)     OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id)                    AS cnt
-        FROM ctxb0womevent_code_patient_chosen_before_after_closest
+        FROM y8hp12zkevent_code_patient_chosen_before_after_closest
      ) x
     GROUP BY anchor_event, event_family, time_relative, concept_id
  ) k
@@ -1586,8 +1586,8 @@ INNER JOIN (SELECT anchor_event,
 -- I) PATIENT-LEVEL TABLE
 ------------------------------------------------------------
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0wompatient_char';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0wompatient_char';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkpatient_char';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkpatient_char';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1595,15 +1595,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0wompatient_char';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0wompatient_char';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkpatient_char';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkpatient_char';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0wompatient_char (
+CREATE TABLE y8hp12zkpatient_char (
     person_id NUMBER(19),
     index_date DATE,
     n_dx_records INT,
@@ -1624,7 +1624,7 @@ CREATE TABLE ctxb0wompatient_char (
     days_dx_to_gen_cancer INT,
     days_met_to_l01 INT
 );
-INSERT INTO ctxb0wompatient_char (
+INSERT INTO y8hp12zkpatient_char (
     person_id,
     index_date,
     n_dx_records,
@@ -1664,24 +1664,24 @@ SELECT c.person_id,
     CASE WHEN odx.first_other_dx_date IS NOT NULL THEN CEIL(CAST(odx.first_other_dx_date AS DATE) - CAST(c.index_date AS DATE)) END AS days_dx_to_other_dx,
     CASE WHEN gdx.first_gen_cancer_date IS NOT NULL THEN CEIL(CAST(gdx.first_gen_cancer_date AS DATE) - CAST(c.index_date AS DATE)) END AS days_dx_to_gen_cancer,
     CASE WHEN mt.first_met_date IS NOT NULL AND l01.first_l01_date IS NOT NULL THEN CEIL(CAST(l01.first_l01_date AS DATE) - CAST(mt.first_met_date AS DATE)) END AS days_met_to_l01
-FROM ctxb0womcohort c
-LEFT JOIN ctxb0womdx_summary dx
+FROM y8hp12zkcohort c
+LEFT JOIN y8hp12zkdx_summary dx
        ON c.person_id = dx.person_id
-LEFT JOIN ctxb0womother_dx_summary odx
+LEFT JOIN y8hp12zkother_dx_summary odx
        ON c.person_id = odx.person_id
-LEFT JOIN ctxb0womgen_cancer_summary gdx
+LEFT JOIN y8hp12zkgen_cancer_summary gdx
        ON c.person_id = gdx.person_id
-LEFT JOIN ctxb0wommet_summary mt
+LEFT JOIN y8hp12zkmet_summary mt
        ON c.person_id = mt.person_id
-LEFT JOIN ctxb0woml01_summary l01
+LEFT JOIN y8hp12zkl01_summary l01
        ON c.person_id = l01.person_id
  ;
 ------------------------------------------------------------
 -- J) FULL CROSSWISE TIMING PAIRS
 ------------------------------------------------------------
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0wompatient_timing_pairs';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0wompatient_timing_pairs';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkpatient_timing_pairs';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkpatient_timing_pairs';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1689,30 +1689,30 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0wompatient_timing_pairs';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0wompatient_timing_pairs';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkpatient_timing_pairs';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkpatient_timing_pairs';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0wompatient_timing_pairs (
+CREATE TABLE y8hp12zkpatient_timing_pairs (
     person_id NUMBER(19),
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     days_diff INT
 );
-INSERT INTO ctxb0wompatient_timing_pairs (person_id, from_event, to_event, days_diff)
- WITH events  AS (SELECT person_id, 'DX' AS event_name, index_date AS event_date FROM ctxb0wompatient_char
+INSERT INTO y8hp12zkpatient_timing_pairs (person_id, from_event, to_event, days_diff)
+ WITH events  AS (SELECT person_id, 'DX' AS event_name, index_date AS event_date FROM y8hp12zkpatient_char
       UNION ALL
-    SELECT person_id, 'ODX', first_other_dx_date FROM ctxb0wompatient_char
+    SELECT person_id, 'ODX', first_other_dx_date FROM y8hp12zkpatient_char
       UNION ALL
-    SELECT person_id, 'GDX', first_gen_cancer_date FROM ctxb0wompatient_char
+    SELECT person_id, 'GDX', first_gen_cancer_date FROM y8hp12zkpatient_char
       UNION ALL
-    SELECT person_id, 'MET', first_met_date FROM ctxb0wompatient_char
+    SELECT person_id, 'MET', first_met_date FROM y8hp12zkpatient_char
       UNION ALL
-    SELECT person_id, 'L01', first_l01_date FROM ctxb0wompatient_char
+    SELECT person_id, 'L01', first_l01_date FROM y8hp12zkpatient_char
  )
  SELECT e1.person_id,
     e1.event_name AS from_event,
@@ -1726,8 +1726,8 @@ JOIN events e2
   AND e2.event_date IS NOT NULL
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womtiming_pair_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womtiming_pair_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zktiming_pair_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zktiming_pair_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1735,15 +1735,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womtiming_pair_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womtiming_pair_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zktiming_pair_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zktiming_pair_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womtiming_pair_summary (
+CREATE TABLE y8hp12zktiming_pair_summary (
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     n_patients_with_pair INT,
@@ -1761,7 +1761,7 @@ CREATE TABLE ctxb0womtiming_pair_summary (
     p90_days FLOAT,
     p95_days FLOAT
 );
-INSERT INTO ctxb0womtiming_pair_summary (
+INSERT INTO y8hp12zktiming_pair_summary (
     from_event,
     to_event,
     n_patients_with_pair,
@@ -1798,13 +1798,13 @@ SELECT from_event,
 FROM (SELECT from_event, to_event, days_diff,
         ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
         COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
-    FROM ctxb0wompatient_timing_pairs
+    FROM y8hp12zkpatient_timing_pairs
  ) x
 GROUP BY from_event, to_event
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womall_events_for_pairs';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womall_events_for_pairs';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkall_events_for_pairs';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkall_events_for_pairs';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1812,33 +1812,33 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womall_events_for_pairs';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womall_events_for_pairs';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkall_events_for_pairs';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkall_events_for_pairs';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womall_events_for_pairs (
+CREATE TABLE y8hp12zkall_events_for_pairs (
     person_id NUMBER(19),
     event_family VARCHAR(10),
     event_date DATE
 );
-INSERT INTO ctxb0womall_events_for_pairs (person_id, event_family, event_date)
-SELECT person_id, 'DX', event_date FROM ctxb0womdx_events
+INSERT INTO y8hp12zkall_events_for_pairs (person_id, event_family, event_date)
+SELECT person_id, 'DX', event_date FROM y8hp12zkdx_events
   UNION ALL
-SELECT person_id, 'ODX', event_date FROM ctxb0womother_dx_events
+SELECT person_id, 'ODX', event_date FROM y8hp12zkother_dx_events
   UNION ALL
-SELECT person_id, 'GDX', event_date FROM ctxb0womgen_cancer_events
+SELECT person_id, 'GDX', event_date FROM y8hp12zkgen_cancer_events
   UNION ALL
-SELECT person_id, 'MET', event_date FROM ctxb0wommet_events
+SELECT person_id, 'MET', event_date FROM y8hp12zkmet_events
   UNION ALL
-SELECT person_id, 'L01', event_date FROM ctxb0woml01_events
+SELECT person_id, 'L01', event_date FROM y8hp12zkl01_events
          ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womfirst_event_dates';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womfirst_event_dates';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkfirst_event_dates';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkfirst_event_dates';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1846,33 +1846,33 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womfirst_event_dates';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womfirst_event_dates';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkfirst_event_dates';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkfirst_event_dates';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womfirst_event_dates (
+CREATE TABLE y8hp12zkfirst_event_dates (
     person_id NUMBER(19),
     from_event VARCHAR(10),
     from_first_date DATE
 );
-INSERT INTO ctxb0womfirst_event_dates (person_id, from_event, from_first_date)
-SELECT person_id, 'DX', index_date FROM ctxb0wompatient_char
+INSERT INTO y8hp12zkfirst_event_dates (person_id, from_event, from_first_date)
+SELECT person_id, 'DX', index_date FROM y8hp12zkpatient_char
   UNION ALL
-SELECT person_id, 'ODX', first_other_dx_date FROM ctxb0wompatient_char         WHERE first_other_dx_date IS NOT NULL
+SELECT person_id, 'ODX', first_other_dx_date FROM y8hp12zkpatient_char         WHERE first_other_dx_date IS NOT NULL
     UNION ALL
-SELECT person_id, 'GDX', first_gen_cancer_date FROM ctxb0wompatient_char     WHERE first_gen_cancer_date IS NOT NULL
+SELECT person_id, 'GDX', first_gen_cancer_date FROM y8hp12zkpatient_char     WHERE first_gen_cancer_date IS NOT NULL
    UNION ALL
-SELECT person_id, 'MET', first_met_date FROM ctxb0wompatient_char     WHERE first_met_date IS NOT NULL
+SELECT person_id, 'MET', first_met_date FROM y8hp12zkpatient_char     WHERE first_met_date IS NOT NULL
    UNION ALL
-SELECT person_id, 'L01', first_l01_date FROM ctxb0wompatient_char   WHERE first_l01_date IS NOT NULL
+SELECT person_id, 'L01', first_l01_date FROM y8hp12zkpatient_char   WHERE first_l01_date IS NOT NULL
          ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0wompatient_timing_pairs_first_to_closest';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0wompatient_timing_pairs_first_to_closest';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkpatient_timing_pairs_first_to_closest';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkpatient_timing_pairs_first_to_closest';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1880,21 +1880,21 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0wompatient_timing_pairs_first_to_closest';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0wompatient_timing_pairs_first_to_closest';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkpatient_timing_pairs_first_to_closest';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkpatient_timing_pairs_first_to_closest';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0wompatient_timing_pairs_first_to_closest (
+CREATE TABLE y8hp12zkpatient_timing_pairs_first_to_closest (
     person_id NUMBER(19),
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     days_diff INT
 );
-INSERT INTO ctxb0wompatient_timing_pairs_first_to_closest (person_id, from_event, to_event, days_diff)
+INSERT INTO y8hp12zkpatient_timing_pairs_first_to_closest (person_id, from_event, to_event, days_diff)
  WITH ranked  AS (SELECT f.person_id,
         f.from_event,
         a.event_family AS to_event,
@@ -1903,8 +1903,8 @@ INSERT INTO ctxb0wompatient_timing_pairs_first_to_closest (person_id, from_event
             PARTITION BY f.person_id, f.from_event, a.event_family
             ORDER BY ABS(CEIL(CAST(a.event_date AS DATE) - CAST(f.from_first_date AS DATE))), a.event_date
         ) AS rn
-    FROM ctxb0womfirst_event_dates f
-    JOIN ctxb0womall_events_for_pairs a
+    FROM y8hp12zkfirst_event_dates f
+    JOIN y8hp12zkall_events_for_pairs a
       ON f.person_id = a.person_id
      AND f.from_event <> a.event_family
  )
@@ -1916,8 +1916,8 @@ FROM ranked
   WHERE rn = 1
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womtiming_pair_summary_first_to_closest';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womtiming_pair_summary_first_to_closest';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zktiming_pair_summary_first_to_closest';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zktiming_pair_summary_first_to_closest';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1925,15 +1925,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womtiming_pair_summary_first_to_closest';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womtiming_pair_summary_first_to_closest';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zktiming_pair_summary_first_to_closest';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zktiming_pair_summary_first_to_closest';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womtiming_pair_summary_first_to_closest (
+CREATE TABLE y8hp12zktiming_pair_summary_first_to_closest (
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     n_patients_with_pair INT,
@@ -1951,7 +1951,7 @@ CREATE TABLE ctxb0womtiming_pair_summary_first_to_closest (
     p90_days FLOAT,
     p95_days FLOAT
 );
-INSERT INTO ctxb0womtiming_pair_summary_first_to_closest (
+INSERT INTO y8hp12zktiming_pair_summary_first_to_closest (
     from_event,
     to_event,
     n_patients_with_pair,
@@ -1988,13 +1988,13 @@ SELECT from_event,
 FROM (SELECT from_event, to_event, days_diff,
         ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
         COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
-    FROM ctxb0wompatient_timing_pairs_first_to_closest
+    FROM y8hp12zkpatient_timing_pairs_first_to_closest
  ) x
 GROUP BY from_event, to_event
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0wompatient_timing_pairs_first_to_closest_before';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0wompatient_timing_pairs_first_to_closest_before';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkpatient_timing_pairs_first_to_closest_before';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkpatient_timing_pairs_first_to_closest_before';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2002,21 +2002,21 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0wompatient_timing_pairs_first_to_closest_before';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0wompatient_timing_pairs_first_to_closest_before';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkpatient_timing_pairs_first_to_closest_before';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkpatient_timing_pairs_first_to_closest_before';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0wompatient_timing_pairs_first_to_closest_before (
+CREATE TABLE y8hp12zkpatient_timing_pairs_first_to_closest_before (
     person_id NUMBER(19),
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     days_diff INT
 );
-INSERT INTO ctxb0wompatient_timing_pairs_first_to_closest_before (person_id, from_event, to_event, days_diff)
+INSERT INTO y8hp12zkpatient_timing_pairs_first_to_closest_before (person_id, from_event, to_event, days_diff)
  WITH ranked_before  AS (SELECT f.person_id,
         f.from_event,
         a.event_family AS to_event,
@@ -2025,8 +2025,8 @@ INSERT INTO ctxb0wompatient_timing_pairs_first_to_closest_before (person_id, fro
             PARTITION BY f.person_id, f.from_event, a.event_family
             ORDER BY ABS(CEIL(CAST(a.event_date AS DATE) - CAST(f.from_first_date AS DATE))), a.event_date DESC
         ) AS rn
-    FROM ctxb0womfirst_event_dates f
-    JOIN ctxb0womall_events_for_pairs a
+    FROM y8hp12zkfirst_event_dates f
+    JOIN y8hp12zkall_events_for_pairs a
       ON f.person_id = a.person_id
      AND f.from_event <> a.event_family
       WHERE CEIL(CAST(a.event_date AS DATE) - CAST(f.from_first_date AS DATE)) < 0
@@ -2039,8 +2039,8 @@ FROM ranked_before
   WHERE rn = 1
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womtiming_pair_summary_first_to_closest_before';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womtiming_pair_summary_first_to_closest_before';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zktiming_pair_summary_first_to_closest_before';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zktiming_pair_summary_first_to_closest_before';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2048,15 +2048,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womtiming_pair_summary_first_to_closest_before';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womtiming_pair_summary_first_to_closest_before';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zktiming_pair_summary_first_to_closest_before';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zktiming_pair_summary_first_to_closest_before';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womtiming_pair_summary_first_to_closest_before (
+CREATE TABLE y8hp12zktiming_pair_summary_first_to_closest_before (
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     n_patients_with_pair INT,
@@ -2074,7 +2074,7 @@ CREATE TABLE ctxb0womtiming_pair_summary_first_to_closest_before (
     p90_days FLOAT,
     p95_days FLOAT
 );
-INSERT INTO ctxb0womtiming_pair_summary_first_to_closest_before (
+INSERT INTO y8hp12zktiming_pair_summary_first_to_closest_before (
     from_event,
     to_event,
     n_patients_with_pair,
@@ -2111,13 +2111,13 @@ SELECT from_event,
 FROM (SELECT from_event, to_event, days_diff,
         ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
         COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
-    FROM ctxb0wompatient_timing_pairs_first_to_closest_before
+    FROM y8hp12zkpatient_timing_pairs_first_to_closest_before
  ) x
 GROUP BY from_event, to_event
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0wompatient_timing_pairs_first_to_closest_after';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0wompatient_timing_pairs_first_to_closest_after';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkpatient_timing_pairs_first_to_closest_after';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkpatient_timing_pairs_first_to_closest_after';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2125,21 +2125,21 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0wompatient_timing_pairs_first_to_closest_after';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0wompatient_timing_pairs_first_to_closest_after';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkpatient_timing_pairs_first_to_closest_after';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkpatient_timing_pairs_first_to_closest_after';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0wompatient_timing_pairs_first_to_closest_after (
+CREATE TABLE y8hp12zkpatient_timing_pairs_first_to_closest_after (
     person_id NUMBER(19),
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     days_diff INT
 );
-INSERT INTO ctxb0wompatient_timing_pairs_first_to_closest_after (person_id, from_event, to_event, days_diff)
+INSERT INTO y8hp12zkpatient_timing_pairs_first_to_closest_after (person_id, from_event, to_event, days_diff)
  WITH ranked_after  AS (SELECT f.person_id,
         f.from_event,
         a.event_family AS to_event,
@@ -2148,8 +2148,8 @@ INSERT INTO ctxb0wompatient_timing_pairs_first_to_closest_after (person_id, from
             PARTITION BY f.person_id, f.from_event, a.event_family
             ORDER BY CEIL(CAST(a.event_date AS DATE) - CAST(f.from_first_date AS DATE)), a.event_date
         ) AS rn
-    FROM ctxb0womfirst_event_dates f
-    JOIN ctxb0womall_events_for_pairs a
+    FROM y8hp12zkfirst_event_dates f
+    JOIN y8hp12zkall_events_for_pairs a
       ON f.person_id = a.person_id
      AND f.from_event <> a.event_family
       WHERE CEIL(CAST(a.event_date AS DATE) - CAST(f.from_first_date AS DATE)) >= 0
@@ -2162,8 +2162,8 @@ FROM ranked_after
   WHERE rn = 1
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womtiming_pair_summary_first_to_closest_after';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womtiming_pair_summary_first_to_closest_after';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zktiming_pair_summary_first_to_closest_after';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zktiming_pair_summary_first_to_closest_after';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2171,15 +2171,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womtiming_pair_summary_first_to_closest_after';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womtiming_pair_summary_first_to_closest_after';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zktiming_pair_summary_first_to_closest_after';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zktiming_pair_summary_first_to_closest_after';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womtiming_pair_summary_first_to_closest_after (
+CREATE TABLE y8hp12zktiming_pair_summary_first_to_closest_after (
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     n_patients_with_pair INT,
@@ -2197,7 +2197,7 @@ CREATE TABLE ctxb0womtiming_pair_summary_first_to_closest_after (
     p90_days FLOAT,
     p95_days FLOAT
 );
-INSERT INTO ctxb0womtiming_pair_summary_first_to_closest_after (
+INSERT INTO y8hp12zktiming_pair_summary_first_to_closest_after (
     from_event,
     to_event,
     n_patients_with_pair,
@@ -2234,13 +2234,13 @@ SELECT from_event,
 FROM (SELECT from_event, to_event, days_diff,
         ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
         COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
-    FROM ctxb0wompatient_timing_pairs_first_to_closest_after
+    FROM y8hp12zkpatient_timing_pairs_first_to_closest_after
  ) x
 GROUP BY from_event, to_event
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_presence';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_presence';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_presence';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_presence';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2248,15 +2248,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womevent_presence';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womevent_presence';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkevent_presence';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkevent_presence';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womevent_presence (
+CREATE TABLE y8hp12zkevent_presence (
     person_id NUMBER(19),
     has_dx INT,
     has_odx INT,
@@ -2264,7 +2264,7 @@ CREATE TABLE ctxb0womevent_presence (
     has_met INT,
     has_l01 INT
 );
-INSERT INTO ctxb0womevent_presence (
+INSERT INTO y8hp12zkevent_presence (
     person_id, has_dx, has_odx, has_gdx, has_met, has_l01
 )
 SELECT person_id,
@@ -2273,7 +2273,7 @@ SELECT person_id,
     CASE WHEN first_gen_cancer_date IS NOT NULL THEN 1 ELSE 0 END,
     CASE WHEN first_met_date IS NOT NULL THEN 1 ELSE 0 END,
     CASE WHEN first_l01_date IS NOT NULL THEN 1 ELSE 0 END
-FROM ctxb0wompatient_char
+FROM y8hp12zkpatient_char
  ;
 ------------------------------------------------------------
 -- J-bis) DEATH TIMING FROM INDEX AND FIRST_MET ANCHORS
@@ -2281,8 +2281,8 @@ FROM ctxb0wompatient_char
 -- Pre-compute each cohort patient's earliest death date and whether it
 -- falls within any of their observation periods.
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdeath_obs_status';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdeath_obs_status';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdeath_obs_status';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdeath_obs_status';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2290,20 +2290,20 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdeath_obs_status';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdeath_obs_status';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdeath_obs_status';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdeath_obs_status';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womdeath_obs_status (
+CREATE TABLE y8hp12zkdeath_obs_status (
     person_id NUMBER(19),
     death_date DATE,
     death_in_obs SMALLINT
 );
-INSERT INTO ctxb0womdeath_obs_status (person_id, death_date, death_in_obs)
+INSERT INTO y8hp12zkdeath_obs_status (person_id, death_date, death_in_obs)
 SELECT d.person_id,
     d.death_date,
     CASE WHEN EXISTS (SELECT 1
@@ -2316,11 +2316,11 @@ FROM (SELECT person_id, MIN(death_date) AS death_date
     FROM @cdm_database_schema.death
     GROUP BY person_id
  ) d
-  WHERE d.person_id IN (SELECT person_id FROM ctxb0womcohort )
+  WHERE d.person_id IN (SELECT person_id FROM y8hp12zkcohort )
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdeath_index_long';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdeath_index_long';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdeath_index_long';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdeath_index_long';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2328,32 +2328,32 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdeath_index_long';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdeath_index_long';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdeath_index_long';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdeath_index_long';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womdeath_index_long (
+CREATE TABLE y8hp12zkdeath_index_long (
     prevalence_year VARCHAR(20),
     days_to_death INT
 );
-INSERT INTO ctxb0womdeath_index_long (prevalence_year, days_to_death)
+INSERT INTO y8hp12zkdeath_index_long (prevalence_year, days_to_death)
 SELECT 'OVERALL', CEIL(CAST(dos.death_date AS DATE) - CAST(c.index_date AS DATE))
-FROM ctxb0womcohort c
-INNER JOIN ctxb0womdeath_obs_status dos ON dos.person_id = c.person_id
+FROM y8hp12zkcohort c
+INNER JOIN y8hp12zkdeath_obs_status dos ON dos.person_id = c.person_id
     WHERE dos.death_date >= c.index_date
    UNION ALL
 SELECT CAST(EXTRACT(YEAR FROM c.index_date) AS VARCHAR(4)), CEIL(CAST(dos.death_date AS DATE) - CAST(c.index_date AS DATE))
-FROM ctxb0womcohort c
-INNER JOIN ctxb0womdeath_obs_status dos ON dos.person_id = c.person_id
+FROM y8hp12zkcohort c
+INNER JOIN y8hp12zkdeath_obs_status dos ON dos.person_id = c.person_id
   WHERE dos.death_date >= c.index_date
    ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdeath_first_met_long';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdeath_first_met_long';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdeath_first_met_long';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdeath_first_met_long';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2361,34 +2361,34 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdeath_first_met_long';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdeath_first_met_long';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdeath_first_met_long';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdeath_first_met_long';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womdeath_first_met_long (
+CREATE TABLE y8hp12zkdeath_first_met_long (
     prevalence_year VARCHAR(20),
     days_to_death INT
 );
-INSERT INTO ctxb0womdeath_first_met_long (prevalence_year, days_to_death)
+INSERT INTO y8hp12zkdeath_first_met_long (prevalence_year, days_to_death)
 SELECT 'OVERALL', CEIL(CAST(dos.death_date AS DATE) - CAST(ms.first_met_date AS DATE))
-FROM ctxb0womcohort c
-INNER JOIN ctxb0wommet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
-INNER JOIN ctxb0womdeath_obs_status dos ON dos.person_id = c.person_id
+FROM y8hp12zkcohort c
+INNER JOIN y8hp12zkmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+INNER JOIN y8hp12zkdeath_obs_status dos ON dos.person_id = c.person_id
     WHERE dos.death_date >= ms.first_met_date
    UNION ALL
 SELECT CAST(EXTRACT(YEAR FROM ms.first_met_date) AS VARCHAR(4)), CEIL(CAST(dos.death_date AS DATE) - CAST(ms.first_met_date AS DATE))
-FROM ctxb0womcohort c
-INNER JOIN ctxb0wommet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
-INNER JOIN ctxb0womdeath_obs_status dos ON dos.person_id = c.person_id
+FROM y8hp12zkcohort c
+INNER JOIN y8hp12zkmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+INNER JOIN y8hp12zkdeath_obs_status dos ON dos.person_id = c.person_id
   WHERE dos.death_date >= ms.first_met_date
    ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdeath_stratum_counts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdeath_stratum_counts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdeath_stratum_counts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdeath_stratum_counts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2396,15 +2396,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdeath_stratum_counts';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdeath_stratum_counts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdeath_stratum_counts';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdeath_stratum_counts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womdeath_stratum_counts (
+CREATE TABLE y8hp12zkdeath_stratum_counts (
     prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     n_patients INT,
@@ -2412,7 +2412,7 @@ CREATE TABLE ctxb0womdeath_stratum_counts (
     n_deaths_in_obs INT,
     n_deaths_out_obs INT
 );
-INSERT INTO ctxb0womdeath_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
+INSERT INTO y8hp12zkdeath_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
 SELECT CASE
         WHEN GROUPING(EXTRACT(YEAR FROM c.index_date)) = 1 THEN 'OVERALL'
         ELSE CAST(EXTRACT(YEAR FROM c.index_date) AS VARCHAR(4))
@@ -2422,11 +2422,11 @@ SELECT CASE
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= c.index_date THEN 1 ELSE 0 END),
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= c.index_date AND dos.death_in_obs = 1 THEN 1 ELSE 0 END),
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= c.index_date AND dos.death_in_obs = 0 THEN 1 ELSE 0 END)
-FROM ctxb0womcohort c
-LEFT JOIN ctxb0womdeath_obs_status dos ON dos.person_id = c.person_id
+FROM y8hp12zkcohort c
+LEFT JOIN y8hp12zkdeath_obs_status dos ON dos.person_id = c.person_id
 GROUP BY GROUPING SETS ((), (EXTRACT(YEAR FROM c.index_date)))
  ;
-INSERT INTO ctxb0womdeath_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
+INSERT INTO y8hp12zkdeath_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
 SELECT CASE
         WHEN GROUPING(EXTRACT(YEAR FROM ms.first_met_date)) = 1 THEN 'OVERALL'
         ELSE CAST(EXTRACT(YEAR FROM ms.first_met_date) AS VARCHAR(4))
@@ -2436,14 +2436,14 @@ SELECT CASE
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= ms.first_met_date THEN 1 ELSE 0 END),
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= ms.first_met_date AND dos.death_in_obs = 1 THEN 1 ELSE 0 END),
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= ms.first_met_date AND dos.death_in_obs = 0 THEN 1 ELSE 0 END)
-FROM ctxb0womcohort c
-INNER JOIN ctxb0wommet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
-LEFT JOIN ctxb0womdeath_obs_status dos ON dos.person_id = c.person_id
+FROM y8hp12zkcohort c
+INNER JOIN y8hp12zkmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+LEFT JOIN y8hp12zkdeath_obs_status dos ON dos.person_id = c.person_id
 GROUP BY GROUPING SETS ((), (EXTRACT(YEAR FROM ms.first_met_date)))
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdeath_timing_long';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdeath_timing_long';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdeath_timing_long';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdeath_timing_long';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2451,27 +2451,27 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdeath_timing_long';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdeath_timing_long';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdeath_timing_long';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdeath_timing_long';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womdeath_timing_long (
+CREATE TABLE y8hp12zkdeath_timing_long (
     prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     days_to_death INT
 );
-INSERT INTO ctxb0womdeath_timing_long (prevalence_year, anchor_event, days_to_death)
-SELECT prevalence_year, 'INDEX', days_to_death FROM ctxb0womdeath_index_long
+INSERT INTO y8hp12zkdeath_timing_long (prevalence_year, anchor_event, days_to_death)
+SELECT prevalence_year, 'INDEX', days_to_death FROM y8hp12zkdeath_index_long
   UNION ALL
-SELECT prevalence_year, 'FIRST_MET', days_to_death FROM ctxb0womdeath_first_met_long
+SELECT prevalence_year, 'FIRST_MET', days_to_death FROM y8hp12zkdeath_first_met_long
    ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdeath_timing_quantiles';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdeath_timing_quantiles';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdeath_timing_quantiles';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdeath_timing_quantiles';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2479,22 +2479,22 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womdeath_timing_quantiles';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womdeath_timing_quantiles';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkdeath_timing_quantiles';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkdeath_timing_quantiles';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womdeath_timing_quantiles (
+CREATE TABLE y8hp12zkdeath_timing_quantiles (
     prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     lq_days FLOAT,
     median_days FLOAT,
     uq_days FLOAT
 );
-INSERT INTO ctxb0womdeath_timing_quantiles (
+INSERT INTO y8hp12zkdeath_timing_quantiles (
     prevalence_year,
     anchor_event,
     lq_days,
@@ -2509,15 +2509,15 @@ SELECT prevalence_year,
 FROM (SELECT prevalence_year, anchor_event, days_to_death,
         ROW_NUMBER() OVER (PARTITION BY prevalence_year, anchor_event ORDER BY days_to_death) AS rn,
         COUNT(*)     OVER (PARTITION BY prevalence_year, anchor_event)                        AS cnt
-    FROM ctxb0womdeath_timing_long
+    FROM y8hp12zkdeath_timing_long
  ) x
 GROUP BY prevalence_year, anchor_event
  ;
 -- Follow-up duration from anchor date to last observation period end,
 -- for all patients with at least one observation period covering or after anchor.
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womfollowup_long';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womfollowup_long';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkfollowup_long';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkfollowup_long';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2525,23 +2525,23 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womfollowup_long';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womfollowup_long';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkfollowup_long';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkfollowup_long';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womfollowup_long (
+CREATE TABLE y8hp12zkfollowup_long (
     prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     followup_days INT
 );
-INSERT INTO ctxb0womfollowup_long (prevalence_year, anchor_event, followup_days)
+INSERT INTO y8hp12zkfollowup_long (prevalence_year, anchor_event, followup_days)
 SELECT 'OVERALL', 'INDEX',
        CEIL(CAST(MAX(op.observation_period_end_date) AS DATE) - CAST(c.index_date AS DATE))
-FROM ctxb0womcohort c
+FROM y8hp12zkcohort c
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= c.index_date
@@ -2549,7 +2549,7 @@ GROUP BY c.person_id, c.index_date
   UNION ALL
 SELECT CAST(EXTRACT(YEAR FROM c.index_date) AS VARCHAR(4)), 'INDEX',
        CEIL(CAST(MAX(op.observation_period_end_date) AS DATE) - CAST(c.index_date AS DATE))
-FROM ctxb0womcohort c
+FROM y8hp12zkcohort c
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= c.index_date
@@ -2557,8 +2557,8 @@ GROUP BY c.person_id, c.index_date, EXTRACT(YEAR FROM c.index_date)
   UNION ALL
 SELECT 'OVERALL', 'FIRST_MET',
        CEIL(CAST(MAX(op.observation_period_end_date) AS DATE) - CAST(ms.first_met_date AS DATE))
-FROM ctxb0womcohort c
-INNER JOIN ctxb0wommet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+FROM y8hp12zkcohort c
+INNER JOIN y8hp12zkmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= ms.first_met_date
@@ -2566,16 +2566,16 @@ GROUP BY c.person_id, ms.first_met_date
   UNION ALL
 SELECT CAST(EXTRACT(YEAR FROM ms.first_met_date) AS VARCHAR(4)), 'FIRST_MET',
        CEIL(CAST(MAX(op.observation_period_end_date) AS DATE) - CAST(ms.first_met_date AS DATE))
-FROM ctxb0womcohort c
-INNER JOIN ctxb0wommet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+FROM y8hp12zkcohort c
+INNER JOIN y8hp12zkmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= ms.first_met_date
 GROUP BY c.person_id, ms.first_met_date, EXTRACT(YEAR FROM ms.first_met_date)
        ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womfollowup_quantiles';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womfollowup_quantiles';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkfollowup_quantiles';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkfollowup_quantiles';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2583,22 +2583,22 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0womfollowup_quantiles';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0womfollowup_quantiles';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkfollowup_quantiles';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkfollowup_quantiles';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0womfollowup_quantiles (
+CREATE TABLE y8hp12zkfollowup_quantiles (
     prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     lq_followup_days FLOAT,
     median_followup_days FLOAT,
     uq_followup_days FLOAT
 );
-INSERT INTO ctxb0womfollowup_quantiles (
+INSERT INTO y8hp12zkfollowup_quantiles (
     prevalence_year,
     anchor_event,
     lq_followup_days,
@@ -2613,7 +2613,7 @@ SELECT prevalence_year,
 FROM (SELECT prevalence_year, anchor_event, followup_days,
         ROW_NUMBER() OVER (PARTITION BY prevalence_year, anchor_event ORDER BY followup_days) AS rn,
         COUNT(*)     OVER (PARTITION BY prevalence_year, anchor_event)                        AS cnt
-    FROM ctxb0womfollowup_long
+    FROM y8hp12zkfollowup_long
  ) x
 GROUP BY prevalence_year, anchor_event
  ;
@@ -2622,8 +2622,8 @@ GROUP BY prevalence_year, anchor_event
 ------------------------------------------------------------
 -- Deduplicated L01 event days per patient (one row per patient-day)
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0woml01_event_days';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0woml01_event_days';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkl01_event_days';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkl01_event_days';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2631,27 +2631,27 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0woml01_event_days';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0woml01_event_days';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkl01_event_days';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkl01_event_days';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0woml01_event_days (
+CREATE TABLE y8hp12zkl01_event_days (
     person_id  NUMBER(19),
     event_day  DATE
 );
-INSERT INTO ctxb0woml01_event_days (person_id, event_day)
+INSERT INTO y8hp12zkl01_event_days (person_id, event_day)
 SELECT DISTINCT person_id, event_date
-FROM ctxb0woml01_events
-  WHERE person_id IN (SELECT person_id FROM ctxb0womcohort )
+FROM y8hp12zkl01_events
+  WHERE person_id IN (SELECT person_id FROM y8hp12zkcohort )
  ;
 -- Consecutive gaps between L01 event days per patient
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0woml01_consecutive_gaps';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0woml01_consecutive_gaps';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkl01_consecutive_gaps';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkl01_consecutive_gaps';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2659,24 +2659,24 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE ctxb0woml01_consecutive_gaps';
-  EXECUTE IMMEDIATE 'DROP TABLE ctxb0woml01_consecutive_gaps';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE y8hp12zkl01_consecutive_gaps';
+  EXECUTE IMMEDIATE 'DROP TABLE y8hp12zkl01_consecutive_gaps';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE ctxb0woml01_consecutive_gaps (
+CREATE TABLE y8hp12zkl01_consecutive_gaps (
     person_id  NUMBER(19),
     subgroup   VARCHAR(12),
     gap_days   INT
 );
-INSERT INTO ctxb0woml01_consecutive_gaps (person_id, subgroup, gap_days)
+INSERT INTO y8hp12zkl01_consecutive_gaps (person_id, subgroup, gap_days)
  WITH ranked  AS (SELECT e.person_id,
         e.event_day,
         LEAD(e.event_day) OVER (PARTITION BY e.person_id ORDER BY e.event_day) AS next_day
-    FROM ctxb0woml01_event_days e
+    FROM y8hp12zkl01_event_days e
  ),
 gaps AS (SELECT person_id,
         CEIL(CAST(next_day AS DATE) - CAST(event_day AS DATE)) AS gap_days
@@ -2687,17 +2687,17 @@ gaps AS (SELECT person_id,
   UNION ALL
 SELECT g.person_id, 'MET_L01', g.gap_days
 FROM gaps g
-JOIN ctxb0wommet_summary ms ON g.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+JOIN y8hp12zkmet_summary ms ON g.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
    ;
 -- Max gap per patient (one row per patient; used for MAX-gap subgroups in chunks 11–12)
-INSERT INTO ctxb0woml01_consecutive_gaps (person_id, subgroup, gap_days)
+INSERT INTO y8hp12zkl01_consecutive_gaps (person_id, subgroup, gap_days)
 SELECT person_id, 'ALL_L01_MAX', MAX(gap_days)
-FROM ctxb0woml01_consecutive_gaps
+FROM y8hp12zkl01_consecutive_gaps
     WHERE subgroup = 'ALL_L01'
 GROUP BY person_id
    UNION ALL
 SELECT person_id, 'MET_L01_MAX', MAX(gap_days)
-FROM ctxb0woml01_consecutive_gaps
+FROM y8hp12zkl01_consecutive_gaps
   WHERE subgroup = 'MET_L01'
 GROUP BY person_id
    ;

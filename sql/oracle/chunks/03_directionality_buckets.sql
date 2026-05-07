@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : oracle
--- Translated     : 2026-05-07 11:53:52 BST
+-- Translated     : 2026-05-07 11:58:10 BST
 -- Source file    : sql/sql_server/chunks/03_directionality_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -41,7 +41,7 @@ WITH dx_met_base AS (SELECT EXTRACT(YEAR FROM index_date) AS index_year_int,
             WHEN days_dx_to_met <= 365   THEN 'AFTER_91_365'
             ELSE 'AFTER_GT365'
         END AS direction
-    FROM ctxb0wompatient_char
+    FROM y8hp12zkpatient_char
  ),
 met_l01_base AS (SELECT EXTRACT(YEAR FROM first_met_date) AS index_year_int,
         CASE
@@ -54,7 +54,7 @@ met_l01_base AS (SELECT EXTRACT(YEAR FROM first_met_date) AS index_year_int,
             WHEN days_met_to_l01 <= 365  THEN 'AFTER_91_365'
             ELSE 'AFTER_GT365'
         END AS direction
-    FROM ctxb0wompatient_char
+    FROM y8hp12zkpatient_char
       WHERE first_met_date IS NOT NULL
  )
 SELECT x.pair,
