@@ -1320,7 +1320,7 @@ def _s01_dx_met_timing(rd: Path) -> str:
         )
         if tbl:
             parts.append(_card(
-                f"Table 1.1 — DX ↔ MET temporal directionality {_badge('new')}",
+                f"Table 1.1 — DX ↔ MET temporal directionality (first to first) {_badge('new')}",
                 tbl + '<p class="tbl-note">OVERALL cohort. % denominated on DX cohort. Suppressed rows hidden.</p>',
             ))
 
