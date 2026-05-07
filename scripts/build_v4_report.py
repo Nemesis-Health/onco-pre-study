@@ -1608,7 +1608,7 @@ def _s03_treatment_timing(rd: Path) -> str:
         if tbl:
             n_lbl = f"N={n_met_s3:,}" if n_met_s3 else "MET subgroup"
             parts.append(_card(
-                f"Table 3.1 — MET ↔ L01 temporal directionality {_badge('new')}",
+                f"Table 3.1 — MET ↔ L01 temporal directionality (first to first) {_badge('new')}",
                 tbl + f'<p class="tbl-note">MET subgroup only ({n_lbl}). NO_EVENT = patients with MET but no L01 ever.</p>',
             ))
 
