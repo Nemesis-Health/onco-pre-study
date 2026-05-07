@@ -61,7 +61,8 @@ result_chunks <- list(
   list(file = "11_l01_gap_deciles.sql",         output = "final_l01_gap_deciles.csv"),
   list(file = "12_l01_gap_buckets.sql",         output = "final_l01_gap_buckets.csv"),
   list(file = "13_death_gap_summary.sql",       output = "final_death_gap_summary.csv"),
-  list(file = "14_death_gap_buckets.sql",       output = "final_death_gap_buckets.csv")
+  list(file = "14_death_gap_buckets.sql",       output = "final_death_gap_buckets.csv"),
+  list(file = "15_l01_day_count_buckets.sql",   output = "final_l01_day_count_buckets.csv")
 )
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
