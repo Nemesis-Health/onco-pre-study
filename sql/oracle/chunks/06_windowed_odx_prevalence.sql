@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : oracle
--- Translated     : 2026-05-07 11:48:00 BST
+-- Translated     : 2026-05-07 11:53:52 BST
 -- Source file    : sql/sql_server/chunks/06_windowed_odx_prevalence.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -36,8 +36,8 @@ WITH odx_gdx_events AS (SELECT 'ODX' AS event_family,
         e.concept_id,
         e.person_id,
         CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)) AS days_from_index
-    FROM qbz8duelother_dx_events e
-    JOIN qbz8duelcohort c ON e.person_id = c.person_id
+    FROM ctxb0womother_dx_events e
+    JOIN ctxb0womcohort c ON e.person_id = c.person_id
       UNION ALL
     -- GDX events with days relative to index_date
     SELECT
@@ -45,8 +45,8 @@ WITH odx_gdx_events AS (SELECT 'ODX' AS event_family,
         e.concept_id,
         e.person_id,
         CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE))  days_from_index
-    FROM qbz8duelgen_cancer_events e
-    JOIN qbz8duelcohort c  ON e.person_id = c.person_id
+    FROM ctxb0womgen_cancer_events e
+    JOIN ctxb0womcohort c  ON e.person_id = c.person_id
  ),
 windowed AS (SELECT event_family,
         concept_id,
@@ -75,13 +75,13 @@ agg AS (SELECT event_family,
  )
 SELECT a.event_family,
     a.concept_id,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever          END AS n_ever,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN NULL             ELSE a.n_pm30d         END AS n_pm30d,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN NULL             ELSE a.n_pm90d         END AS n_pm90d,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN NULL             ELSE a.n_pm180d        END AS n_pm180d,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN NULL             ELSE a.n_pm1yr         END AS n_pm1yr,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN NULL             ELSE a.n_ever_before   END AS n_ever_before,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN NULL             ELSE a.n_ever_after    END AS n_ever_after
+    CASE WHEN a.n_ever        <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever        END AS n_ever,
+    CASE WHEN a.n_pm30d       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm30d       END AS n_pm30d,
+    CASE WHEN a.n_pm90d       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm90d       END AS n_pm90d,
+    CASE WHEN a.n_pm180d      <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm180d      END AS n_pm180d,
+    CASE WHEN a.n_pm1yr       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm1yr       END AS n_pm1yr,
+    CASE WHEN a.n_ever_before <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_before END AS n_ever_before,
+    CASE WHEN a.n_ever_after  <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_after  END AS n_ever_after
 FROM agg a
 ORDER BY a.event_family, a.n_ever DESC, a.concept_id
  ;

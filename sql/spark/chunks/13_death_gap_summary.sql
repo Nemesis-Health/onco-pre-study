@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : spark
--- Translated     : 2026-05-07 11:48:09 BST
+-- Translated     : 2026-05-07 11:54:01 BST
 -- Source file    : sql/sql_server/chunks/13_death_gap_summary.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -19,7 +19,7 @@ WITH patient_obs AS (
  MIN(observation_period_start_date) AS first_obs_start,
  MAX(observation_period_end_date) AS last_obs_end
  FROM @cdm_database_schema.observation_period
- WHERE person_id IN (SELECT person_id FROM qbz8duelcohort)
+ WHERE person_id IN (SELECT person_id FROM ctxb0womcohort)
  GROUP BY person_id
 ),
 death_obs_gaps AS (
@@ -40,12 +40,21 @@ death_obs_gaps AS (
  THEN 1
  ELSE 0
  END AS death_before_obs
- FROM qbz8duelcohort c
- INNER JOIN qbz8dueldeath_obs_status dos ON dos.person_id = c.person_id
- LEFT JOIN qbz8duelmet_summary ms ON ms.person_id = c.person_id
+ FROM ctxb0womcohort c
+ INNER JOIN ctxb0womdeath_obs_status dos ON dos.person_id = c.person_id
+ LEFT JOIN ctxb0wommet_summary ms ON ms.person_id = c.person_id
  LEFT JOIN patient_obs po ON po.person_id = c.person_id
 )
 SELECT
+ anchor_event,
+ CASE WHEN n_death_before_obs <= @min_cell_count THEN -@min_cell_count ELSE n_death_before_obs END AS n_death_before_obs,
+ CASE WHEN n_death_after_obs <= @min_cell_count THEN -@min_cell_count ELSE n_death_after_obs END AS n_death_after_obs,
+ CASE WHEN n_death_after_obs <= @min_cell_count THEN NULL ELSE lq_gap_days END AS lq_gap_days,
+ CASE WHEN n_death_after_obs <= @min_cell_count THEN NULL ELSE median_gap_days END AS median_gap_days,
+ CASE WHEN n_death_after_obs <= @min_cell_count THEN NULL ELSE uq_gap_days END AS uq_gap_days,
+ CASE WHEN n_death_after_obs <= @min_cell_count THEN NULL ELSE p90_gap_days END AS p90_gap_days
+FROM (
+ SELECT
  'INDEX' AS anchor_event,
  SUM(CASE WHEN death_before_obs = 1 THEN 1 ELSE 0 END) AS n_death_before_obs,
  SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) AS n_death_after_obs,
@@ -53,15 +62,15 @@ SELECT
  MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 2.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS DOUBLE) END) AS median_gap_days,
  MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 4.0 * rn >= 3 * non_null_cnt THEN CAST(gap_death_after_obs AS DOUBLE) END) AS uq_gap_days,
  MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 10.0 * rn >= 9 * non_null_cnt THEN CAST(gap_death_after_obs AS DOUBLE) END) AS p90_gap_days
-FROM (
+ FROM (
  SELECT death_before_obs, gap_death_after_obs,
  ROW_NUMBER() OVER (ORDER BY gap_death_after_obs) AS rn,
  SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) OVER () AS non_null_cnt
  FROM death_obs_gaps
  WHERE death_date IS NOT NULL
-) x
-UNION ALL
-SELECT
+ ) x
+ UNION ALL
+ SELECT
  'FIRST_MET' AS anchor_event,
  SUM(CASE WHEN death_before_obs = 1 THEN 1 ELSE 0 END) AS n_death_before_obs,
  SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) AS n_death_after_obs,
@@ -69,11 +78,12 @@ SELECT
  MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 2.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS DOUBLE) END) AS median_gap_days,
  MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 4.0 * rn >= 3 * non_null_cnt THEN CAST(gap_death_after_obs AS DOUBLE) END) AS uq_gap_days,
  MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 10.0 * rn >= 9 * non_null_cnt THEN CAST(gap_death_after_obs AS DOUBLE) END) AS p90_gap_days
-FROM (
+ FROM (
  SELECT death_before_obs, gap_death_after_obs,
  ROW_NUMBER() OVER (ORDER BY gap_death_after_obs) AS rn,
  SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) OVER () AS non_null_cnt
  FROM death_obs_gaps
  WHERE death_date IS NOT NULL
  AND first_met_date IS NOT NULL
-) x;
+ ) x
+) agg;

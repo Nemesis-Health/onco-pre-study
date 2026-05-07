@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-07 11:48:08 BST
+-- Translated     : 2026-05-07 11:54:00 BST
 -- Source file    : sql/sql_server/chunks/06_windowed_odx_prevalence.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -39,8 +39,8 @@ with odx_gdx_events as (
         e.concept_id,
         e.person_id,
         DATE_DIFF(IF(SAFE_CAST(e.event_date  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(e.event_date  AS STRING)),SAFE_CAST(e.event_date  AS DATE)), IF(SAFE_CAST(c.index_date  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(c.index_date  AS STRING)),SAFE_CAST(c.index_date  AS DATE)), DAY) as days_from_index
-    from qbz8duelother_dx_events e
-    join qbz8duelcohort c on e.person_id = c.person_id
+    from ctxb0womother_dx_events e
+    join ctxb0womcohort c on e.person_id = c.person_id
     union all
     -- GDX events with days relative to index_date
     select
@@ -48,8 +48,8 @@ with odx_gdx_events as (
         e.concept_id,
         e.person_id,
         DATE_DIFF(IF(SAFE_CAST(e.event_date  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(e.event_date  AS STRING)),SAFE_CAST(e.event_date  AS DATE)), IF(SAFE_CAST(c.index_date  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(c.index_date  AS STRING)),SAFE_CAST(c.index_date  AS DATE)), DAY) as days_from_index
-    from qbz8duelgen_cancer_events e
-    join qbz8duelcohort c on e.person_id = c.person_id
+    from ctxb0womgen_cancer_events e
+    join ctxb0womcohort c on e.person_id = c.person_id
 ),
 windowed as (
      select event_family,
@@ -78,13 +78,13 @@ agg as (
      group by  1, 2 )
  select a.event_family,
     a.concept_id,
-    case when a.n_ever          <= @min_cell_count then -@min_cell_count else a.n_ever          end as n_ever,
-    case when a.n_ever          <= @min_cell_count then null             else a.n_pm30d         end as n_pm30d,
-    case when a.n_ever          <= @min_cell_count then null             else a.n_pm90d         end as n_pm90d,
-    case when a.n_ever          <= @min_cell_count then null             else a.n_pm180d        end as n_pm180d,
-    case when a.n_ever          <= @min_cell_count then null             else a.n_pm1yr         end as n_pm1yr,
-    case when a.n_ever          <= @min_cell_count then null             else a.n_ever_before   end as n_ever_before,
-    case when a.n_ever          <= @min_cell_count then null             else a.n_ever_after    end as n_ever_after
+    case when a.n_ever        <= @min_cell_count then -@min_cell_count else a.n_ever        end as n_ever,
+    case when a.n_pm30d       <= @min_cell_count then -@min_cell_count else a.n_pm30d       end as n_pm30d,
+    case when a.n_pm90d       <= @min_cell_count then -@min_cell_count else a.n_pm90d       end as n_pm90d,
+    case when a.n_pm180d      <= @min_cell_count then -@min_cell_count else a.n_pm180d      end as n_pm180d,
+    case when a.n_pm1yr       <= @min_cell_count then -@min_cell_count else a.n_pm1yr       end as n_pm1yr,
+    case when a.n_ever_before <= @min_cell_count then -@min_cell_count else a.n_ever_before end as n_ever_before,
+    case when a.n_ever_after  <= @min_cell_count then -@min_cell_count else a.n_ever_after  end as n_ever_after
  from agg a
  order by  a.event_family, a.n_ever desc, a.concept_id
  ;

@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : oracle
--- Translated     : 2026-05-07 11:48:00 BST
+-- Translated     : 2026-05-07 11:53:52 BST
 -- Source file    : sql/sql_server/chunks/14_death_gap_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -21,7 +21,7 @@ WITH patient_obs AS (SELECT person_id,
         MIN(observation_period_start_date) AS first_obs_start,
         MAX(observation_period_end_date)   AS last_obs_end
     FROM @cdm_database_schema.observation_period
-      WHERE person_id IN (SELECT person_id FROM qbz8duelcohort )
+      WHERE person_id IN (SELECT person_id FROM ctxb0womcohort )
     GROUP BY person_id
  ),
 death_obs_gaps AS (SELECT c.person_id,
@@ -31,9 +31,9 @@ death_obs_gaps AS (SELECT c.person_id,
                 THEN CEIL(CAST(dos.death_date AS DATE) - CAST(po.last_obs_end AS DATE))
             ELSE NULL
         END AS gap_death_after_obs
-    FROM qbz8duelcohort c
-    INNER JOIN qbz8dueldeath_obs_status dos ON dos.person_id = c.person_id
-    LEFT JOIN qbz8duelmet_summary ms        ON ms.person_id  = c.person_id
+    FROM ctxb0womcohort c
+    INNER JOIN ctxb0womdeath_obs_status dos ON dos.person_id = c.person_id
+    LEFT JOIN ctxb0wommet_summary ms        ON ms.person_id  = c.person_id
     LEFT JOIN patient_obs po         ON po.person_id  = c.person_id
  ),
 bucketed AS (SELECT person_id,
@@ -60,15 +60,19 @@ bucketed AS (SELECT person_id,
       WHERE gap_death_after_obs IS NOT NULL
  )
 SELECT anchor_event, gap_bucket, n_patients
-FROM (SELECT 'INDEX'     AS anchor_event, gap_bucket, COUNT(*) AS n_patients, MIN(sort_key) AS sort_key
+FROM (SELECT 'INDEX' AS anchor_event, gap_bucket,
+         CASE WHEN  COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*)  END AS n_patients,
+        MIN(sort_key) AS sort_key
     FROM bucketed
     GROUP BY gap_bucket
       UNION ALL
-    SELECT 'FIRST_MET'  anchor_event, gap_bucket, COUNT(*)  n_patients, MIN(sort_key) AS sort_key
+    SELECT 'FIRST_MET'  anchor_event, gap_bucket,
+        CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END  n_patients,
+        MIN(sort_key) AS sort_key
     FROM bucketed
        WHERE first_met_date IS NOT NULL
     GROUP BY gap_bucket
- ) x
+  ) x
 ORDER BY
     CASE WHEN anchor_event = 'INDEX' THEN 0 ELSE 1 END,
     sort_key

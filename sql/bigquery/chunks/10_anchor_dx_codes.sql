@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-07 11:48:08 BST
+-- Translated     : 2026-05-07 11:54:00 BST
 -- Source file    : sql/sql_server/chunks/10_anchor_dx_codes.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -20,7 +20,7 @@ with dx_days as (
         person_id,
         event_date,
         concept_id
-    from qbz8dueldx_events
+    from ctxb0womdx_events
 )
  select s.concept_id,
     case when s.n_distinct_patients <= @min_cell_count then -@min_cell_count else s.n_distinct_patients end as n_distinct_patients,

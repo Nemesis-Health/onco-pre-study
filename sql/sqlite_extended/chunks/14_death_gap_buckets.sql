@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : sqlite extended
--- Translated     : 2026-05-07 11:48:15 BST
+-- Translated     : 2026-05-07 11:54:05 BST
 -- Source file    : sql/sql_server/chunks/14_death_gap_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -62,11 +62,15 @@ bucketed AS (
 )
 SELECT anchor_event, gap_bucket, n_patients
 FROM (
-    SELECT 'INDEX'     AS anchor_event, gap_bucket, COUNT(*) AS n_patients, MIN(sort_key) AS sort_key
+    SELECT 'INDEX' AS anchor_event, gap_bucket,
+        CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_patients,
+        MIN(sort_key) AS sort_key
     FROM bucketed
     GROUP BY gap_bucket
     UNION ALL
-    SELECT 'FIRST_MET' AS anchor_event, gap_bucket, COUNT(*) AS n_patients, MIN(sort_key) AS sort_key
+    SELECT 'FIRST_MET' AS anchor_event, gap_bucket,
+        CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_patients,
+        MIN(sort_key) AS sort_key
     FROM bucketed
     WHERE first_met_date IS NOT NULL
     GROUP BY gap_bucket

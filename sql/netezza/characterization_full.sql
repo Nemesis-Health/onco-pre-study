@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : netezza
--- Translated     : 2026-05-07 11:48:04 BST
+-- Translated     : 2026-05-07 11:53:56 BST
 -- Source file    : sql/sql_server/characterization_full.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -2103,13 +2103,13 @@ agg AS (
 SELECT
     a.event_family,
     a.concept_id,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever          END AS n_ever,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN NULL             ELSE a.n_pm30d         END AS n_pm30d,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN NULL             ELSE a.n_pm90d         END AS n_pm90d,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN NULL             ELSE a.n_pm180d        END AS n_pm180d,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN NULL             ELSE a.n_pm1yr         END AS n_pm1yr,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN NULL             ELSE a.n_ever_before   END AS n_ever_before,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN NULL             ELSE a.n_ever_after    END AS n_ever_after
+    CASE WHEN a.n_ever        <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever        END AS n_ever,
+    CASE WHEN a.n_pm30d       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm30d       END AS n_pm30d,
+    CASE WHEN a.n_pm90d       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm90d       END AS n_pm90d,
+    CASE WHEN a.n_pm180d      <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm180d      END AS n_pm180d,
+    CASE WHEN a.n_pm1yr       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm1yr       END AS n_pm1yr,
+    CASE WHEN a.n_ever_before <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_before END AS n_ever_before,
+    CASE WHEN a.n_ever_after  <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_after  END AS n_ever_after
 FROM agg a
 ORDER BY a.event_family, a.n_ever DESC, a.concept_id
 ;
@@ -2390,15 +2390,17 @@ ORDER BY s.n_distinct_patients DESC, s.concept_id
 --       MET_L01 : patients who also have a first_met_date
 --
 --     Output: one row per subgroup with gap-day deciles.
+--     Small-cell suppression: n_gaps <= @min_cell_count suppresses percentiles to NULL
+--     and replaces counts with -@min_cell_count.
 SELECT
     subgroup,
-    COUNT(*)                  AS n_gaps,
-    COUNT(DISTINCT person_id) AS n_patients_with_gaps,
-    MIN(CASE WHEN 10.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT(6)) END) AS p10_days,
-    MIN(CASE WHEN  4.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT(6)) END) AS p25_days,
-    MIN(CASE WHEN  2.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT(6)) END) AS p50_days,
-    MIN(CASE WHEN  4.0 * rn >= 3 * cnt THEN CAST(gap_days AS FLOAT(6)) END) AS p75_days,
-    MIN(CASE WHEN 10.0 * rn >= 9 * cnt THEN CAST(gap_days AS FLOAT(6)) END) AS p90_days
+    CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_gaps,
+    CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(DISTINCT person_id) END AS n_patients_with_gaps,
+    MIN(CASE WHEN cnt > @min_cell_count AND 10.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT(6)) END) AS p10_days,
+    MIN(CASE WHEN cnt > @min_cell_count AND  4.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT(6)) END) AS p25_days,
+    MIN(CASE WHEN cnt > @min_cell_count AND  2.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT(6)) END) AS p50_days,
+    MIN(CASE WHEN cnt > @min_cell_count AND  4.0 * rn >= 3 * cnt  THEN CAST(gap_days AS FLOAT(6)) END) AS p75_days,
+    MIN(CASE WHEN cnt > @min_cell_count AND 10.0 * rn >= 9 * cnt  THEN CAST(gap_days AS FLOAT(6)) END) AS p90_days
 FROM (
     SELECT subgroup, person_id, gap_days,
         ROW_NUMBER() OVER (PARTITION BY subgroup ORDER BY gap_days) AS rn,
@@ -2413,6 +2415,7 @@ ORDER BY subgroup
 --     (section L).  Same subgroups as chunk 11 (ALL_L01, MET_L01).
 --
 --     Output: one row per (subgroup, gap_bucket) for histogram rendering.
+--     Small-cell suppression: n_gaps <= @min_cell_count suppressed to -@min_cell_count.
 SELECT
     subgroup,
     CASE
@@ -2423,7 +2426,7 @@ SELECT
         WHEN gap_days < 365  THEN '180_364d'
         ELSE 'ge365d'
     END AS gap_bucket,
-    COUNT(*) AS n_gaps
+    CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_gaps
 FROM l01_consecutive_gaps
 GROUP BY
     subgroup,
@@ -2455,8 +2458,8 @@ ORDER BY
 --       - lq/median/uq/p90 percentiles of the post-obs gap (days).
 --
 --     Stratified by anchor (INDEX / FIRST_MET).
---     Small-cell suppression intentionally NOT applied here — these are
---     aggregate distribution statistics over (already small) flagged subsets.
+--     Small-cell suppression: n_death_before_obs and n_death_after_obs use -@min_cell_count
+--     when suppressed; percentile columns are set to NULL when n_death_after_obs is suppressed.
 WITH patient_obs AS (
     SELECT
         person_id,
@@ -2490,37 +2493,47 @@ death_obs_gaps AS (
     LEFT JOIN patient_obs po  ON po.person_id  = c.person_id
 )
 SELECT
-    'INDEX' AS anchor_event,
-    SUM(CASE WHEN death_before_obs = 1 THEN 1 ELSE 0 END) AS n_death_before_obs,
-    SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) AS n_death_after_obs,
-    MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  4.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT(6)) END) AS lq_gap_days,
-    MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  2.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT(6)) END) AS median_gap_days,
-    MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  4.0 * rn >= 3 * non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT(6)) END) AS uq_gap_days,
-    MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 10.0 * rn >= 9 * non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT(6)) END) AS p90_gap_days
+    anchor_event,
+    CASE WHEN n_death_before_obs <= @min_cell_count THEN -@min_cell_count ELSE n_death_before_obs END AS n_death_before_obs,
+    CASE WHEN n_death_after_obs  <= @min_cell_count THEN -@min_cell_count ELSE n_death_after_obs  END AS n_death_after_obs,
+    CASE WHEN n_death_after_obs  <= @min_cell_count THEN NULL ELSE lq_gap_days     END AS lq_gap_days,
+    CASE WHEN n_death_after_obs  <= @min_cell_count THEN NULL ELSE median_gap_days END AS median_gap_days,
+    CASE WHEN n_death_after_obs  <= @min_cell_count THEN NULL ELSE uq_gap_days     END AS uq_gap_days,
+    CASE WHEN n_death_after_obs  <= @min_cell_count THEN NULL ELSE p90_gap_days    END AS p90_gap_days
 FROM (
-    SELECT death_before_obs, gap_death_after_obs,
-        ROW_NUMBER() OVER (ORDER BY gap_death_after_obs) AS rn,
-        SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) OVER () AS non_null_cnt
-    FROM death_obs_gaps
-    WHERE death_date IS NOT NULL
-) x
-UNION ALL
-SELECT
-    'FIRST_MET' AS anchor_event,
-    SUM(CASE WHEN death_before_obs = 1 THEN 1 ELSE 0 END) AS n_death_before_obs,
-    SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) AS n_death_after_obs,
-    MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  4.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT(6)) END) AS lq_gap_days,
-    MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  2.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT(6)) END) AS median_gap_days,
-    MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  4.0 * rn >= 3 * non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT(6)) END) AS uq_gap_days,
-    MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 10.0 * rn >= 9 * non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT(6)) END) AS p90_gap_days
-FROM (
-    SELECT death_before_obs, gap_death_after_obs,
-        ROW_NUMBER() OVER (ORDER BY gap_death_after_obs) AS rn,
-        SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) OVER () AS non_null_cnt
-    FROM death_obs_gaps
-    WHERE death_date IS NOT NULL
-      AND first_met_date IS NOT NULL
-) x
+    SELECT
+        'INDEX' AS anchor_event,
+        SUM(CASE WHEN death_before_obs = 1 THEN 1 ELSE 0 END) AS n_death_before_obs,
+        SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) AS n_death_after_obs,
+        MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  4.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT(6)) END) AS lq_gap_days,
+        MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  2.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT(6)) END) AS median_gap_days,
+        MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  4.0 * rn >= 3 * non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT(6)) END) AS uq_gap_days,
+        MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 10.0 * rn >= 9 * non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT(6)) END) AS p90_gap_days
+    FROM (
+        SELECT death_before_obs, gap_death_after_obs,
+            ROW_NUMBER() OVER (ORDER BY gap_death_after_obs) AS rn,
+            SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) OVER () AS non_null_cnt
+        FROM death_obs_gaps
+        WHERE death_date IS NOT NULL
+    ) x
+    UNION ALL
+    SELECT
+        'FIRST_MET' AS anchor_event,
+        SUM(CASE WHEN death_before_obs = 1 THEN 1 ELSE 0 END) AS n_death_before_obs,
+        SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) AS n_death_after_obs,
+        MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  4.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT(6)) END) AS lq_gap_days,
+        MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  2.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT(6)) END) AS median_gap_days,
+        MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  4.0 * rn >= 3 * non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT(6)) END) AS uq_gap_days,
+        MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 10.0 * rn >= 9 * non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT(6)) END) AS p90_gap_days
+    FROM (
+        SELECT death_before_obs, gap_death_after_obs,
+            ROW_NUMBER() OVER (ORDER BY gap_death_after_obs) AS rn,
+            SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) OVER () AS non_null_cnt
+        FROM death_obs_gaps
+        WHERE death_date IS NOT NULL
+          AND first_met_date IS NOT NULL
+    ) x
+) agg
 ;
 -- 14) Death date vs observation period — bucketed gap histogram
 --     Restricted to patients where death_date > obs_period_end_date.
@@ -2576,11 +2589,15 @@ bucketed AS (
 )
 SELECT anchor_event, gap_bucket, n_patients
 FROM (
-    SELECT 'INDEX'     AS anchor_event, gap_bucket, COUNT(*) AS n_patients, MIN(sort_key) AS sort_key
+    SELECT 'INDEX' AS anchor_event, gap_bucket,
+        CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_patients,
+        MIN(sort_key) AS sort_key
     FROM bucketed
     GROUP BY gap_bucket
     UNION ALL
-    SELECT 'FIRST_MET' AS anchor_event, gap_bucket, COUNT(*) AS n_patients, MIN(sort_key) AS sort_key
+    SELECT 'FIRST_MET' AS anchor_event, gap_bucket,
+        CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_patients,
+        MIN(sort_key) AS sort_key
     FROM bucketed
     WHERE first_met_date IS NOT NULL
     GROUP BY gap_bucket
@@ -2597,6 +2614,7 @@ ORDER BY
 --     Two subgroups:
 --       ALL_L01 : all DX cohort patients with any L01 record
 --       MET_L01 : patients who also have a first_met_date
+--     Small-cell suppression: n_patients <= @min_cell_count suppressed to -@min_cell_count.
 SELECT
     subgroup,
     CASE
@@ -2605,7 +2623,7 @@ SELECT
         WHEN n_days <= 11 THEN '7_11'
         ELSE '12plus'
     END AS days_bucket,
-    COUNT(*) AS n_patients
+    CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_patients
 FROM (
     SELECT e.person_id, COUNT(*) AS n_days, 'ALL_L01' AS subgroup
     FROM l01_event_days e

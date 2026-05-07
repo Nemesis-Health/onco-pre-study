@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : netezza
--- Translated     : 2026-05-07 11:48:05 BST
+-- Translated     : 2026-05-07 11:53:57 BST
 -- Source file    : sql/sql_server/chunks/11_l01_gap_deciles.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -22,15 +22,17 @@
 --       MET_L01 : patients who also have a first_met_date
 --
 --     Output: one row per subgroup with gap-day deciles.
+--     Small-cell suppression: n_gaps <= @min_cell_count suppresses percentiles to NULL
+--     and replaces counts with -@min_cell_count.
 SELECT
     subgroup,
-    COUNT(*)                  AS n_gaps,
-    COUNT(DISTINCT person_id) AS n_patients_with_gaps,
-    MIN(CASE WHEN 10.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT(6)) END) AS p10_days,
-    MIN(CASE WHEN  4.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT(6)) END) AS p25_days,
-    MIN(CASE WHEN  2.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT(6)) END) AS p50_days,
-    MIN(CASE WHEN  4.0 * rn >= 3 * cnt THEN CAST(gap_days AS FLOAT(6)) END) AS p75_days,
-    MIN(CASE WHEN 10.0 * rn >= 9 * cnt THEN CAST(gap_days AS FLOAT(6)) END) AS p90_days
+    CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_gaps,
+    CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(DISTINCT person_id) END AS n_patients_with_gaps,
+    MIN(CASE WHEN cnt > @min_cell_count AND 10.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT(6)) END) AS p10_days,
+    MIN(CASE WHEN cnt > @min_cell_count AND  4.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT(6)) END) AS p25_days,
+    MIN(CASE WHEN cnt > @min_cell_count AND  2.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT(6)) END) AS p50_days,
+    MIN(CASE WHEN cnt > @min_cell_count AND  4.0 * rn >= 3 * cnt  THEN CAST(gap_days AS FLOAT(6)) END) AS p75_days,
+    MIN(CASE WHEN cnt > @min_cell_count AND 10.0 * rn >= 9 * cnt  THEN CAST(gap_days AS FLOAT(6)) END) AS p90_days
 FROM (
     SELECT subgroup, person_id, gap_days,
         ROW_NUMBER() OVER (PARTITION BY subgroup ORDER BY gap_days) AS rn,

@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : spark
--- Translated     : 2026-05-07 11:48:09 BST
+-- Translated     : 2026-05-07 11:54:01 BST
 -- Source file    : sql/sql_server/chunks/10_anchor_dx_codes.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -18,7 +18,7 @@ WITH dx_days AS (
  person_id,
  event_date,
  concept_id
- FROM qbz8dueldx_events
+ FROM ctxb0womdx_events
 )
 SELECT
  s.concept_id,

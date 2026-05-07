@@ -6,6 +6,7 @@
 --     Two subgroups:
 --       ALL_L01 : all DX cohort patients with any L01 record
 --       MET_L01 : patients who also have a first_met_date
+--     Small-cell suppression: n_patients <= @min_cell_count suppressed to -@min_cell_count.
 
 SELECT
     subgroup,
@@ -15,7 +16,7 @@ SELECT
         WHEN n_days <= 11 THEN '7_11'
         ELSE '12plus'
     END AS days_bucket,
-    COUNT(*) AS n_patients
+    CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_patients
 FROM (
     SELECT e.person_id, COUNT(*) AS n_days, 'ALL_L01' AS subgroup
     FROM #l01_event_days e

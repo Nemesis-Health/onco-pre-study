@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : impala
--- Translated     : 2026-05-07 11:48:03 BST
+-- Translated     : 2026-05-07 11:53:56 BST
 -- Source file    : sql/sql_server/chunks/06_windowed_odx_prevalence.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -39,8 +39,8 @@ WITH odx_gdx_events AS (
         e.concept_id,
         e.person_id,
         DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END) AS days_from_index
-    FROM qbz8duelother_dx_events e
-    JOIN qbz8duelcohort c ON e.person_id = c.person_id
+    FROM ctxb0womother_dx_events e
+    JOIN ctxb0womcohort c ON e.person_id = c.person_id
     UNION ALL
     -- GDX events with days relative to index_date
     SELECT
@@ -48,8 +48,8 @@ WITH odx_gdx_events AS (
         e.concept_id,
         e.person_id,
         DATEDIFF(CASE TYPEOF(e.event_date ) WHEN 'TIMESTAMP' THEN CAST(e.event_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(e.event_date  AS STRING), 1, 4), SUBSTR(CAST(e.event_date  AS STRING), 5, 2), SUBSTR(CAST(e.event_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(c.index_date ) WHEN 'TIMESTAMP' THEN CAST(c.index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(c.index_date  AS STRING), 1, 4), SUBSTR(CAST(c.index_date  AS STRING), 5, 2), SUBSTR(CAST(c.index_date  AS STRING), 7, 2)), 'UTC') END) AS days_from_index
-    FROM qbz8duelgen_cancer_events e
-    JOIN qbz8duelcohort c ON e.person_id = c.person_id
+    FROM ctxb0womgen_cancer_events e
+    JOIN ctxb0womcohort c ON e.person_id = c.person_id
 ),
 windowed AS (
     SELECT
@@ -83,13 +83,13 @@ agg AS (
 SELECT
     a.event_family,
     a.concept_id,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever          END AS n_ever,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN NULL             ELSE a.n_pm30d         END AS n_pm30d,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN NULL             ELSE a.n_pm90d         END AS n_pm90d,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN NULL             ELSE a.n_pm180d        END AS n_pm180d,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN NULL             ELSE a.n_pm1yr         END AS n_pm1yr,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN NULL             ELSE a.n_ever_before   END AS n_ever_before,
-    CASE WHEN a.n_ever          <= @min_cell_count THEN NULL             ELSE a.n_ever_after    END AS n_ever_after
+    CASE WHEN a.n_ever        <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever        END AS n_ever,
+    CASE WHEN a.n_pm30d       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm30d       END AS n_pm30d,
+    CASE WHEN a.n_pm90d       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm90d       END AS n_pm90d,
+    CASE WHEN a.n_pm180d      <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm180d      END AS n_pm180d,
+    CASE WHEN a.n_pm1yr       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm1yr       END AS n_pm1yr,
+    CASE WHEN a.n_ever_before <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_before END AS n_ever_before,
+    CASE WHEN a.n_ever_after  <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_after  END AS n_ever_after
 FROM agg a
 ORDER BY a.event_family, a.n_ever DESC, a.concept_id
 ;

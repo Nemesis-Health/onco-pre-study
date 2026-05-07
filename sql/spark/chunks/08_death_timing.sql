@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : spark
--- Translated     : 2026-05-07 11:48:09 BST
+-- Translated     : 2026-05-07 11:54:01 BST
 -- Source file    : sql/sql_server/chunks/08_death_timing.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -30,11 +30,11 @@ SELECT
  CASE WHEN s.n_patients <= @min_cell_count THEN NULL ELSE f.lq_followup_days END AS lq_followup_days,
  CASE WHEN s.n_patients <= @min_cell_count THEN NULL ELSE f.median_followup_days END AS median_followup_days,
  CASE WHEN s.n_patients <= @min_cell_count THEN NULL ELSE f.uq_followup_days END AS uq_followup_days
-FROM qbz8dueldeath_stratum_counts s
-LEFT JOIN qbz8dueldeath_timing_quantiles q
+FROM ctxb0womdeath_stratum_counts s
+LEFT JOIN ctxb0womdeath_timing_quantiles q
  ON s.prevalence_year = q.prevalence_year
  AND s.anchor_event = q.anchor_event
-LEFT JOIN qbz8duelfollowup_quantiles f
+LEFT JOIN ctxb0womfollowup_quantiles f
  ON s.prevalence_year = f.prevalence_year
  AND s.anchor_event = f.anchor_event
 ORDER BY
