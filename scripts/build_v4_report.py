@@ -1532,7 +1532,7 @@ def _s02_gdx_odx(rd: Path) -> str:
                     rows.append(f"<tr><td><code>{cid}</code> {_e(cname)}</td>{cells}</tr>")
                 tbl = header + "\n".join(rows) + "</tbody></table>"
                 parts.append(_card(
-                    f"Table 2.2 — Windowed ODX prevalence relative to DX index date {_badge('new')}",
+                    f"Table 2.2 — Windowed ODX prevalence relative to DX index date (any ODX within window) {_badge('new')}",
                     _tbl_wrap(tbl),
                 ))
 
