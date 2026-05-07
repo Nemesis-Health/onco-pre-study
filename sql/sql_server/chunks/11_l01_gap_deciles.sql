@@ -13,8 +13,8 @@
 
 SELECT
     subgroup,
-    CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_gaps,
-    CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(DISTINCT person_id) END AS n_patients_with_gaps,
+    CASE WHEN COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_gaps,
+    CASE WHEN COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(DISTINCT person_id) END AS n_patients_with_gaps,
     MIN(CASE WHEN cnt > @min_cell_count AND 10.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT) END) AS p10_days,
     MIN(CASE WHEN cnt > @min_cell_count AND  4.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT) END) AS p25_days,
     MIN(CASE WHEN cnt > @min_cell_count AND  2.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT) END) AS p50_days,

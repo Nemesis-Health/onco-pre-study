@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-07 12:03:59 BST
+-- Translated     : 2026-05-07 12:40:20 BST
 -- Source file    : sql/sql_server/chunks/11_l01_gap_deciles.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -25,8 +25,8 @@
 --     Small-cell suppression: n_gaps <= @min_cell_count suppresses percentiles to NULL
 --     and replaces counts with -@min_cell_count.
    select subgroup,
-    case when count(*) <= @min_cell_count then -@min_cell_count else count(*) end as n_gaps,
-    case when count(*) <= @min_cell_count then -@min_cell_count else count(distinct person_id) end as n_patients_with_gaps,
+    case when count(*) > 0 and count(*) <= @min_cell_count then -@min_cell_count else count(*) end as n_gaps,
+    case when count(*) > 0 and count(*) <= @min_cell_count then -@min_cell_count else count(distinct person_id) end as n_patients_with_gaps,
     min(case when cnt > @min_cell_count and 10.0 * rn >= cnt      then cast(gap_days  as float64) end) as p10_days,
     min(case when cnt > @min_cell_count and  4.0 * rn >= cnt      then cast(gap_days  as float64) end) as p25_days,
     min(case when cnt > @min_cell_count and  2.0 * rn >= cnt      then cast(gap_days  as float64) end) as p50_days,
@@ -36,7 +36,7 @@
     select subgroup, person_id, gap_days,
         row_number() over (partition by subgroup order by gap_days) as rn,
         count(*)     over (partition by subgroup)                   as cnt
-    from quyq3b3el01_consecutive_gaps
+    from a9of9doxl01_consecutive_gaps
 ) x
   group by  1   order by  1 ;
 

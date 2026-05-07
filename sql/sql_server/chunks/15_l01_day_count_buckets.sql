@@ -16,7 +16,7 @@ SELECT
         WHEN n_days <= 11 THEN '7_11'
         ELSE '12plus'
     END AS days_bucket,
-    CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_patients
+    CASE WHEN COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_patients
 FROM (
     SELECT e.person_id, COUNT(*) AS n_days, 'ALL_L01' AS subgroup
     FROM #l01_event_days e

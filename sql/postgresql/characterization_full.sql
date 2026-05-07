@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : postgresql
--- Translated     : 2026-05-07 12:03:53 BST
+-- Translated     : 2026-05-07 12:40:11 BST
 -- Source file    : sql/sql_server/characterization_full.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -2123,13 +2123,13 @@ SELECT
     a.anchor_event,
     a.event_family,
     a.concept_id,
-    CASE WHEN a.n_ever        <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever        END AS n_ever,
-    CASE WHEN a.n_pm30d       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm30d       END AS n_pm30d,
-    CASE WHEN a.n_pm90d       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm90d       END AS n_pm90d,
-    CASE WHEN a.n_pm180d      <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm180d      END AS n_pm180d,
-    CASE WHEN a.n_pm1yr       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm1yr       END AS n_pm1yr,
-    CASE WHEN a.n_ever_before <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_before END AS n_ever_before,
-    CASE WHEN a.n_ever_after  <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_after  END AS n_ever_after
+    CASE WHEN a.n_ever        > 0 AND a.n_ever        <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever        END AS n_ever,
+    CASE WHEN a.n_pm30d       > 0 AND a.n_pm30d       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm30d       END AS n_pm30d,
+    CASE WHEN a.n_pm90d       > 0 AND a.n_pm90d       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm90d       END AS n_pm90d,
+    CASE WHEN a.n_pm180d      > 0 AND a.n_pm180d      <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm180d      END AS n_pm180d,
+    CASE WHEN a.n_pm1yr       > 0 AND a.n_pm1yr       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm1yr       END AS n_pm1yr,
+    CASE WHEN a.n_ever_before > 0 AND a.n_ever_before <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_before END AS n_ever_before,
+    CASE WHEN a.n_ever_after  > 0 AND a.n_ever_after  <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_after  END AS n_ever_after
 FROM agg a
 ORDER BY
     CASE WHEN a.anchor_event = 'INDEX' THEN 0 ELSE 1 END,
@@ -2413,8 +2413,8 @@ ORDER BY s.n_distinct_patients DESC, s.concept_id
 --     and replaces counts with -@min_cell_count.
 SELECT
     subgroup,
-    CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_gaps,
-    CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(DISTINCT person_id) END AS n_patients_with_gaps,
+    CASE WHEN COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_gaps,
+    CASE WHEN COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(DISTINCT person_id) END AS n_patients_with_gaps,
     MIN(CASE WHEN cnt > @min_cell_count AND 10.0 * rn >= cnt      THEN CAST(gap_days AS NUMERIC) END) AS p10_days,
     MIN(CASE WHEN cnt > @min_cell_count AND  4.0 * rn >= cnt      THEN CAST(gap_days AS NUMERIC) END) AS p25_days,
     MIN(CASE WHEN cnt > @min_cell_count AND  2.0 * rn >= cnt      THEN CAST(gap_days AS NUMERIC) END) AS p50_days,
@@ -2445,7 +2445,7 @@ SELECT
         WHEN gap_days < 365  THEN '180_364d'
         ELSE 'ge365d'
     END AS gap_bucket,
-    CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_gaps
+    CASE WHEN COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_gaps
 FROM l01_consecutive_gaps
 GROUP BY
     subgroup,
@@ -2513,12 +2513,12 @@ death_obs_gaps AS (
 )
 SELECT
     anchor_event,
-    CASE WHEN n_death_before_obs <= @min_cell_count THEN -@min_cell_count ELSE n_death_before_obs END AS n_death_before_obs,
-    CASE WHEN n_death_after_obs  <= @min_cell_count THEN -@min_cell_count ELSE n_death_after_obs  END AS n_death_after_obs,
-    CASE WHEN n_death_after_obs  <= @min_cell_count THEN NULL ELSE lq_gap_days     END AS lq_gap_days,
-    CASE WHEN n_death_after_obs  <= @min_cell_count THEN NULL ELSE median_gap_days END AS median_gap_days,
-    CASE WHEN n_death_after_obs  <= @min_cell_count THEN NULL ELSE uq_gap_days     END AS uq_gap_days,
-    CASE WHEN n_death_after_obs  <= @min_cell_count THEN NULL ELSE p90_gap_days    END AS p90_gap_days
+    CASE WHEN n_death_before_obs > 0 AND n_death_before_obs <= @min_cell_count THEN -@min_cell_count ELSE n_death_before_obs END AS n_death_before_obs,
+    CASE WHEN n_death_after_obs  > 0 AND n_death_after_obs  <= @min_cell_count THEN -@min_cell_count ELSE n_death_after_obs  END AS n_death_after_obs,
+    CASE WHEN n_death_after_obs  > 0 AND n_death_after_obs  <= @min_cell_count THEN NULL ELSE lq_gap_days     END AS lq_gap_days,
+    CASE WHEN n_death_after_obs  > 0 AND n_death_after_obs  <= @min_cell_count THEN NULL ELSE median_gap_days END AS median_gap_days,
+    CASE WHEN n_death_after_obs  > 0 AND n_death_after_obs  <= @min_cell_count THEN NULL ELSE uq_gap_days     END AS uq_gap_days,
+    CASE WHEN n_death_after_obs  > 0 AND n_death_after_obs  <= @min_cell_count THEN NULL ELSE p90_gap_days    END AS p90_gap_days
 FROM (
     SELECT
         'INDEX' AS anchor_event,
@@ -2609,13 +2609,13 @@ bucketed AS (
 SELECT anchor_event, gap_bucket, n_patients
 FROM (
     SELECT 'INDEX' AS anchor_event, gap_bucket,
-        CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_patients,
+        CASE WHEN COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_patients,
         MIN(sort_key) AS sort_key
     FROM bucketed
     GROUP BY gap_bucket
     UNION ALL
     SELECT 'FIRST_MET' AS anchor_event, gap_bucket,
-        CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_patients,
+        CASE WHEN COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_patients,
         MIN(sort_key) AS sort_key
     FROM bucketed
     WHERE first_met_date IS NOT NULL
@@ -2642,7 +2642,7 @@ SELECT
         WHEN n_days <= 11 THEN '7_11'
         ELSE '12plus'
     END AS days_bucket,
-    CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_patients
+    CASE WHEN COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_patients
 FROM (
     SELECT e.person_id, COUNT(*) AS n_days, 'ALL_L01' AS subgroup
     FROM l01_event_days e

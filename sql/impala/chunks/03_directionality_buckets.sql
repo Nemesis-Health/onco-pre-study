@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : impala
--- Translated     : 2026-05-07 12:03:56 BST
+-- Translated     : 2026-05-07 12:40:15 BST
 -- Source file    : sql/sql_server/chunks/03_directionality_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -45,7 +45,7 @@ WITH dx_met_base AS (
             WHEN days_dx_to_met <= 365   THEN 'AFTER_91_365'
             ELSE 'AFTER_GT365'
         END AS direction
-    FROM quyq3b3epatient_char
+    FROM a9of9doxpatient_char
 ),
 dx_l01_base AS (
     SELECT
@@ -60,7 +60,7 @@ dx_l01_base AS (
             WHEN days_dx_to_l01 <= 365   THEN 'AFTER_91_365'
             ELSE 'AFTER_GT365'
         END AS direction
-    FROM quyq3b3epatient_char
+    FROM a9of9doxpatient_char
 ),
 met_l01_base AS (
     SELECT
@@ -75,7 +75,7 @@ met_l01_base AS (
             WHEN days_met_to_l01 <= 365  THEN 'AFTER_91_365'
             ELSE 'AFTER_GT365'
         END AS direction
-    FROM quyq3b3epatient_char
+    FROM a9of9doxpatient_char
     WHERE first_met_date IS NOT NULL
 )
 SELECT
