@@ -1541,7 +1541,7 @@ def _s02_gdx_odx(rd: Path) -> str:
         fig = _windowed_odx_chart(windowed, n_dx)
         if fig:
             parts.append(_plot_box(
-                "Figure 2.1 — Windowed ODX prevalence for top 5 concepts",
+                "Figure 2.1 — Windowed ODX prevalence for top 5 concepts (any ODX within window)",
                 _fig_div(fig), badge="new",
                 sub="% of DX cohort with each ODX concept within each time window around DX index",
             ))
