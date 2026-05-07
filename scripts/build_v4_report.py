@@ -1380,10 +1380,41 @@ def _s01_dx_met_timing(rd: Path) -> str:
                         for m in meds
                     )
                     ths = "".join(f"<th>{y}</th>" for y in years)
+
+                    # Per-year n_dx from population prevalence
+                    prev_ndx_yr: dict[int, int | None] = {}
+                    if prev is not None:
+                        ypc = _col(prev, "prevalence_year")
+                        ndc = _col(prev, "n_dx")
+                        if ypc and ndc:
+                            for _, pr in prev.iterrows():
+                                try:
+                                    prev_ndx_yr[int(float(str(pr[ypc])))] = _safe_int(pr[ndc])
+                                except (ValueError, TypeError):
+                                    pass
+
+                    # Per-year n_patients_with_pair from filtered sub
+                    nwpc = _col(sub, "n_patients_with_pair")
+                    pair_by_yr: dict[int, int | None] = {}
+                    if nwpc:
+                        for _, sr in sub.iterrows():
+                            pair_by_yr[int(sr["__y"])] = _safe_int(sr[nwpc])
+
+                    ndx_cells = "".join(
+                        f'<td>{_fmt_n(prev_ndx_yr.get(y))}</td>' for y in years
+                    )
+                    pct_met_cells = "".join(
+                        f'<td>{_pct_of(pair_by_yr.get(y), prev_ndx_yr.get(y))}</td>'
+                        for y in years
+                    )
+
                     tbl = (
                         '<div class="hm-wrap"><table class="hm-table"><thead><tr>'
                         f'<th class="row-head">DX→MET median days</th>{ths}'
-                        f'</tr></thead><tbody><tr><td class="hm-table" style="text-align:left;">Median</td>{cells}</tr>'
+                        f'</tr></thead><tbody>'
+                        f'<tr><td class="hm-table" style="text-align:left;">N_DX</td>{ndx_cells}</tr>'
+                        f'<tr><td class="hm-table" style="text-align:left;">%_MET</td>{pct_met_cells}</tr>'
+                        f'<tr><td class="hm-table" style="text-align:left;">Median</td>{cells}</tr>'
                         '</tbody></table></div>'
                     )
                     parts.append(_card(
