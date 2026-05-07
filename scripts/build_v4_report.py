@@ -476,7 +476,7 @@ def _timing_box_chart(
 
 # ── Chart: L01 treatment windows ────────────────────────────────────────────────
 
-def _l01_windows_chart(df: pd.DataFrame) -> go.Figure | None:
+def _l01_windows_chart(df: pd.DataFrame, anchor_filter: str | None = None) -> go.Figure | None:
     ac = _col(df, "anchor_event")
     wc = _col(df, "window_index")
     lc = _col(df, "n_patients_with_l01")
@@ -487,7 +487,8 @@ def _l01_windows_chart(df: pd.DataFrame) -> go.Figure | None:
     fig = go.Figure()
     colors = {"INDEX": "#1a3a5c", "FIRST_MET": "#b45309"}
 
-    for anchor in ["INDEX", "FIRST_MET"]:
+    anchors = [anchor_filter.upper()] if anchor_filter else ["INDEX", "FIRST_MET"]
+    for anchor in anchors:
         sub = df[df[ac].astype(str).str.upper() == anchor].copy()
         if sub.empty:
             continue
@@ -1775,15 +1776,14 @@ def _s04_longitudinal(rd: Path) -> str:
 
     # L01 treatment windows — side-by-side Figures 4.1 / 4.2
     if windows is not None:
-        fig = _l01_windows_chart(windows)
-        if fig:
-            dx_fig_html = _fig_div(fig)
+        fig_41 = _l01_windows_chart(windows, anchor_filter="INDEX")
+        fig_42 = _l01_windows_chart(windows, anchor_filter="FIRST_MET")
+        if fig_41 or fig_42:
             parts.append(
                 f'<div class="card-grid card-grid-2" style="margin-bottom:16px;">'
-                + _plot_box("Figure 4.1 — % cohort with L01 per 30-day window (DX anchor)", dx_fig_html, badge="new")
-                + _plot_box("Figure 4.2 — % MET subgroup with L01 per 30-day window (MET anchor)", dx_fig_html, badge="new")
+                + (_plot_box("Figure 4.1 — % cohort with L01 per 30-day window (DX anchor)", _fig_div(fig_41), badge="new") if fig_41 else "")
+                + (_plot_box("Figure 4.2 — % MET subgroup with L01 per 30-day window (MET anchor)", _fig_div(fig_42), badge="new") if fig_42 else "")
                 + "</div>"
-                + '<p class="tbl-note" style="margin:0 0 16px;">Both plots use the same source data until separate DX/MET-anchored window outputs are available.</p>'
             )
 
     # Figure 4.3 — gap bucket distribution
