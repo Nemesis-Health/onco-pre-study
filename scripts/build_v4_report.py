@@ -1258,7 +1258,7 @@ def _directionality_table(
         n = sub_map.get(key)
         if n is None:
             continue
-        pct = f"{100.0 * n / denom:.1f}%" if denom > 0 and n and n > 0 else "—"
+        pct = "—" if key == "NO_EVENT" else (f"{100.0 * n / denom:.1f}%" if denom > 0 and n and n > 0 else "—")
         flag = " flag-red" if css_cls == "before" and n and n > 0 else (" flag-amber" if css_cls == "none" and n and n > 0 else "")
         badge_html = _dir_badge(css_cls, label)
         interp_cell = interp.get(key, "") if interp else ""
