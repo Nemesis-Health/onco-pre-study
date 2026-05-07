@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : snowflake
--- Translated     : 2026-05-07 11:44:56 BST
+-- Translated     : 2026-05-07 11:48:16 BST
 -- Source file    : sql/sql_server/chunks/06_windowed_odx_prevalence.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -31,8 +31,8 @@ WITH odx_gdx_events  AS (SELECT  CAST('ODX' as TEXT) AS event_family,
         e.concept_id,
         e.person_id,
         DATEDIFF(DAY, c.index_date, e.event_date) AS days_from_index
-    FROM prnpim5kother_dx_events e
-    JOIN prnpim5kcohort c ON e.person_id = c.person_id
+    FROM qbz8duelother_dx_events e
+    JOIN qbz8duelcohort c ON e.person_id = c.person_id
     UNION ALL
     -- GDX events with days relative to index_date
     SELECT
@@ -40,8 +40,8 @@ WITH odx_gdx_events  AS (SELECT  CAST('ODX' as TEXT) AS event_family,
         e.concept_id,
         e.person_id,
         DATEDIFF(DAY, c.index_date, e.event_date) AS days_from_index
-    FROM prnpim5kgen_cancer_events e
-    JOIN prnpim5kcohort c ON e.person_id = c.person_id
+    FROM qbz8duelgen_cancer_events e
+    JOIN qbz8duelcohort c ON e.person_id = c.person_id
 ),
 windowed AS (
     SELECT

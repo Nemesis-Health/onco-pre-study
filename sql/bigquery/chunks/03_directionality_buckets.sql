@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-07 11:44:47 BST
+-- Translated     : 2026-05-07 11:48:08 BST
 -- Source file    : sql/sql_server/chunks/03_directionality_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -28,7 +28,7 @@
 --      AFTER_GT365  : > 365 days after                 (days > 365)
 --      NO_EVENT     : FROM event present but TO event absent
 --
---    Stratified by OVERALL and by index_year (YEAR(index_date)).
+--    Stratified by OVERALL and by anchor year: DX_MET uses YEAR(index_date), MET_L01 uses YEAR(first_met_date).
 --    Small-cell suppression: n suppressed to -@min_cell_count when <= @min_cell_count.
 with dx_met_base as (
     select
@@ -43,11 +43,11 @@ with dx_met_base as (
             when days_dx_to_met <= 365   then 'AFTER_91_365'
             else 'AFTER_GT365'
         end as direction
-    from prnpim5kpatient_char
+    from qbz8duelpatient_char
 ),
 met_l01_base as (
     select
-        EXTRACT(YEAR from index_date) as index_year_int,
+        EXTRACT(YEAR from first_met_date) as index_year_int,
         case
             when first_l01_date is null  then 'NO_EVENT'
             when days_met_to_l01 < -90   then 'BEFORE_GT90'
@@ -58,7 +58,7 @@ met_l01_base as (
             when days_met_to_l01 <= 365  then 'AFTER_91_365'
             else 'AFTER_GT365'
         end as direction
-    from prnpim5kpatient_char
+    from qbz8duelpatient_char
     where first_met_date is not null
 )
  select x.pair,

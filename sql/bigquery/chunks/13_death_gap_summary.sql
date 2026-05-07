@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-07 11:44:47 BST
+-- Translated     : 2026-05-07 11:48:08 BST
 -- Source file    : sql/sql_server/chunks/13_death_gap_summary.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -29,7 +29,7 @@ with patient_obs as (
         min(observation_period_start_date) as first_obs_start,
         max(observation_period_end_date)   as last_obs_end
      from @cdm_database_schema.observation_period
-    where person_id in (select person_id from prnpim5kcohort)
+    where person_id in (select person_id from qbz8duelcohort)
      group by  1 ),
 death_obs_gaps as (
     select
@@ -49,9 +49,9 @@ death_obs_gaps as (
                 then 1
             else 0
         end as death_before_obs
-    from prnpim5kcohort c
-    inner join prnpim5kdeath_obs_status dos on dos.person_id = c.person_id
-    left join prnpim5kmet_summary ms on ms.person_id = c.person_id
+    from qbz8duelcohort c
+    inner join qbz8dueldeath_obs_status dos on dos.person_id = c.person_id
+    left join qbz8duelmet_summary ms on ms.person_id = c.person_id
     left join patient_obs po  on po.person_id  = c.person_id
 )
 select

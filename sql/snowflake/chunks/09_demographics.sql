@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : snowflake
--- Translated     : 2026-05-07 11:44:56 BST
+-- Translated     : 2026-05-07 11:48:16 BST
 -- Source file    : sql/sql_server/chunks/09_demographics.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -13,14 +13,14 @@
 WITH anchor_persons  AS (SELECT  CAST('INDEX' as TEXT) AS anchor_event,
         c.person_id,
         c.index_date AS anchor_date
-    FROM prnpim5kpatient_char c
+    FROM qbz8duelpatient_char c
     WHERE c.index_date IS NOT NULL
     UNION ALL
     SELECT
         'FIRST_MET' AS anchor_event,
         c.person_id,
         c.first_met_date AS anchor_date
-    FROM prnpim5kpatient_char c
+    FROM qbz8duelpatient_char c
     WHERE c.first_met_date IS NOT NULL
 ),
 base AS (

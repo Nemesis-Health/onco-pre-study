@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : iris
--- Translated     : 2026-05-07 11:44:57 BST
+-- Translated     : 2026-05-07 11:48:17 BST
 -- Source file    : sql/sql_server/chunks/15_l01_day_count_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -27,12 +27,12 @@ SELECT
     COUNT(*) AS n_patients
 FROM (
     SELECT e.person_id, COUNT(*) AS n_days, 'ALL_L01' AS subgroup
-    FROM prnpim5kl01_event_days e
+    FROM qbz8duell01_event_days e
     GROUP BY e.person_id
     UNION ALL
     SELECT e.person_id, COUNT(*) AS n_days, 'MET_L01' AS subgroup
-    FROM prnpim5kl01_event_days e
-    JOIN prnpim5kmet_summary ms ON e.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+    FROM qbz8duell01_event_days e
+    JOIN qbz8duelmet_summary ms ON e.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
     GROUP BY e.person_id
 ) x
 GROUP BY

@@ -13,7 +13,7 @@
 --      AFTER_GT365  : > 365 days after                 (days > 365)
 --      NO_EVENT     : FROM event present but TO event absent
 --
---    Stratified by OVERALL and by index_year (YEAR(index_date)).
+--    Stratified by OVERALL and by anchor year: DX_MET uses YEAR(index_date), MET_L01 uses YEAR(first_met_date).
 --    Small-cell suppression: n suppressed to -@min_cell_count when <= @min_cell_count.
 
 WITH dx_met_base AS (
@@ -33,7 +33,7 @@ WITH dx_met_base AS (
 ),
 met_l01_base AS (
     SELECT
-        YEAR(index_date) AS index_year_int,
+        YEAR(first_met_date) AS index_year_int,
         CASE
             WHEN first_l01_date IS NULL  THEN 'NO_EVENT'
             WHEN days_met_to_l01 < -90   THEN 'BEFORE_GT90'

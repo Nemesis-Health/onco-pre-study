@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : impala
--- Translated     : 2026-05-07 11:44:43 BST
+-- Translated     : 2026-05-07 11:48:03 BST
 -- Source file    : sql/sql_server/chunks/03_directionality_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -28,7 +28,7 @@
 --      AFTER_GT365  : > 365 days after                 (days > 365)
 --      NO_EVENT     : FROM event present but TO event absent
 --
---    Stratified by OVERALL and by index_year (YEAR(index_date)).
+--    Stratified by OVERALL and by anchor year: DX_MET uses YEAR(index_date), MET_L01 uses YEAR(first_met_date).
 --    Small-cell suppression: n suppressed to -@min_cell_count when <= @min_cell_count.
 WITH dx_met_base AS (
     SELECT
@@ -43,11 +43,11 @@ WITH dx_met_base AS (
             WHEN days_dx_to_met <= 365   THEN 'AFTER_91_365'
             ELSE 'AFTER_GT365'
         END AS direction
-    FROM prnpim5kpatient_char
+    FROM qbz8duelpatient_char
 ),
 met_l01_base AS (
     SELECT
-        YEAR(CASE TYPEOF(index_date ) WHEN 'TIMESTAMP' THEN CAST(index_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(index_date  AS STRING), 1, 4), SUBSTR(CAST(index_date  AS STRING), 5, 2), SUBSTR(CAST(index_date  AS STRING), 7, 2)), 'UTC') END) AS index_year_int,
+        YEAR(CASE TYPEOF(first_met_date ) WHEN 'TIMESTAMP' THEN CAST(first_met_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(first_met_date  AS STRING), 1, 4), SUBSTR(CAST(first_met_date  AS STRING), 5, 2), SUBSTR(CAST(first_met_date  AS STRING), 7, 2)), 'UTC') END) AS index_year_int,
         CASE
             WHEN first_l01_date IS NULL  THEN 'NO_EVENT'
             WHEN days_met_to_l01 < -90   THEN 'BEFORE_GT90'
@@ -58,7 +58,7 @@ met_l01_base AS (
             WHEN days_met_to_l01 <= 365  THEN 'AFTER_91_365'
             ELSE 'AFTER_GT365'
         END AS direction
-    FROM prnpim5kpatient_char
+    FROM qbz8duelpatient_char
     WHERE first_met_date IS NOT NULL
 )
 SELECT

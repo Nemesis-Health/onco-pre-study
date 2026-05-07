@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : netezza
--- Translated     : 2026-05-07 11:44:43 BST
+-- Translated     : 2026-05-07 11:48:04 BST
 -- Source file    : sql/sql_server/characterization_full.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -1847,7 +1847,7 @@ ORDER BY x.time_window, x.anchor_event, x.event_family, x.n_patients DESC, x.n_r
 --      AFTER_GT365  : > 365 days after                 (days > 365)
 --      NO_EVENT     : FROM event present but TO event absent
 --
---    Stratified by OVERALL and by index_year (YEAR(index_date)).
+--    Stratified by OVERALL and by anchor year: DX_MET uses YEAR(index_date), MET_L01 uses YEAR(first_met_date).
 --    Small-cell suppression: n suppressed to -@min_cell_count when <= @min_cell_count.
 WITH dx_met_base AS (
     SELECT
@@ -1866,7 +1866,7 @@ WITH dx_met_base AS (
 ),
 met_l01_base AS (
     SELECT
-        DATE_PART('YEAR', index_date) AS index_year_int,
+        DATE_PART('YEAR', first_met_date) AS index_year_int,
         CASE
             WHEN first_l01_date IS NULL  THEN 'NO_EVENT'
             WHEN days_met_to_l01 < -90   THEN 'BEFORE_GT90'
