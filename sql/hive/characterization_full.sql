@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : hive
--- Translated     : 2026-05-06 18:54:05 BST
+-- Translated     : 2026-05-07 06:29:50 BST
 -- Source file    : sql/sql_server/characterization_full.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -315,17 +315,33 @@ JOIN @cdm_database_schema.concept ing
 ------------------------------------------------------------
 -- G) COHORT ANCHOR + SUMMARIES
 ------------------------------------------------------------
+-- Track attrition: count all patients with a qualifying DX before the
+-- obs-period filter so the report can show how many were excluded.
+DROP TABLE IF EXISTS cohort_attrition;
+CREATE TEMPORARY TABLE IF NOT EXISTS cohort_attrition  (stage      VARCHAR(50),
+    n_patients INT
+);
+INSERT INTO cohort_attrition (stage, n_patients)
+SELECT 'dx_any', COUNT(DISTINCT person_id) FROM dx_events;
 DROP TABLE IF EXISTS cohort;
 CREATE TEMPORARY TABLE IF NOT EXISTS cohort  (person_id BIGINT,
     index_date TIMESTAMP
 );
+-- Index date = earliest qualifying DX that falls within an observation period.
+-- Patients with no obs-period-covered DX are excluded entirely.
 INSERT INTO cohort (person_id, index_date)
 SELECT
-    person_id,
-    MIN(event_date) AS index_date
-FROM dx_events
-GROUP BY person_id
+    dx.person_id,
+    MIN(dx.event_date) AS index_date
+FROM dx_events dx
+INNER JOIN @cdm_database_schema.observation_period op
+    ON  op.person_id = dx.person_id
+    AND dx.event_date BETWEEN op.observation_period_start_date
+                          AND op.observation_period_end_date
+GROUP BY dx.person_id
 ;
+INSERT INTO cohort_attrition (stage, n_patients)
+SELECT 'dx_in_obs', COUNT(*) FROM cohort;
 DROP TABLE IF EXISTS dx_summary;
 CREATE TEMPORARY TABLE IF NOT EXISTS dx_summary  (person_id BIGINT,
     n_dx_records INT,
@@ -773,10 +789,15 @@ FROM (
         event_family,
         concept_id,
         COUNT(*) AS n_patients_with_code_timing,
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS lq_days_first,
-        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS median_days_first,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS uq_days_first
-    FROM event_code_patient_chosen_first
+        MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS lq_days_first,
+        MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS median_days_first,
+        MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS FLOAT) END) AS uq_days_first
+    FROM (
+        SELECT anchor_event, event_family, concept_id, days_diff,
+            ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, concept_id ORDER BY days_diff) AS rn,
+            COUNT(*)     OVER (PARTITION BY anchor_event, event_family, concept_id)                    AS cnt
+        FROM event_code_patient_chosen_first
+    ) x
     GROUP BY anchor_event, event_family, concept_id
 ) f
 INNER JOIN (
@@ -784,10 +805,15 @@ INNER JOIN (
         anchor_event,
         event_family,
         concept_id,
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS lq_days_closest,
-        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS median_days_closest,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS uq_days_closest
-    FROM event_code_patient_chosen_closest
+        MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS lq_days_closest,
+        MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS median_days_closest,
+        MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS FLOAT) END) AS uq_days_closest
+    FROM (
+        SELECT anchor_event, event_family, concept_id, days_diff,
+            ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, concept_id ORDER BY days_diff) AS rn,
+            COUNT(*)     OVER (PARTITION BY anchor_event, event_family, concept_id)                    AS cnt
+        FROM event_code_patient_chosen_closest
+    ) x
     GROUP BY anchor_event, event_family, concept_id
 ) k
   ON f.anchor_event = k.anchor_event
@@ -917,10 +943,15 @@ FROM (
         time_relative,
         concept_id,
         COUNT(*) AS n_patients_with_code_timing,
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS lq_days_first,
-        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS median_days_first,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS uq_days_first
-    FROM event_code_patient_chosen_before_after_first
+        MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS lq_days_first,
+        MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS median_days_first,
+        MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS FLOAT) END) AS uq_days_first
+    FROM (
+        SELECT anchor_event, event_family, time_relative, concept_id, days_diff,
+            ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id ORDER BY days_diff) AS rn,
+            COUNT(*)     OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id)                    AS cnt
+        FROM event_code_patient_chosen_before_after_first
+    ) x
     GROUP BY anchor_event, event_family, time_relative, concept_id
 ) f
 INNER JOIN (
@@ -929,10 +960,15 @@ INNER JOIN (
         event_family,
         time_relative,
         concept_id,
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS lq_days_closest,
-        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS median_days_closest,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS uq_days_closest
-    FROM event_code_patient_chosen_before_after_closest
+        MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS lq_days_closest,
+        MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS median_days_closest,
+        MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS FLOAT) END) AS uq_days_closest
+    FROM (
+        SELECT anchor_event, event_family, time_relative, concept_id, days_diff,
+            ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id ORDER BY days_diff) AS rn,
+            COUNT(*)     OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id)                    AS cnt
+        FROM event_code_patient_chosen_before_after_closest
+    ) x
     GROUP BY anchor_event, event_family, time_relative, concept_id
 ) k
   ON f.anchor_event = k.anchor_event
@@ -1090,20 +1126,25 @@ SELECT
     from_event,
     to_event,
     COUNT(*) AS n_patients_with_pair,
-    PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY days_diff) AS p05_days,
-    PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY days_diff) AS p10_days,
-    PERCENTILE_CONT(0.20) WITHIN GROUP (ORDER BY days_diff) AS p20_days,
-    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS p25_days,
-    PERCENTILE_CONT(0.30) WITHIN GROUP (ORDER BY days_diff) AS p30_days,
-    PERCENTILE_CONT(0.40) WITHIN GROUP (ORDER BY days_diff) AS p40_days,
-    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS p50_days,
-    PERCENTILE_CONT(0.60) WITHIN GROUP (ORDER BY days_diff) AS p60_days,
-    PERCENTILE_CONT(0.70) WITHIN GROUP (ORDER BY days_diff) AS p70_days,
-    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS p75_days,
-    PERCENTILE_CONT(0.80) WITHIN GROUP (ORDER BY days_diff) AS p80_days,
-    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY days_diff) AS p90_days,
-    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY days_diff) AS p95_days
-FROM patient_timing_pairs
+    MIN(CASE WHEN 20.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p05_days,
+    MIN(CASE WHEN 10.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p10_days,
+    MIN(CASE WHEN  5.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p20_days,
+    MIN(CASE WHEN  4.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p25_days,
+    MIN(CASE WHEN 10.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p30_days,
+    MIN(CASE WHEN  5.0 * rn >= 2 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p40_days,
+    MIN(CASE WHEN  2.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p50_days,
+    MIN(CASE WHEN  5.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p60_days,
+    MIN(CASE WHEN 10.0 * rn >= 7 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p70_days,
+    MIN(CASE WHEN  4.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p75_days,
+    MIN(CASE WHEN  5.0 * rn >= 4 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p80_days,
+    MIN(CASE WHEN 10.0 * rn >= 9 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p90_days,
+    MIN(CASE WHEN 20.0 * rn >= 19 * cnt THEN CAST(days_diff AS FLOAT) END) AS p95_days
+FROM (
+    SELECT from_event, to_event, days_diff,
+        ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
+        COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
+    FROM patient_timing_pairs
+) x
 GROUP BY from_event, to_event
 ;
 DROP TABLE IF EXISTS all_events_for_pairs;
@@ -1208,20 +1249,25 @@ SELECT
     from_event,
     to_event,
     COUNT(*) AS n_patients_with_pair,
-    PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY days_diff) AS p05_days,
-    PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY days_diff) AS p10_days,
-    PERCENTILE_CONT(0.20) WITHIN GROUP (ORDER BY days_diff) AS p20_days,
-    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS p25_days,
-    PERCENTILE_CONT(0.30) WITHIN GROUP (ORDER BY days_diff) AS p30_days,
-    PERCENTILE_CONT(0.40) WITHIN GROUP (ORDER BY days_diff) AS p40_days,
-    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS p50_days,
-    PERCENTILE_CONT(0.60) WITHIN GROUP (ORDER BY days_diff) AS p60_days,
-    PERCENTILE_CONT(0.70) WITHIN GROUP (ORDER BY days_diff) AS p70_days,
-    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS p75_days,
-    PERCENTILE_CONT(0.80) WITHIN GROUP (ORDER BY days_diff) AS p80_days,
-    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY days_diff) AS p90_days,
-    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY days_diff) AS p95_days
-FROM patient_timing_pairs_first_to_closest
+    MIN(CASE WHEN 20.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p05_days,
+    MIN(CASE WHEN 10.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p10_days,
+    MIN(CASE WHEN  5.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p20_days,
+    MIN(CASE WHEN  4.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p25_days,
+    MIN(CASE WHEN 10.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p30_days,
+    MIN(CASE WHEN  5.0 * rn >= 2 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p40_days,
+    MIN(CASE WHEN  2.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p50_days,
+    MIN(CASE WHEN  5.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p60_days,
+    MIN(CASE WHEN 10.0 * rn >= 7 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p70_days,
+    MIN(CASE WHEN  4.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p75_days,
+    MIN(CASE WHEN  5.0 * rn >= 4 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p80_days,
+    MIN(CASE WHEN 10.0 * rn >= 9 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p90_days,
+    MIN(CASE WHEN 20.0 * rn >= 19 * cnt THEN CAST(days_diff AS FLOAT) END) AS p95_days
+FROM (
+    SELECT from_event, to_event, days_diff,
+        ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
+        COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
+    FROM patient_timing_pairs_first_to_closest
+) x
 GROUP BY from_event, to_event
 ;
 DROP TABLE IF EXISTS patient_timing_pairs_first_to_closest_before;
@@ -1295,20 +1341,25 @@ SELECT
     from_event,
     to_event,
     COUNT(*) AS n_patients_with_pair,
-    PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY days_diff) AS p05_days,
-    PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY days_diff) AS p10_days,
-    PERCENTILE_CONT(0.20) WITHIN GROUP (ORDER BY days_diff) AS p20_days,
-    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS p25_days,
-    PERCENTILE_CONT(0.30) WITHIN GROUP (ORDER BY days_diff) AS p30_days,
-    PERCENTILE_CONT(0.40) WITHIN GROUP (ORDER BY days_diff) AS p40_days,
-    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS p50_days,
-    PERCENTILE_CONT(0.60) WITHIN GROUP (ORDER BY days_diff) AS p60_days,
-    PERCENTILE_CONT(0.70) WITHIN GROUP (ORDER BY days_diff) AS p70_days,
-    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS p75_days,
-    PERCENTILE_CONT(0.80) WITHIN GROUP (ORDER BY days_diff) AS p80_days,
-    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY days_diff) AS p90_days,
-    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY days_diff) AS p95_days
-FROM patient_timing_pairs_first_to_closest_before
+    MIN(CASE WHEN 20.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p05_days,
+    MIN(CASE WHEN 10.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p10_days,
+    MIN(CASE WHEN  5.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p20_days,
+    MIN(CASE WHEN  4.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p25_days,
+    MIN(CASE WHEN 10.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p30_days,
+    MIN(CASE WHEN  5.0 * rn >= 2 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p40_days,
+    MIN(CASE WHEN  2.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p50_days,
+    MIN(CASE WHEN  5.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p60_days,
+    MIN(CASE WHEN 10.0 * rn >= 7 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p70_days,
+    MIN(CASE WHEN  4.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p75_days,
+    MIN(CASE WHEN  5.0 * rn >= 4 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p80_days,
+    MIN(CASE WHEN 10.0 * rn >= 9 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p90_days,
+    MIN(CASE WHEN 20.0 * rn >= 19 * cnt THEN CAST(days_diff AS FLOAT) END) AS p95_days
+FROM (
+    SELECT from_event, to_event, days_diff,
+        ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
+        COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
+    FROM patient_timing_pairs_first_to_closest_before
+) x
 GROUP BY from_event, to_event
 ;
 DROP TABLE IF EXISTS patient_timing_pairs_first_to_closest_after;
@@ -1382,20 +1433,25 @@ SELECT
     from_event,
     to_event,
     COUNT(*) AS n_patients_with_pair,
-    PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY days_diff) AS p05_days,
-    PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY days_diff) AS p10_days,
-    PERCENTILE_CONT(0.20) WITHIN GROUP (ORDER BY days_diff) AS p20_days,
-    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_diff) AS p25_days,
-    PERCENTILE_CONT(0.30) WITHIN GROUP (ORDER BY days_diff) AS p30_days,
-    PERCENTILE_CONT(0.40) WITHIN GROUP (ORDER BY days_diff) AS p40_days,
-    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_diff) AS p50_days,
-    PERCENTILE_CONT(0.60) WITHIN GROUP (ORDER BY days_diff) AS p60_days,
-    PERCENTILE_CONT(0.70) WITHIN GROUP (ORDER BY days_diff) AS p70_days,
-    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_diff) AS p75_days,
-    PERCENTILE_CONT(0.80) WITHIN GROUP (ORDER BY days_diff) AS p80_days,
-    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY days_diff) AS p90_days,
-    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY days_diff) AS p95_days
-FROM patient_timing_pairs_first_to_closest_after
+    MIN(CASE WHEN 20.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p05_days,
+    MIN(CASE WHEN 10.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p10_days,
+    MIN(CASE WHEN  5.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p20_days,
+    MIN(CASE WHEN  4.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p25_days,
+    MIN(CASE WHEN 10.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p30_days,
+    MIN(CASE WHEN  5.0 * rn >= 2 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p40_days,
+    MIN(CASE WHEN  2.0 * rn >= cnt       THEN CAST(days_diff AS FLOAT) END) AS p50_days,
+    MIN(CASE WHEN  5.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p60_days,
+    MIN(CASE WHEN 10.0 * rn >= 7 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p70_days,
+    MIN(CASE WHEN  4.0 * rn >= 3 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p75_days,
+    MIN(CASE WHEN  5.0 * rn >= 4 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p80_days,
+    MIN(CASE WHEN 10.0 * rn >= 9 * cnt  THEN CAST(days_diff AS FLOAT) END) AS p90_days,
+    MIN(CASE WHEN 20.0 * rn >= 19 * cnt THEN CAST(days_diff AS FLOAT) END) AS p95_days
+FROM (
+    SELECT from_event, to_event, days_diff,
+        ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
+        COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
+    FROM patient_timing_pairs_first_to_closest_after
+) x
 GROUP BY from_event, to_event
 ;
 DROP TABLE IF EXISTS event_presence;
@@ -1544,10 +1600,15 @@ INSERT INTO death_timing_quantiles (
 SELECT
     prevalence_year,
     anchor_event,
-    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY days_to_death) AS lq_days,
-    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY days_to_death) AS median_days,
-    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY days_to_death) AS uq_days
-FROM death_timing_long
+    MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(days_to_death AS FLOAT) END) AS lq_days,
+    MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_to_death AS FLOAT) END) AS median_days,
+    MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_to_death AS FLOAT) END) AS uq_days
+FROM (
+    SELECT prevalence_year, anchor_event, days_to_death,
+        ROW_NUMBER() OVER (PARTITION BY prevalence_year, anchor_event ORDER BY days_to_death) AS rn,
+        COUNT(*)     OVER (PARTITION BY prevalence_year, anchor_event)                        AS cnt
+    FROM death_timing_long
+) x
 GROUP BY prevalence_year, anchor_event
 ;
 -- Follow-up duration from anchor date to last observation period end,
@@ -1609,10 +1670,15 @@ INSERT INTO followup_quantiles (
 SELECT
     prevalence_year,
     anchor_event,
-    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY followup_days) AS lq_followup_days,
-    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY followup_days) AS median_followup_days,
-    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY followup_days) AS uq_followup_days
-FROM followup_long
+    MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(followup_days AS FLOAT) END) AS lq_followup_days,
+    MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(followup_days AS FLOAT) END) AS median_followup_days,
+    MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(followup_days AS FLOAT) END) AS uq_followup_days
+FROM (
+    SELECT prevalence_year, anchor_event, followup_days,
+        ROW_NUMBER() OVER (PARTITION BY prevalence_year, anchor_event ORDER BY followup_days) AS rn,
+        COUNT(*)     OVER (PARTITION BY prevalence_year, anchor_event)                        AS cnt
+    FROM followup_long
+) x
 GROUP BY prevalence_year, anchor_event
 ;
 ------------------------------------------------------------
@@ -1631,7 +1697,7 @@ WHERE person_id IN (SELECT person_id FROM cohort)
 -- Consecutive gaps between L01 event days per patient
 DROP TABLE IF EXISTS l01_consecutive_gaps;
 CREATE TEMPORARY TABLE IF NOT EXISTS l01_consecutive_gaps  (person_id  BIGINT,
-    subgroup   VARCHAR(10),
+    subgroup   VARCHAR(12),
     gap_days   INT
 );
 WITH ranked AS (
@@ -1655,9 +1721,31 @@ SELECT g.person_id, 'MET_L01', g.gap_days
 FROM gaps g
 JOIN met_summary ms ON g.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 ;
+-- Max gap per patient (one row per patient; used for MAX-gap subgroups in chunks 11–12)
+INSERT INTO l01_consecutive_gaps (person_id, subgroup, gap_days)
+SELECT person_id, 'ALL_L01_MAX', MAX(gap_days)
+FROM l01_consecutive_gaps
+WHERE subgroup = 'ALL_L01'
+GROUP BY person_id
+UNION ALL
+SELECT person_id, 'MET_L01_MAX', MAX(gap_days)
+FROM l01_consecutive_gaps
+WHERE subgroup = 'MET_L01'
+GROUP BY person_id
+;
 ------------------------------------------------------------
 -- K) FINAL SELECTS (export to CSV from SQL client)
 ------------------------------------------------------------
+-- 0b) Cohort attrition: patients with any qualifying DX vs those with a DX
+--     that falls within an observation period (the study-eligible subset).
+--     The difference is the number excluded by the obs-period filter.
+SELECT
+    SUM(CASE WHEN stage = 'dx_any'    THEN n_patients ELSE 0 END) AS n_dx_any,
+    SUM(CASE WHEN stage = 'dx_in_obs' THEN n_patients ELSE 0 END) AS n_dx_in_obs,
+    SUM(CASE WHEN stage = 'dx_any'    THEN n_patients ELSE 0 END)
+    - SUM(CASE WHEN stage = 'dx_in_obs' THEN n_patients ELSE 0 END)  AS n_excluded_no_obs_dx
+FROM cohort_attrition
+;
 -- 1) Population prevalence
 WITH base AS (
     SELECT
@@ -1905,30 +1993,42 @@ FROM (
     -- first_to_first by year
     SELECT
         'first_to_first' AS timing_type,
-        CAST(YEAR(pc.index_date) AS VARCHAR(4)) AS index_year,
-        p.from_event,
-        p.to_event,
+        CAST(index_year_int AS VARCHAR(4)) AS index_year,
+        from_event,
+        to_event,
         COUNT(*) AS n_patients_with_pair,
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY p.days_diff) AS p25_days,
-        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY p.days_diff) AS p50_days,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY p.days_diff) AS p75_days
-    FROM patient_timing_pairs p
-    JOIN patient_char pc ON p.person_id = pc.person_id
-    GROUP BY YEAR(pc.index_date), p.from_event, p.to_event
+        MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS p25_days,
+        MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS p50_days,
+        MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS FLOAT) END) AS p75_days
+    FROM (
+        SELECT p.from_event, p.to_event, p.days_diff,
+            YEAR(pc.index_date) AS index_year_int,
+            ROW_NUMBER() OVER (PARTITION BY YEAR(pc.index_date), p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
+            COUNT(*)     OVER (PARTITION BY YEAR(pc.index_date), p.from_event, p.to_event)                    AS cnt
+        FROM patient_timing_pairs p
+        JOIN patient_char pc ON p.person_id = pc.person_id
+    ) y
+    GROUP BY index_year_int, from_event, to_event
     UNION ALL
     -- first_to_closest_after by year (for MET->L01 post-MET treatment timing)
     SELECT
         'first_to_closest_after' AS timing_type,
-        CAST(YEAR(pc.index_date) AS VARCHAR(4)) AS index_year,
-        p.from_event,
-        p.to_event,
+        CAST(index_year_int AS VARCHAR(4)) AS index_year,
+        from_event,
+        to_event,
         COUNT(*) AS n_patients_with_pair,
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY p.days_diff) AS p25_days,
-        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY p.days_diff) AS p50_days,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY p.days_diff) AS p75_days
-    FROM patient_timing_pairs_first_to_closest_after p
-    JOIN patient_char pc ON p.person_id = pc.person_id
-    GROUP BY YEAR(pc.index_date), p.from_event, p.to_event
+        MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS p25_days,
+        MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS p50_days,
+        MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS FLOAT) END) AS p75_days
+    FROM (
+        SELECT p.from_event, p.to_event, p.days_diff,
+            YEAR(pc.index_date) AS index_year_int,
+            ROW_NUMBER() OVER (PARTITION BY YEAR(pc.index_date), p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
+            COUNT(*)     OVER (PARTITION BY YEAR(pc.index_date), p.from_event, p.to_event)                    AS cnt
+        FROM patient_timing_pairs_first_to_closest_after p
+        JOIN patient_char pc ON p.person_id = pc.person_id
+    ) y
+    GROUP BY index_year_int, from_event, to_event
 ) x
 ORDER BY
     x.timing_type,
@@ -2072,7 +2172,6 @@ WITH window_bounds AS (
         ms.first_met_date AS anchor_date,
         w.window_index
     FROM met_summary ms
-    WHERE ms.first_met_date IS NOT NULL
     CROSS JOIN (
         SELECT -6  AS window_index UNION ALL SELECT -5  UNION ALL SELECT -4
         UNION ALL SELECT -3  UNION ALL SELECT -2  UNION ALL SELECT -1
@@ -2085,6 +2184,7 @@ WITH window_bounds AS (
         UNION ALL SELECT 18  UNION ALL SELECT 19  UNION ALL SELECT 20
         UNION ALL SELECT 21  UNION ALL SELECT 22  UNION ALL SELECT 23
     ) w
+    WHERE ms.first_met_date IS NOT NULL
 ),
 -- Mark which patients have at least one L01 exposure in each window
 window_l01 AS (
@@ -2246,11 +2346,16 @@ FROM (
 JOIN (
     SELECT
         anchor_event,
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY age_years) AS age_lq_years,
-        PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY age_years) AS age_median_years,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY age_years) AS age_uq_years
-    FROM ages
-    WHERE age_years IS NOT NULL
+        MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(age_years AS FLOAT) END) AS age_lq_years,
+        MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(age_years AS FLOAT) END) AS age_median_years,
+        MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(age_years AS FLOAT) END) AS age_uq_years
+    FROM (
+        SELECT anchor_event, age_years,
+            ROW_NUMBER() OVER (PARTITION BY anchor_event ORDER BY age_years) AS rn,
+            COUNT(*)     OVER (PARTITION BY anchor_event)                    AS cnt
+        FROM ages
+        WHERE age_years IS NOT NULL
+    ) y
     GROUP BY anchor_event
 ) p
   ON agg.anchor_event = p.anchor_event
@@ -2290,14 +2395,19 @@ ORDER BY s.n_distinct_patients DESC, s.concept_id
 --     Output: one row per subgroup with gap-day deciles.
 SELECT
     subgroup,
-    COUNT(*)                                                   AS n_gaps,
-    COUNT(DISTINCT person_id)                                  AS n_patients_with_gaps,
-    PERCENTILE_CONT(0.10) WITHIN GROUP (ORDER BY gap_days)    AS p10_days,
-    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY gap_days)    AS p25_days,
-    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY gap_days)    AS p50_days,
-    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY gap_days)    AS p75_days,
-    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY gap_days)    AS p90_days
-FROM l01_consecutive_gaps
+    COUNT(*)                  AS n_gaps,
+    COUNT(DISTINCT person_id) AS n_patients_with_gaps,
+    MIN(CASE WHEN 10.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT) END) AS p10_days,
+    MIN(CASE WHEN  4.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT) END) AS p25_days,
+    MIN(CASE WHEN  2.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT) END) AS p50_days,
+    MIN(CASE WHEN  4.0 * rn >= 3 * cnt THEN CAST(gap_days AS FLOAT) END) AS p75_days,
+    MIN(CASE WHEN 10.0 * rn >= 9 * cnt THEN CAST(gap_days AS FLOAT) END) AS p90_days
+FROM (
+    SELECT subgroup, person_id, gap_days,
+        ROW_NUMBER() OVER (PARTITION BY subgroup ORDER BY gap_days) AS rn,
+        COUNT(*)     OVER (PARTITION BY subgroup)                   AS cnt
+    FROM l01_consecutive_gaps
+) x
 GROUP BY subgroup
 ORDER BY subgroup
 ;
@@ -2330,14 +2440,14 @@ GROUP BY
     END
 ORDER BY
     subgroup,
-    CASE
+    MIN(CASE
         WHEN gap_days <  30  THEN 1
         WHEN gap_days <  60  THEN 2
         WHEN gap_days <  90  THEN 3
         WHEN gap_days < 180  THEN 4
         WHEN gap_days < 365  THEN 5
         ELSE 6
-    END
+    END)
 ;
 -- 13) Death date vs observation period alignment — summary counts
 --     For patients in the DX cohort (and the FIRST_MET subgroup), reports:
@@ -2386,24 +2496,34 @@ SELECT
     'INDEX' AS anchor_event,
     SUM(CASE WHEN death_before_obs = 1 THEN 1 ELSE 0 END) AS n_death_before_obs,
     SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) AS n_death_after_obs,
-    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY gap_death_after_obs) AS lq_gap_days,
-    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY gap_death_after_obs) AS median_gap_days,
-    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY gap_death_after_obs) AS uq_gap_days,
-    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY gap_death_after_obs) AS p90_gap_days
-FROM death_obs_gaps
-WHERE death_date IS NOT NULL
+    MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  4.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT) END) AS lq_gap_days,
+    MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  2.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT) END) AS median_gap_days,
+    MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  4.0 * rn >= 3 * non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT) END) AS uq_gap_days,
+    MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 10.0 * rn >= 9 * non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT) END) AS p90_gap_days
+FROM (
+    SELECT death_before_obs, gap_death_after_obs,
+        ROW_NUMBER() OVER (ORDER BY gap_death_after_obs) AS rn,
+        SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) OVER () AS non_null_cnt
+    FROM death_obs_gaps
+    WHERE death_date IS NOT NULL
+) x
 UNION ALL
 SELECT
     'FIRST_MET' AS anchor_event,
     SUM(CASE WHEN death_before_obs = 1 THEN 1 ELSE 0 END) AS n_death_before_obs,
     SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) AS n_death_after_obs,
-    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY gap_death_after_obs) AS lq_gap_days,
-    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY gap_death_after_obs) AS median_gap_days,
-    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY gap_death_after_obs) AS uq_gap_days,
-    PERCENTILE_CONT(0.90) WITHIN GROUP (ORDER BY gap_death_after_obs) AS p90_gap_days
-FROM death_obs_gaps
-WHERE death_date IS NOT NULL
-  AND first_met_date IS NOT NULL
+    MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  4.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT) END) AS lq_gap_days,
+    MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  2.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT) END) AS median_gap_days,
+    MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND  4.0 * rn >= 3 * non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT) END) AS uq_gap_days,
+    MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 10.0 * rn >= 9 * non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT) END) AS p90_gap_days
+FROM (
+    SELECT death_before_obs, gap_death_after_obs,
+        ROW_NUMBER() OVER (ORDER BY gap_death_after_obs) AS rn,
+        SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) OVER () AS non_null_cnt
+    FROM death_obs_gaps
+    WHERE death_date IS NOT NULL
+      AND first_met_date IS NOT NULL
+) x
 ;
 -- 14) Death date vs observation period — bucketed gap histogram
 --     Restricted to patients where death_date > obs_period_end_date (i.e.
@@ -2458,7 +2578,7 @@ GROUP BY
         ELSE 'ge730d'
     END
 ORDER BY
-    CASE
+    MIN(CASE
         WHEN gap_death_after_obs <   30 THEN 1
         WHEN gap_death_after_obs <   60 THEN 2
         WHEN gap_death_after_obs <   90 THEN 3
@@ -2466,6 +2586,45 @@ ORDER BY
         WHEN gap_death_after_obs <  365 THEN 5
         WHEN gap_death_after_obs <  730 THEN 6
         ELSE 7
+    END)
+;
+-- 15) Distribution of distinct L01 event days per patient
+--     Shows how many patients have 1, 2-6, 7-11, or 12+ distinct L01 days.
+--     Patients with exactly 1 day cannot contribute to gap analyses (chunks 11-12).
+--     Source: #l01_event_days (built in 00_setup.sql section L).
+--
+--     Two subgroups:
+--       ALL_L01 : all DX cohort patients with any L01 record
+--       MET_L01 : patients who also have a first_met_date
+SELECT
+    subgroup,
+    CASE
+        WHEN n_days =  1 THEN '1'
+        WHEN n_days <= 6 THEN '2_6'
+        WHEN n_days <= 11 THEN '7_11'
+        ELSE '12plus'
+    END AS days_bucket,
+    COUNT(*) AS n_patients
+FROM (
+    SELECT e.person_id, COUNT(*) AS n_days, 'ALL_L01' AS subgroup
+    FROM l01_event_days e
+    GROUP BY e.person_id
+    UNION ALL
+    SELECT e.person_id, COUNT(*) AS n_days, 'MET_L01' AS subgroup
+    FROM l01_event_days e
+    JOIN met_summary ms ON e.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+    GROUP BY e.person_id
+) x
+GROUP BY
+    subgroup,
+    CASE
+        WHEN n_days =  1 THEN '1'
+        WHEN n_days <= 6 THEN '2_6'
+        WHEN n_days <= 11 THEN '7_11'
+        ELSE '12plus'
     END
+ORDER BY
+    subgroup,
+    MIN(n_days)
 ;
 

@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-06 18:54:00 BST
+-- Translated     : 2026-05-07 06:29:46 BST
 -- Source file    : sql/sql_server/chunks/05_timing_by_year.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -43,8 +43,8 @@
             EXTRACT(YEAR from pc.index_date) as index_year_int,
             row_number() over (partition by EXTRACT(YEAR from pc.index_date), p.from_event, p.to_event order by p.days_diff) as rn,
             count(*)     over (partition by EXTRACT(YEAR from pc.index_date), p.from_event, p.to_event)                    as cnt
-        from sqvhwkzfpatient_timing_pairs p
-        join sqvhwkzfpatient_char pc on p.person_id = pc.person_id
+        from u2ijfaoqpatient_timing_pairs p
+        join u2ijfaoqpatient_char pc on p.person_id = pc.person_id
     ) y
      group by  2, 3, to_event
     union all
@@ -55,8 +55,8 @@
             EXTRACT(YEAR from pc.index_date) as index_year_int,
             row_number() over (partition by EXTRACT(YEAR from pc.index_date), p.from_event, p.to_event order by p.days_diff) as rn,
             count(*)     over (partition by EXTRACT(YEAR from pc.index_date), p.from_event, p.to_event)                    as cnt
-        from sqvhwkzfpatient_timing_pairs_first_to_closest_after p
-        join sqvhwkzfpatient_char pc on p.person_id = pc.person_id
+        from u2ijfaoqpatient_timing_pairs_first_to_closest_after p
+        join u2ijfaoqpatient_char pc on p.person_id = pc.person_id
     ) y
      group by  2, 3, 2 ) x
  order by  x.timing_type, x.from_event, x.to_event, cast(x.index_year  as int64)

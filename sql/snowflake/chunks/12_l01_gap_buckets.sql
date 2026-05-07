@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : snowflake
--- Translated     : 2026-05-06 18:54:08 BST
+-- Translated     : 2026-05-07 06:29:53 BST
 -- Source file    : sql/sql_server/chunks/12_l01_gap_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -24,7 +24,7 @@ SELECT
         ELSE 'ge365d'
     END AS gap_bucket,
     COUNT(*) AS n_gaps
-FROM sqvhwkzfl01_consecutive_gaps
+FROM u2ijfaoql01_consecutive_gaps
 GROUP BY
     subgroup,
     CASE

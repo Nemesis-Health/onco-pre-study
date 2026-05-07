@@ -16,7 +16,6 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BASE_DIR))
 
 # ── Output defaults ─────────────────────────────────────────────────────────────
-OUTPUTS_DIR = BASE_DIR / "outputs_v2"
 OUT_FILE = "summary_report_v4.html"
 
 # ── Display constants ───────────────────────────────────────────────────────────
@@ -476,7 +475,7 @@ def _timing_box_chart(
 
 # ── Chart: L01 treatment windows ────────────────────────────────────────────────
 
-def _l01_windows_chart(df: pd.DataFrame) -> go.Figure | None:
+def _l01_windows_chart(df: pd.DataFrame, anchor_filter: str | None = None) -> go.Figure | None:
     ac = _col(df, "anchor_event")
     wc = _col(df, "window_index")
     lc = _col(df, "n_patients_with_l01")
@@ -487,7 +486,8 @@ def _l01_windows_chart(df: pd.DataFrame) -> go.Figure | None:
     fig = go.Figure()
     colors = {"INDEX": "#1a3a5c", "FIRST_MET": "#b45309"}
 
-    for anchor in ["INDEX", "FIRST_MET"]:
+    anchors = [anchor_filter.upper()] if anchor_filter else ["INDEX", "FIRST_MET"]
+    for anchor in anchors:
         sub = df[df[ac].astype(str).str.upper() == anchor].copy()
         if sub.empty:
             continue
@@ -735,7 +735,17 @@ def _density_histogram_chart(
         (p40, p50, 10), (p50, p60, 10), (p60, p70, 10), (p70, p80, 10),
         (p80, p90, 10), (p90, p95, 5),
     ]
-    bins = [(lo, hi, pct) for lo, hi, pct in raw_bins if abs(hi - lo) > 0.1]
+    # Merge zero-width bins into the next bin so no patients are silently dropped
+    bins: list[tuple[float, float, int]] = []
+    carry = 0
+    for lo, hi, pct in raw_bins:
+        carry += pct
+        if abs(hi - lo) > 0.1:
+            bins.append((lo, hi, carry))
+            carry = 0
+    if carry > 0 and bins:
+        lo, hi, pct = bins[-1]
+        bins[-1] = (lo, hi, pct + carry)
     if not bins:
         return None, None
 
@@ -1123,7 +1133,7 @@ def _s00_overview(rd: Path) -> str:
             yearly = prev[prev[oc].astype(str).str.upper() != "OVERALL"].copy()
             fig = _prevalence_chart(yearly)
             if fig:
-                parts.append(_plot_box("Figure 0.1 — Population prevalence by calendar year", _fig_div(fig), badge="new"))
+                parts.append(_plot_box("Figure 0.1 — Population prevalence by calendar year", _fig_div(fig)))
 
     # ── Demographics table ──────────────────────────────────────────────────────
     if demo is not None:
@@ -1187,7 +1197,7 @@ def _s00_overview(rd: Path) -> str:
                 ids = [int(x) for x in top[cid_col].dropna().astype(int).tolist()]
                 names_map = _fetch_concept_names(ids)
                 rows = []
-                for i, (_, r) in enumerate(top.iterrows(), 1):
+                for _, r in top.iterrows():
                     cid = _safe_int(r.get(cid_col))
                     cname = names_map.get(cid, "") if cid else ""
                     np_ = _safe_int(r.get(np_col))
@@ -1195,9 +1205,7 @@ def _s00_overview(rd: Path) -> str:
                     pct_ = _pct_of(np_, n_dx) if n_dx else "—"
                     nd_str = f"{nd_:,}" if nd_ and nd_ > 0 else "—"
                     rows.append(
-                        f"<tr><td>{i}</td>"
-                        f'<td><code>{_e(str(cid))}</code></td>'
-                        f"<td>{_e(cname)}</td>"
+                        f"<tr><td><code>{_e(str(cid))}</code> {_e(cname)}</td>"
                         f'<td class="num">{_fmt_n(np_)}</td>'
                         f'<td class="num">{nd_str}</td>'
                         f'<td class="num">{_e(pct_)}</td>'
@@ -1205,7 +1213,7 @@ def _s00_overview(rd: Path) -> str:
                     )
                 tbl = (
                     '<table class="rt"><thead><tr>'
-                    '<th>#</th><th>Concept ID</th><th>Concept name</th>'
+                    '<th>Concept</th>'
                     '<th class="num">Patients</th><th class="num">Patient-days</th><th class="num">% of DX cohort</th>'
                     '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
                 )
@@ -1258,7 +1266,7 @@ def _directionality_table(
         n = sub_map.get(key)
         if n is None:
             continue
-        pct = f"{100.0 * n / denom:.1f}%" if denom > 0 and n and n > 0 else "—"
+        pct = "—" if key == "NO_EVENT" else (f"{100.0 * n / denom:.1f}%" if denom > 0 and n and n > 0 else "—")
         flag = " flag-red" if css_cls == "before" and n and n > 0 else (" flag-amber" if css_cls == "none" and n and n > 0 else "")
         badge_html = _dir_badge(css_cls, label)
         interp_cell = interp.get(key, "") if interp else ""
@@ -1311,17 +1319,16 @@ def _s01_dx_met_timing(rd: Path) -> str:
                 n_dx = _safe_int(ov.iloc[0].get(_col(prev, "n_dx")))
                 n_met = _safe_int(ov.iloc[0].get(_col(prev, "n_met")))
 
-    # Directionality table — denominate on n_dx: DX_MET covers all DX patients
-    # (NO_EVENT alone = n_dx - n_met >> n_met, so using n_met would give >100%)
     if directionality is not None:
         tbl = _directionality_table(
             directionality, "DX_MET", _DIR_LABELS,
-            n_total=n_dx, interp=_DX_MET_INTERP, col4_header="Interpretation",
+            n_total=n_met, interp=_DX_MET_INTERP, col4_header="Interpretation",
         )
         if tbl:
+            n_met_lbl = f"N={n_met:,}" if n_met else "DX+MET subgroup"
             parts.append(_card(
-                f"Table 1.1 — DX ↔ MET temporal directionality {_badge('new')}",
-                tbl + '<p class="tbl-note">OVERALL cohort. % denominated on DX cohort. Suppressed rows hidden.</p>',
+                f"Table 1.1 — DX ↔ MET temporal directionality (first to first)",
+                tbl + f'<p class="tbl-note">DX patients with MET only ({n_met_lbl}). % denominated on DX+MET subgroup. Suppressed rows hidden.</p>',
             ))
 
     # DX→MET timing distribution — density histogram
@@ -1380,14 +1387,45 @@ def _s01_dx_met_timing(rd: Path) -> str:
                         for m in meds
                     )
                     ths = "".join(f"<th>{y}</th>" for y in years)
+
+                    # Per-year n_dx from population prevalence
+                    prev_ndx_yr: dict[int, int | None] = {}
+                    if prev is not None:
+                        ypc = _col(prev, "prevalence_year")
+                        ndc = _col(prev, "n_dx")
+                        if ypc and ndc:
+                            for _, pr in prev.iterrows():
+                                try:
+                                    prev_ndx_yr[int(float(str(pr[ypc])))] = _safe_int(pr[ndc])
+                                except (ValueError, TypeError):
+                                    pass
+
+                    # Per-year n_patients_with_pair from filtered sub
+                    nwpc = _col(sub, "n_patients_with_pair")
+                    pair_by_yr: dict[int, int | None] = {}
+                    if nwpc:
+                        for _, sr in sub.iterrows():
+                            pair_by_yr[int(sr["__y"])] = _safe_int(sr[nwpc])
+
+                    ndx_cells = "".join(
+                        f'<td>{_fmt_n(prev_ndx_yr.get(y))}</td>' for y in years
+                    )
+                    pct_met_cells = "".join(
+                        f'<td>{_pct_of(pair_by_yr.get(y), prev_ndx_yr.get(y))}</td>'
+                        for y in years
+                    )
+
                     tbl = (
                         '<div class="hm-wrap"><table class="hm-table"><thead><tr>'
                         f'<th class="row-head">DX→MET median days</th>{ths}'
-                        f'</tr></thead><tbody><tr><td class="hm-table" style="text-align:left;">Median</td>{cells}</tr>'
+                        f'</tr></thead><tbody>'
+                        f'<tr><td class="hm-table" style="text-align:left;">N_DX</td>{ndx_cells}</tr>'
+                        f'<tr><td class="hm-table" style="text-align:left;">%_MET</td>{pct_met_cells}</tr>'
+                        f'<tr><td class="hm-table" style="text-align:left;">Median</td>{cells}</tr>'
                         '</tbody></table></div>'
                     )
                     parts.append(_card(
-                        f"Figure 1.2 — DX→MET median days by index year {_badge('new')}",
+                        f"Figure 1.2 — DX→MET median days by index year (first to first)",
                         tbl,
                     ))
 
@@ -1440,26 +1478,24 @@ def _s02_gdx_odx(rd: Path) -> str:
                 ids = [int(x) for x in gdx[cid_col].dropna().astype(int).tolist()]
                 names_map = _fetch_concept_names(ids)
                 rows = []
-                for i, (_, r) in enumerate(gdx.iterrows(), 1):
+                for _, r in gdx.iterrows():
                     cid = _safe_int(r.get(cid_col))
                     cname = names_map.get(cid, "") if cid else ""
                     np_ = _safe_int(r.get(np_col))
                     pct_ = _pct_of(np_, n_dx) if n_dx else "—"
                     rows.append(
-                        f"<tr><td>{i}</td>"
-                        f'<td><code>{_e(str(cid))}</code></td>'
-                        f"<td>{_e(cname)}</td>"
+                        f"<tr><td><code>{_e(str(cid))}</code> {_e(cname)}</td>"
                         f'<td class="num">{_fmt_n(np_)}</td>'
                         f'<td class="num">{pct_}</td></tr>'
                     )
                 tbl = (
                     '<table class="rt"><thead><tr>'
-                    '<th>#</th><th>Concept ID</th><th>Concept name</th>'
+                    '<th>Concept</th>'
                     '<th class="num">Patients (any time)</th><th class="num">% DX cohort</th>'
                     '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
                 )
                 parts.append(_card(
-                    f"Table 2.1 — Most frequent GDX concepts {_badge('new')}",
+                    f"Table 2.1 — Most frequent GDX concepts",
                     _tbl_wrap(tbl),
                 ))
 
@@ -1503,7 +1539,7 @@ def _s02_gdx_odx(rd: Path) -> str:
                     rows.append(f"<tr><td><code>{cid}</code> {_e(cname)}</td>{cells}</tr>")
                 tbl = header + "\n".join(rows) + "</tbody></table>"
                 parts.append(_card(
-                    f"Table 2.2 — Windowed ODX prevalence relative to DX index date {_badge('new')}",
+                    f"Table 2.2 — Windowed ODX prevalence relative to DX index date (any ODX within window)",
                     _tbl_wrap(tbl),
                 ))
 
@@ -1512,8 +1548,8 @@ def _s02_gdx_odx(rd: Path) -> str:
         fig = _windowed_odx_chart(windowed, n_dx)
         if fig:
             parts.append(_plot_box(
-                "Figure 2.1 — Windowed ODX prevalence for top 5 concepts",
-                _fig_div(fig), badge="new",
+                "Figure 2.1 — Windowed ODX prevalence for top 5 concepts (any ODX within window)",
+                _fig_div(fig),
                 sub="% of DX cohort with each ODX concept within each time window around DX index",
             ))
 
@@ -1533,7 +1569,7 @@ def _s02_gdx_odx(rd: Path) -> str:
                     iqr2 = f" (IQR {int(round(p25v2))}–{int(round(p75v2))})" if p25v2 and p75v2 else ""
                     sub2 = f"Anchored on DX · days positive = ODX after DX · median {int(round(med2))}d{iqr2}"
             parts.append(_plot_box(
-                "Figure 2.2 — ODX timing relative to DX index (full distribution, not zoomed)",
+                "Figure 2.2 — ODX timing relative to DX index (first to first)",
                 _fig_div(fig2), sub=sub2,
             ))
 
@@ -1568,40 +1604,77 @@ def _s03_treatment_timing(rd: Path) -> str:
                 n_dx = _safe_int(o.iloc[0].get(_col(prev, "n_dx")))
                 n_met_s3 = _safe_int(o.iloc[0].get(_col(prev, "n_met")))
 
+    # MET patients with L01 = sum of non-NO_EVENT rows for MET_L01 OVERALL
+    n_met_l01: int | None = None
+    if directionality is not None:
+        pc = _col(directionality, "pair")
+        yc = _col(directionality, "index_year")
+        dc = _col(directionality, "direction")
+        nc = _col(directionality, "n_patients")
+        if pc and yc and dc and nc:
+            sub = directionality[
+                (directionality[pc].astype(str).str.upper() == "MET_L01") &
+                (directionality[yc].astype(str).str.upper() == "OVERALL") &
+                (directionality[dc].astype(str).str.upper() != "NO_EVENT")
+            ]
+            vals = pd.to_numeric(sub[nc], errors="coerce").dropna()
+            total = int(vals[vals > 0].sum())
+            if total > 0:
+                n_met_l01 = total
+
     parts: list[str] = []
 
     # MET→L01 directionality
     if directionality is not None:
         tbl = _directionality_table(
             directionality, "MET_L01", _MET_L01_DIR_LABELS,
-            n_total=n_met_s3, interp=_MET_L01_IMPLICATION, col4_header="Phenotype implication",
+            n_total=n_met_l01, interp=_MET_L01_IMPLICATION, col4_header="Phenotype implication",
         )
         if tbl:
-            n_lbl = f"N={n_met_s3:,}" if n_met_s3 else "MET subgroup"
+            n_lbl = f"N={n_met_l01:,}" if n_met_l01 else "MET+L01 subgroup"
             parts.append(_card(
-                f"Table 3.1 — MET ↔ L01 temporal directionality {_badge('new')}",
-                tbl + f'<p class="tbl-note">MET subgroup only ({n_lbl}). NO_EVENT = patients with MET but no L01 ever.</p>',
+                f"Table 3.1 — MET ↔ L01 temporal directionality (first to first)",
+                tbl + f'<p class="tbl-note">MET patients with L01 only ({n_lbl}). % denominated on MET+L01 subgroup. NO_EVENT = patients with MET but no L01 ever.</p>',
             ))
 
-    # MET→L01 timing distribution — overlay density histogram
+    # MET→L01 timing distribution — two separate histograms
     if timing is not None:
-        fig = _overlay_density_histogram(
-            timing,
-            [
-                ("MET", "L01", "first_to_first",
-                 "rgba(29,78,216,0.20)", "rgba(29,78,216,0.55)",
-                 "First-ever L01 (incl. pre-MET)"),
-                ("MET", "L01", "first_to_closest_after",
-                 "rgba(217,119,6,0.22)", "rgba(217,119,6,0.55)",
-                 "First L01 on/after MET"),
-            ],
-            height=310,
-            x_label="Days (MET → L01) · bar width = decile range in days",
+        fig_a, stats_a = _density_histogram_chart(
+            timing, "MET", "L01", "first_to_first",
+            color_fill="rgba(29,78,216,0.20)", color_line="rgba(29,78,216,0.55)",
+            from_label="MET", to_label="L01",
         )
-        if fig:
+        if fig_a:
+            sub_a = ""
+            if stats_a:
+                med = stats_a.get("median")
+                p25v = stats_a.get("p25")
+                p75v = stats_a.get("p75")
+                if med is not None:
+                    iqr = f" (IQR {int(round(p25v))}–{int(round(p75v))})" if p25v and p75v else ""
+                    sub_a = f"Anchored on first MET · includes L01 events before MET · median {int(round(med))}d{iqr}"
             parts.append(_plot_box(
-                "Figure 3.1 — Time from first MET to first L01 (bidirectional, full range)",
-                _fig_div(fig),
+                "Figure 3.1a — Time from first MET to first L01",
+                _fig_div(fig_a), sub=sub_a,
+            ))
+
+        fig_b, stats_b = _density_histogram_chart(
+            timing, "MET", "L01", "first_to_closest_after",
+            color_fill="rgba(217,119,6,0.22)", color_line="rgba(217,119,6,0.55)",
+            from_label="MET", to_label="L01",
+        )
+        if fig_b:
+            sub_b = ""
+            if stats_b:
+                med = stats_b.get("median")
+                p25v = stats_b.get("p25")
+                p75v = stats_b.get("p75")
+                if med is not None:
+                    iqr = f" (IQR {int(round(p25v))}–{int(round(p75v))})" if p25v and p75v else ""
+                    sub_b = f"Anchored on first MET · L01 on or after MET only · median {int(round(med))}d{iqr}"
+            parts.append(_plot_box(
+                "Figure 3.1b — Time from first MET to first L01 on or after MET",
+                _fig_div(fig_b), sub=sub_b,
             ))
 
     # Drug-level L01 codes table (top 15 by FIRST_MET anchor) — with before/after breakdown
@@ -1664,7 +1737,7 @@ def _s03_treatment_timing(rd: Path) -> str:
                     return _fmt_iqr(r.get(med_first_c), r.get(lq_first_c) if lq_first_c else None, r.get(uq_first_c) if uq_first_c else None)
 
                 rows = []
-                for i, (_, r) in enumerate(top_ids_df.iterrows(), 1):
+                for _, r in top_ids_df.iterrows():
                     cid = _safe_int(r.get(cid_col))
                     cname = names_map.get(cid, "") if cid else ""
                     np_ = _safe_int(r.get(np_col))
@@ -1676,9 +1749,7 @@ def _s03_treatment_timing(rd: Path) -> str:
                     iqr_first_str = _iqr_first(cid)
                     iqr_after_str = _iqr_after(cid)
                     rows.append(
-                        f"<tr><td>{i}</td>"
-                        f'<td><code>{_e(str(cid))}</code></td>'
-                        f"<td>{_e(cname)}</td>"
+                        f"<tr><td><code>{_e(str(cid))}</code> {_e(cname)}</td>"
                         f'<td class="num">{_fmt_n(np_)}</td>'
                         f'<td class="num">{pct_met}</td>'
                         f'<td class="num">{pct_bef}</td>'
@@ -1689,7 +1760,7 @@ def _s03_treatment_timing(rd: Path) -> str:
                 n_met_lbl = f"N={n_met_s3:,}" if n_met_s3 else "MET cohort"
                 tbl = (
                     '<table class="rt"><thead><tr>'
-                    '<th>#</th><th>Concept ID</th><th>Drug</th>'
+                    '<th>Concept</th>'
                     f'<th class="num">N patients</th>'
                     f'<th class="num">% of MET cohort ({n_met_lbl})</th>'
                     '<th class="num">% with record before MET</th>'
@@ -1699,7 +1770,7 @@ def _s03_treatment_timing(rd: Path) -> str:
                     '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
                 )
                 parts.append(_card(
-                    f"Table 3.2 — Drug-level L01 timing around MET (top {CODE_COUNTS_TOP_N}) {_badge('new')}",
+                    f"Table 3.2 — Drug-level L01 timing around MET (top {CODE_COUNTS_TOP_N})",
                     _tbl_wrap(tbl),
                 ))
 
@@ -1727,15 +1798,14 @@ def _s04_longitudinal(rd: Path) -> str:
 
     # L01 treatment windows — side-by-side Figures 4.1 / 4.2
     if windows is not None:
-        fig = _l01_windows_chart(windows)
-        if fig:
-            dx_fig_html = _fig_div(fig)
+        fig_41 = _l01_windows_chart(windows, anchor_filter="INDEX")
+        fig_42 = _l01_windows_chart(windows, anchor_filter="FIRST_MET")
+        if fig_41 or fig_42:
             parts.append(
                 f'<div class="card-grid card-grid-2" style="margin-bottom:16px;">'
-                + _plot_box("Figure 4.1 — % cohort with L01 per 30-day window (DX anchor)", dx_fig_html, badge="new")
-                + _plot_box("Figure 4.2 — % MET subgroup with L01 per 30-day window (MET anchor)", dx_fig_html, badge="new")
+                + (_plot_box("Figure 4.1 — % cohort with L01 per 30-day window (DX anchor)", _fig_div(fig_41)) if fig_41 else "")
+                + (_plot_box("Figure 4.2 — % MET subgroup with L01 per 30-day window (MET anchor)", _fig_div(fig_42)) if fig_42 else "")
                 + "</div>"
-                + '<p class="tbl-note" style="margin:0 0 16px;">Both plots use the same source data until separate DX/MET-anchored window outputs are available.</p>'
             )
 
     # Figure 4.3 — gap bucket distribution
@@ -1743,7 +1813,7 @@ def _s04_longitudinal(rd: Path) -> str:
         fig = _gap_bucket_chart(gap_buckets)
         if fig:
             parts.append(_plot_box(
-                "Figure 4.3 — Distribution of gaps between consecutive L01 records", _fig_div(fig), badge="new",
+                "Figure 4.3 — Distribution of gaps between consecutive L01 records", _fig_div(fig),
                 sub="All L01 patients vs MET subgroup · bimodal shape = empirical episode boundary",
             ))
 
@@ -1827,7 +1897,7 @@ def _s04_longitudinal(rd: Path) -> str:
                 + '</tbody></table>'
             )
             parts.append(_card(
-                f"Table 4.1 — L01 gap distribution summary: all L01 patients vs MET subgroup {_badge('new')}",
+                f"Table 4.1 — L01 gap distribution summary: all L01 patients vs MET subgroup",
                 _tbl_wrap(tbl),
             ))
 
@@ -1960,7 +2030,7 @@ def _s05_obs_death(rd: Path) -> str:
                     '</tr></thead><tbody>' + rows_html + '</tbody></table>'
                 )
                 parts.append(_card(
-                    f"Table 5.1 — Death vs observation period alignment {_badge('new')}",
+                    f"Table 5.1 — Death vs observation period alignment",
                     _tbl_wrap(tbl),
                 ))
 
@@ -2039,7 +2109,7 @@ def _s05_obs_death(rd: Path) -> str:
         fig = _gap_bucket_chart(gap_buckets, n_col="n_patients", group_col=None)
         if fig:
             parts.append(_plot_box(
-                "Figure 5.1 — Gap distribution: death date − obs. period end", _fig_div(fig), badge="new",
+                "Figure 5.1 — Gap distribution: death date − obs. period end", _fig_div(fig),
                 sub="Patients whose death date falls outside their observation window",
             ))
 
@@ -2206,7 +2276,7 @@ def _s06_yoy(rd: Path) -> str:
             '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
         )
         parts.append(_card(
-            f"Table 6.1 — Timing summary matrix by index year {_badge('new')}",
+            f"Table 6.1 — Timing summary matrix by index year",
             tbl,
         ))
 
@@ -2216,7 +2286,7 @@ def _s06_yoy(rd: Path) -> str:
         if fig:
             parts.append(_plot_box(
                 "Figure 6.1 — Key timing metrics by index year",
-                _fig_div(fig), badge="new",
+                _fig_div(fig),
                 sub="DX→MET and MET→L01 median days by index year · trend shifts indicate coding or guideline changes",
             ))
 
@@ -2257,7 +2327,7 @@ def _s06_yoy(rd: Path) -> str:
                         '</tr></thead><tbody>' + "\n".join(rows2) + '</tbody></table></div>'
                     )
                     parts.append(_card(
-                        f"Table 6.2 — DX→MET directionality by index year {_badge('new')}",
+                        f"Table 6.2 — DX→MET directionality by index year",
                         tbl2,
                     ))
 
@@ -2409,12 +2479,12 @@ _GOOGLE_FONTS = (
 
 # ── Main build ───────────────────────────────────────────────────────────────────
 
-def build_report(outputs_dir: str | Path | None = None) -> Path:
+def build_report(outputs_dir: str | Path) -> Path:
     import datetime
     global _plotly_included
     _plotly_included = False
 
-    rd = Path(outputs_dir).expanduser().resolve() if outputs_dir else OUTPUTS_DIR
+    rd = Path(outputs_dir).expanduser().resolve()
     out = rd / OUT_FILE
 
     generated_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -2508,4 +2578,7 @@ def build_report(outputs_dir: str | Path | None = None) -> Path:
 
 
 if __name__ == "__main__":
-    build_report(sys.argv[1] if len(sys.argv) > 1 else None)
+    if len(sys.argv) != 2:
+        print("Usage: python3 build_v4_report.py <outputs_dir>", file=sys.stderr)
+        sys.exit(1)
+    build_report(sys.argv[1])

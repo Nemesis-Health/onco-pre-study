@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : postgresql
--- Translated     : 2026-05-06 18:53:53 BST
+-- Translated     : 2026-05-07 06:29:40 BST
 -- Source file    : sql/sql_server/chunks/06_windowed_odx_prevalence.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R

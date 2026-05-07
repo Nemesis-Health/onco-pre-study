@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : snowflake
--- Translated     : 2026-05-06 18:54:08 BST
+-- Translated     : 2026-05-07 06:29:53 BST
 -- Source file    : sql/sql_server/chunks/05_timing_by_year.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -40,8 +40,8 @@ FROM (
             EXTRACT(YEAR FROM pc.index_date) AS index_year_int,
             ROW_NUMBER() OVER (PARTITION BY EXTRACT(YEAR FROM pc.index_date), p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
             COUNT(*)     OVER (PARTITION BY EXTRACT(YEAR FROM pc.index_date), p.from_event, p.to_event)                    AS cnt
-        FROM sqvhwkzfpatient_timing_pairs p
-        JOIN sqvhwkzfpatient_char pc ON p.person_id = pc.person_id
+        FROM u2ijfaoqpatient_timing_pairs p
+        JOIN u2ijfaoqpatient_char pc ON p.person_id = pc.person_id
     ) y
     GROUP BY index_year_int, from_event, to_event
     UNION ALL
@@ -60,8 +60,8 @@ FROM (
             EXTRACT(YEAR FROM pc.index_date) AS index_year_int,
             ROW_NUMBER() OVER (PARTITION BY EXTRACT(YEAR FROM pc.index_date), p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
             COUNT(*)     OVER (PARTITION BY EXTRACT(YEAR FROM pc.index_date), p.from_event, p.to_event)                    AS cnt
-        FROM sqvhwkzfpatient_timing_pairs_first_to_closest_after p
-        JOIN sqvhwkzfpatient_char pc ON p.person_id = pc.person_id
+        FROM u2ijfaoqpatient_timing_pairs_first_to_closest_after p
+        JOIN u2ijfaoqpatient_char pc ON p.person_id = pc.person_id
     ) y
     GROUP BY index_year_int, from_event, to_event
 ) x

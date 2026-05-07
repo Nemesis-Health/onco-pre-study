@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : snowflake
--- Translated     : 2026-05-06 18:54:08 BST
+-- Translated     : 2026-05-07 06:29:53 BST
 -- Source file    : sql/sql_server/chunks/01_population_prevalence.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -17,7 +17,7 @@ WITH base  AS (SELECT CASE
         SUM(CASE WHEN first_gen_cancer_date IS NOT NULL THEN 1 ELSE 0 END) AS n_with_gen_cancer_dx,
         SUM(CASE WHEN first_met_date IS NOT NULL THEN 1 ELSE 0 END) AS n_with_met,
         SUM(CASE WHEN first_l01_date IS NOT NULL THEN 1 ELSE 0 END) AS n_with_l01
-    FROM sqvhwkzfpatient_char
+    FROM u2ijfaoqpatient_char
     GROUP BY GROUPING SETS (
         (),
         (EXTRACT(YEAR FROM index_date))

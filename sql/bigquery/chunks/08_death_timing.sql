@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-06 18:54:00 BST
+-- Translated     : 2026-05-07 06:29:46 BST
 -- Source file    : sql/sql_server/chunks/08_death_timing.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -30,11 +30,11 @@
     case when s.n_patients <= @min_cell_count then null else f.lq_followup_days end as lq_followup_days,
     case when s.n_patients <= @min_cell_count then null else f.median_followup_days end as median_followup_days,
     case when s.n_patients <= @min_cell_count then null else f.uq_followup_days end as uq_followup_days
- from sqvhwkzfdeath_stratum_counts s
-left join sqvhwkzfdeath_timing_quantiles q
+ from u2ijfaoqdeath_stratum_counts s
+left join u2ijfaoqdeath_timing_quantiles q
   on s.prevalence_year = q.prevalence_year
  and s.anchor_event = q.anchor_event
-left join sqvhwkzffollowup_quantiles f
+left join u2ijfaoqfollowup_quantiles f
   on s.prevalence_year = f.prevalence_year
  and s.anchor_event = f.anchor_event
  order by  case when s.prevalence_year = 'OVERALL' then 0 else 1 end, case when s.prevalence_year = 'OVERALL' then null else cast(s.prevalence_year  as int64) end, case when s.anchor_event = 'INDEX' then 0 else 1 end

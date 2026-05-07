@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : postgresql
--- Translated     : 2026-05-06 20:27:50 BST
+-- Translated     : 2026-05-07 06:29:40 BST
 -- Source file    : sql/sql_server/chunks/00_setup.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -1691,7 +1691,7 @@ WHERE person_id IN (SELECT person_id FROM cohort)
 -- Consecutive gaps between L01 event days per patient
 DROP TABLE IF EXISTS l01_consecutive_gaps;
 CREATE TEMP TABLE l01_consecutive_gaps  (person_id  BIGINT,
-    subgroup   VARCHAR(10),
+    subgroup   VARCHAR(12),
     gap_days   INT
 );
 WITH ranked AS (
@@ -1714,6 +1714,18 @@ UNION ALL
 SELECT g.person_id, 'MET_L01', g.gap_days
 FROM gaps g
 JOIN met_summary ms ON g.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+;
+-- Max gap per patient (one row per patient; used for MAX-gap subgroups in chunks 11–12)
+INSERT INTO l01_consecutive_gaps (person_id, subgroup, gap_days)
+SELECT person_id, 'ALL_L01_MAX', MAX(gap_days)
+FROM l01_consecutive_gaps
+WHERE subgroup = 'ALL_L01'
+GROUP BY person_id
+UNION ALL
+SELECT person_id, 'MET_L01_MAX', MAX(gap_days)
+FROM l01_consecutive_gaps
+WHERE subgroup = 'MET_L01'
+GROUP BY person_id
 ;
 ------------------------------------------------------------
 -- K) FINAL SELECTS (export to CSV from SQL client)
