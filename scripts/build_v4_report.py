@@ -1310,17 +1310,16 @@ def _s01_dx_met_timing(rd: Path) -> str:
                 n_dx = _safe_int(ov.iloc[0].get(_col(prev, "n_dx")))
                 n_met = _safe_int(ov.iloc[0].get(_col(prev, "n_met")))
 
-    # Directionality table — denominate on n_dx: DX_MET covers all DX patients
-    # (NO_EVENT alone = n_dx - n_met >> n_met, so using n_met would give >100%)
     if directionality is not None:
         tbl = _directionality_table(
             directionality, "DX_MET", _DIR_LABELS,
-            n_total=n_dx, interp=_DX_MET_INTERP, col4_header="Interpretation",
+            n_total=n_met, interp=_DX_MET_INTERP, col4_header="Interpretation",
         )
         if tbl:
+            n_met_lbl = f"N={n_met:,}" if n_met else "DX+MET subgroup"
             parts.append(_card(
                 f"Table 1.1 — DX ↔ MET temporal directionality (first to first)",
-                tbl + '<p class="tbl-note">OVERALL cohort. % denominated on DX cohort. Suppressed rows hidden.</p>',
+                tbl + f'<p class="tbl-note">DX patients with MET only ({n_met_lbl}). % denominated on DX+MET subgroup. Suppressed rows hidden.</p>',
             ))
 
     # DX→MET timing distribution — density histogram
@@ -1588,6 +1587,7 @@ def _s03_treatment_timing(rd: Path) -> str:
     prev = _read(rd, "final_population_prevalence.csv")
     n_dx = None
     n_met_s3: int | None = None
+    n_l01_s3: int | None = None
     if prev is not None:
         oc = _col(prev, "prevalence_year")
         if oc:
@@ -1595,6 +1595,7 @@ def _s03_treatment_timing(rd: Path) -> str:
             if not o.empty:
                 n_dx = _safe_int(o.iloc[0].get(_col(prev, "n_dx")))
                 n_met_s3 = _safe_int(o.iloc[0].get(_col(prev, "n_met")))
+                n_l01_s3 = _safe_int(o.iloc[0].get(_col(prev, "n_l01")))
 
     parts: list[str] = []
 
@@ -1602,13 +1603,13 @@ def _s03_treatment_timing(rd: Path) -> str:
     if directionality is not None:
         tbl = _directionality_table(
             directionality, "MET_L01", _MET_L01_DIR_LABELS,
-            n_total=n_met_s3, interp=_MET_L01_IMPLICATION, col4_header="Phenotype implication",
+            n_total=n_l01_s3, interp=_MET_L01_IMPLICATION, col4_header="Phenotype implication",
         )
         if tbl:
-            n_lbl = f"N={n_met_s3:,}" if n_met_s3 else "MET subgroup"
+            n_lbl = f"N={n_l01_s3:,}" if n_l01_s3 else "MET+L01 subgroup"
             parts.append(_card(
                 f"Table 3.1 — MET ↔ L01 temporal directionality (first to first)",
-                tbl + f'<p class="tbl-note">MET subgroup only ({n_lbl}). NO_EVENT = patients with MET but no L01 ever.</p>',
+                tbl + f'<p class="tbl-note">MET patients with L01 only ({n_lbl}). % denominated on MET+L01 subgroup. NO_EVENT = patients with MET but no L01 ever.</p>',
             ))
 
     # MET→L01 timing distribution — two separate histograms
