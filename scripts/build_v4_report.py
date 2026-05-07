@@ -1612,25 +1612,44 @@ def _s03_treatment_timing(rd: Path) -> str:
                 tbl + f'<p class="tbl-note">MET subgroup only ({n_lbl}). NO_EVENT = patients with MET but no L01 ever.</p>',
             ))
 
-    # MET→L01 timing distribution — overlay density histogram
+    # MET→L01 timing distribution — two separate histograms
     if timing is not None:
-        fig = _overlay_density_histogram(
-            timing,
-            [
-                ("MET", "L01", "first_to_first",
-                 "rgba(29,78,216,0.20)", "rgba(29,78,216,0.55)",
-                 "First-ever L01 (incl. pre-MET)"),
-                ("MET", "L01", "first_to_closest_after",
-                 "rgba(217,119,6,0.22)", "rgba(217,119,6,0.55)",
-                 "First L01 on/after MET"),
-            ],
-            height=310,
-            x_label="Days (MET → L01) · bar width = decile range in days",
+        fig_a, stats_a = _density_histogram_chart(
+            timing, "MET", "L01", "first_to_first",
+            color_fill="rgba(29,78,216,0.20)", color_line="rgba(29,78,216,0.55)",
+            from_label="MET", to_label="L01",
         )
-        if fig:
+        if fig_a:
+            sub_a = ""
+            if stats_a:
+                med = stats_a.get("median")
+                p25v = stats_a.get("p25")
+                p75v = stats_a.get("p75")
+                if med is not None:
+                    iqr = f" (IQR {int(round(p25v))}–{int(round(p75v))})" if p25v and p75v else ""
+                    sub_a = f"Anchored on first MET · includes L01 events before MET · median {int(round(med))}d{iqr}"
             parts.append(_plot_box(
-                "Figure 3.1 — Time from first MET to first L01 (bidirectional, full range)",
-                _fig_div(fig),
+                "Figure 3.1a — Time from first MET to first L01",
+                _fig_div(fig_a), sub=sub_a,
+            ))
+
+        fig_b, stats_b = _density_histogram_chart(
+            timing, "MET", "L01", "first_to_closest_after",
+            color_fill="rgba(217,119,6,0.22)", color_line="rgba(217,119,6,0.55)",
+            from_label="MET", to_label="L01",
+        )
+        if fig_b:
+            sub_b = ""
+            if stats_b:
+                med = stats_b.get("median")
+                p25v = stats_b.get("p25")
+                p75v = stats_b.get("p75")
+                if med is not None:
+                    iqr = f" (IQR {int(round(p25v))}–{int(round(p75v))})" if p25v and p75v else ""
+                    sub_b = f"Anchored on first MET · L01 on or after MET only · median {int(round(med))}d{iqr}"
+            parts.append(_plot_box(
+                "Figure 3.1b — Time from first MET to first L01 on or after MET",
+                _fig_div(fig_b), sub=sub_b,
             ))
 
     # Drug-level L01 codes table (top 15 by FIRST_MET anchor) — with before/after breakdown
