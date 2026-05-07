@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-07 11:48:08 BST
+-- Translated     : 2026-05-07 12:03:59 BST
 -- Source file    : sql/sql_server/chunks/05_timing_by_year.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -42,9 +42,9 @@
             case when p.from_event = 'MET' then EXTRACT(YEAR from ms.first_met_date) else EXTRACT(YEAR from pc.index_date) end as index_year_int,
             row_number() over (partition by case when p.from_event = 'MET' then EXTRACT(YEAR from ms.first_met_date) else EXTRACT(YEAR from pc.index_date) end, p.from_event, p.to_event order by p.days_diff) as rn,
             count(*)     over (partition by case when p.from_event = 'MET' then EXTRACT(YEAR from ms.first_met_date) else EXTRACT(YEAR from pc.index_date) end, p.from_event, p.to_event)                    as cnt
-        from qbz8duelpatient_timing_pairs p
-        join qbz8duelpatient_char pc    on p.person_id = pc.person_id
-        left join qbz8duelmet_summary ms on p.person_id = ms.person_id
+        from quyq3b3epatient_timing_pairs p
+        join quyq3b3epatient_char pc    on p.person_id = pc.person_id
+        left join quyq3b3emet_summary ms on p.person_id = ms.person_id
     ) y
      group by  2, 3, to_event
     union all
@@ -55,9 +55,9 @@
             case when p.from_event = 'MET' then EXTRACT(YEAR from ms.first_met_date) else EXTRACT(YEAR from pc.index_date) end as index_year_int,
             row_number() over (partition by case when p.from_event = 'MET' then EXTRACT(YEAR from ms.first_met_date) else EXTRACT(YEAR from pc.index_date) end, p.from_event, p.to_event order by p.days_diff) as rn,
             count(*)     over (partition by case when p.from_event = 'MET' then EXTRACT(YEAR from ms.first_met_date) else EXTRACT(YEAR from pc.index_date) end, p.from_event, p.to_event)                    as cnt
-        from qbz8duelpatient_timing_pairs_first_to_closest_after p
-        join qbz8duelpatient_char pc    on p.person_id = pc.person_id
-        left join qbz8duelmet_summary ms on p.person_id = ms.person_id
+        from quyq3b3epatient_timing_pairs_first_to_closest_after p
+        join quyq3b3epatient_char pc    on p.person_id = pc.person_id
+        left join quyq3b3emet_summary ms on p.person_id = ms.person_id
     ) y
      group by  2, 3, 2 ) x
  order by  x.timing_type, x.from_event, x.to_event, cast(x.index_year  as int64)

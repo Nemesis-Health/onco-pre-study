@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-07 11:48:08 BST
+-- Translated     : 2026-05-07 12:03:59 BST
 -- Source file    : sql/sql_server/chunks/00b_cohort_attrition.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -21,6 +21,6 @@ select
     sum(case when stage = 'dx_in_obs' then n_patients else 0 end) as n_dx_in_obs,
     sum(case when stage = 'dx_any'    then n_patients else 0 end)
     - sum(case when stage = 'dx_in_obs' then n_patients else 0 end)  as n_excluded_no_obs_dx
-from qbz8duelcohort_attrition
+from quyq3b3ecohort_attrition
 ;
 

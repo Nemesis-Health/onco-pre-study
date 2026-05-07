@@ -72,6 +72,28 @@ _MET_L01_IMPLICATION = {
     "NO_EVENT":     "<strong>Investigational drug / trial enrollment signal</strong> — or true treatment-naive / supportive care only",
 }
 
+_DX_L01_DIR_LABELS = {
+    "BEFORE_GT90":  ("before", "L01 > 90 d before DX"),
+    "BEFORE_1_90":  ("before", "L01 1–90 d before DX"),
+    "SAME_DAY":     ("same",   "Same calendar day"),
+    "AFTER_1_30":   ("after",  "L01 within 30 d after DX"),
+    "AFTER_31_90":  ("after",  "L01 31–90 d after DX"),
+    "AFTER_91_365": ("after",  "L01 91–365 d after DX"),
+    "AFTER_GT365":  ("after",  "L01 > 365 d after DX"),
+    "NO_EVENT":     ("none",   "No L01 ever recorded"),
+}
+
+_DX_L01_IMPLICATION = {
+    "BEFORE_GT90":  "Treatment preceded DX by >90 d — prior line or neoadjuvant; review cohort index logic",
+    "BEFORE_1_90":  "Treatment just before DX — likely neoadjuvant or index date capture issue",
+    "SAME_DAY":     "Treatment co-coded on DX encounter — staging day initiation",
+    "AFTER_1_30":   "Rapid initiation within 30 d of diagnosis",
+    "AFTER_31_90":  "Standard first-line window — 1–3 months post DX",
+    "AFTER_91_365": "Delayed initiation — 3 months to 1 year post DX",
+    "AFTER_GT365":  "Very delayed treatment — >1 year post DX; late-stage detection or watchful waiting",
+    "NO_EVENT":     "No L01 code in observation period — trial enrolment, supportive care, or data gap",
+}
+
 # ── Column resolution ───────────────────────────────────────────────────────────
 
 def _col(df: pd.DataFrame, name: str) -> str | None:
@@ -892,8 +914,9 @@ def _density_histogram_chart(
     return fig, stats
 
 
-def _windowed_odx_chart(windowed: pd.DataFrame, n_dx: int | None = None) -> go.Figure | None:
-    """Grouped bar chart: top 5 ODX concepts × 6 time windows (% of DX cohort)."""
+def _windowed_odx_chart(windowed: pd.DataFrame, n_denom: int | None = None, anchor: str = "INDEX") -> go.Figure | None:
+    """Grouped bar chart: top 5 ODX concepts × 6 time windows (% of anchor cohort)."""
+    ac = _col(windowed, "anchor_event")
     fc = _col(windowed, "event_family")
     cid_col = _col(windowed, "concept_id")
     ne = _col(windowed, "n_ever")
@@ -905,7 +928,10 @@ def _windowed_odx_chart(windowed: pd.DataFrame, n_dx: int | None = None) -> go.F
     nea = _col(windowed, "n_ever_after")
     if not all([fc, cid_col, ne]):
         return None
-    odx = windowed[windowed[fc].astype(str).str.upper() == "ODX"].copy()
+    df = windowed.copy()
+    if ac:
+        df = df[df[ac].astype(str).str.upper() == anchor.upper()]
+    odx = df[df[fc].astype(str).str.upper() == "ODX"].copy()
     odx["__n"] = pd.to_numeric(odx[ne], errors="coerce")
     odx = odx[odx["__n"] > 0].nlargest(5, "__n")
     if odx.empty:
@@ -920,6 +946,7 @@ def _windowed_odx_chart(windowed: pd.DataFrame, n_dx: int | None = None) -> go.F
     if not windows:
         return None
     win_labels = [lbl for lbl, _ in windows]
+    anchor_label = "MET" if anchor.upper() == "FIRST_MET" else "DX"
     colors = ["#1d4ed8", "#7c3aed", "#ea580c", "#dc2626", "#16a34a"]
     fig = go.Figure()
     for i, (_, row) in enumerate(odx.iterrows()):
@@ -929,7 +956,7 @@ def _windowed_odx_chart(windowed: pd.DataFrame, n_dx: int | None = None) -> go.F
         ys = []
         for _, wcol in windows:
             n = pd.to_numeric(row.get(wcol), errors="coerce") if wcol else float("nan")
-            pct = (float(n) / n_dx * 100.0) if n_dx and not math.isnan(n) and n_dx > 0 else float("nan")
+            pct = (float(n) / n_denom * 100.0) if n_denom and not math.isnan(n) and n_denom > 0 else float("nan")
             ys.append(round(pct, 2) if not math.isnan(pct) else None)
         fig.add_trace(go.Bar(
             name=short_name, x=win_labels, y=ys,
@@ -940,8 +967,8 @@ def _windowed_odx_chart(windowed: pd.DataFrame, n_dx: int | None = None) -> go.F
     layout.update({
         "height": 300,
         "barmode": "group",
-        "xaxis": dict(title=dict(text="Time window around DX index"), gridcolor="#e5e7eb"),
-        "yaxis": dict(title=dict(text="% of DX cohort"), rangemode="tozero", gridcolor="#e5e7eb"),
+        "xaxis": dict(title=dict(text=f"Time window around {anchor_label} index"), gridcolor="#e5e7eb"),
+        "yaxis": dict(title=dict(text=f"% of {anchor_label} cohort"), rangemode="tozero", gridcolor="#e5e7eb"),
     })
     fig.update_layout(**layout)
     return fig
@@ -1552,12 +1579,14 @@ def _s02_gdx_odx(rd: Path) -> str:
     timing = _read(rd, "final_timing_pairwise.csv")
     prev = _read(rd, "final_population_prevalence.csv")
     n_dx = None
+    n_met = None
     if prev is not None:
         oc = _col(prev, "prevalence_year")
         if oc:
             o = prev[prev[oc].astype(str).str.upper() == "OVERALL"]
             if not o.empty:
                 n_dx = _safe_int(o.iloc[0].get(_col(prev, "n_dx")))
+                n_met = _safe_int(o.iloc[0].get(_col(prev, "n_met")))
 
     parts: list[str] = []
 
@@ -1601,8 +1630,9 @@ def _s02_gdx_odx(rd: Path) -> str:
                     _tbl_wrap(tbl),
                 ))
 
-    # Windowed ODX prevalence table
+    # Tables 2.2a/b and Figures 2.1a/b — windowed ODX prevalence by anchor
     if windowed is not None:
+        ac = _col(windowed, "anchor_event")
         fc = _col(windowed, "event_family")
         cid_col = _col(windowed, "concept_id")
         ne = _col(windowed, "n_ever")
@@ -1612,48 +1642,66 @@ def _s02_gdx_odx(rd: Path) -> str:
         n1y = _col(windowed, "n_pm1yr")
         neb = _col(windowed, "n_ever_before")
         nea = _col(windowed, "n_ever_after")
-        if all([fc, cid_col, ne]):
-            odx = windowed[windowed[fc].astype(str).str.upper() == "ODX"].copy()
+
+        def _odx_table(anchor_key: str, anchor_label: str, tbl_id: str) -> None:
+            df = windowed.copy()
+            if ac:
+                df = df[df[ac].astype(str).str.upper() == anchor_key.upper()]
+            if not all([fc, cid_col, ne]):
+                return
+            odx = df[df[fc].astype(str).str.upper() == "ODX"].copy()
             odx["__n"] = pd.to_numeric(odx[ne], errors="coerce")
             odx = odx[odx["__n"] > 0].nlargest(10, "__n")
-            if not odx.empty:
-                ids = [int(x) for x in odx[cid_col].dropna().astype(int).tolist()]
-                names_map = _fetch_concept_names(ids)
-                win_cols = [
-                    ("±30d", n30), ("±90d", n90), ("±180d", n180), ("±1yr", n1y),
-                    ("Ever before", neb), ("Ever after", nea), ("Ever", ne),
-                ]
-                win_cols = [(lbl, c) for lbl, c in win_cols if c]
-                header = (
-                    '<table class="rt"><thead><tr>'
-                    '<th>Concept</th>'
-                    + "".join(f'<th class="num">{l}</th>' for l, _ in win_cols) +
-                    '</tr></thead><tbody>'
-                )
-                rows = []
-                for _, r in odx.iterrows():
-                    cid = _safe_int(r.get(cid_col))
-                    cname = names_map.get(cid, str(cid)) if cid else "?"
-                    cells = "".join(
-                        f'<td class="num">{_fmt_n(r.get(c))}</td>'
-                        for _, c in win_cols
-                    )
-                    rows.append(f"<tr><td><code>{cid}</code> {_e(cname)}</td>{cells}</tr>")
-                tbl = header + "\n".join(rows) + "</tbody></table>"
-                parts.append(_card(
-                    f"Table 2.2 — Windowed ODX prevalence relative to DX index date (any ODX within window)",
-                    _tbl_wrap(tbl),
-                ))
-
-    # Figure 2.1 — windowed ODX grouped bar chart (top 5 concepts × 6 windows)
-    if windowed is not None:
-        fig = _windowed_odx_chart(windowed, n_dx)
-        if fig:
-            parts.append(_plot_box(
-                "Figure 2.1 — Windowed ODX prevalence for top 5 concepts (any ODX within window)",
-                _fig_div(fig),
-                sub="% of DX cohort with each ODX concept within each time window around DX index",
+            if odx.empty:
+                return
+            ids = [int(x) for x in odx[cid_col].dropna().astype(int).tolist()]
+            names_map = _fetch_concept_names(ids)
+            win_cols = [
+                ("±30d", n30), ("±90d", n90), ("±180d", n180), ("±1yr", n1y),
+                ("Ever before", neb), ("Ever after", nea), ("Ever", ne),
+            ]
+            win_cols = [(lbl, c) for lbl, c in win_cols if c]
+            header = (
+                '<table class="rt"><thead><tr><th>Concept</th>'
+                + "".join(f'<th class="num">{l}</th>' for l, _ in win_cols)
+                + '</tr></thead><tbody>'
+            )
+            rows = []
+            for _, r in odx.iterrows():
+                cid = _safe_int(r.get(cid_col))
+                cname = names_map.get(cid, str(cid)) if cid else "?"
+                cells = "".join(f'<td class="num">{_fmt_n(r.get(c))}</td>' for _, c in win_cols)
+                rows.append(f"<tr><td><code>{cid}</code> {_e(cname)}</td>{cells}</tr>")
+            tbl = header + "\n".join(rows) + "</tbody></table>"
+            parts.append(_card(
+                f"{tbl_id} — Windowed ODX prevalence relative to {anchor_label} index date",
+                _tbl_wrap(tbl),
             ))
+
+        _odx_table("INDEX",     "DX",  "Table 2.2a")
+        _odx_table("FIRST_MET", "MET", "Table 2.2b")
+
+        # Figures 2.1a/b — side by side grouped bar charts
+        fig_21a = _windowed_odx_chart(windowed, n_denom=n_dx,  anchor="INDEX")
+        fig_21b = _windowed_odx_chart(windowed, n_denom=n_met, anchor="FIRST_MET")
+        if fig_21a or fig_21b:
+            panels_21 = []
+            if fig_21a:
+                panels_21.append(_plot_box(
+                    "Figure 2.1a — Windowed ODX prevalence: DX anchor (top 5 concepts)",
+                    _fig_div(fig_21a),
+                    sub="% of DX cohort with each ODX concept within each time window around DX index",
+                ))
+            if fig_21b:
+                panels_21.append(_plot_box(
+                    "Figure 2.1b — Windowed ODX prevalence: MET anchor (top 5 concepts)",
+                    _fig_div(fig_21b),
+                    sub="% of MET subgroup with each ODX concept within each time window around MET index",
+                ))
+            if len(panels_21) == 2:
+                parts.append(f'<div class="card-grid card-grid-2" style="margin-bottom:16px;">{"".join(panels_21)}</div>')
+            else:
+                parts.extend(panels_21)
 
     # Figures 2.2a/b — ODX timing density histogram split by anchor (DX vs MET)
     if timing is not None:
@@ -1738,7 +1786,59 @@ def _s03_treatment_timing(rd: Path) -> str:
             if total > 0:
                 n_met_l01 = total
 
+    # DX patients with L01 (for denominator)
+    n_dx_l01: int | None = None
+    if directionality is not None:
+        pc = _col(directionality, "pair")
+        yc = _col(directionality, "index_year")
+        dc = _col(directionality, "direction")
+        nc = _col(directionality, "n_patients")
+        if pc and yc and dc and nc:
+            sub = directionality[
+                (directionality[pc].astype(str).str.upper() == "DX_L01") &
+                (directionality[yc].astype(str).str.upper() == "OVERALL") &
+                (directionality[dc].astype(str).str.upper() != "NO_EVENT")
+            ]
+            vals = pd.to_numeric(sub[nc], errors="coerce").dropna()
+            total = int(vals[vals > 0].sum())
+            if total > 0:
+                n_dx_l01 = total
+
     parts: list[str] = []
+
+    # DX→L01 directionality
+    if directionality is not None:
+        tbl = _directionality_table(
+            directionality, "DX_L01", _DX_L01_DIR_LABELS,
+            n_total=n_dx_l01, interp=_DX_L01_IMPLICATION, col4_header="Implication",
+        )
+        if tbl:
+            n_lbl = f"N={n_dx_l01:,}" if n_dx_l01 else "DX+L01 subgroup"
+            parts.append(_card(
+                "Table 3.1 — DX ↔ L01 temporal directionality (first to first)",
+                tbl + f'<p class="tbl-note">DX patients with any L01 ({n_lbl}). % denominated on DX+L01 subgroup. NO_EVENT = patients with DX but no L01 ever.</p>',
+            ))
+
+    # DX→L01 timing distribution
+    if timing is not None:
+        fig_dx_l01, stats_dx_l01 = _density_histogram_chart(
+            timing, "DX", "L01", "first_to_first",
+            color_fill="rgba(13,148,136,0.20)", color_line="rgba(13,148,136,0.55)",
+            from_label="DX", to_label="L01",
+        )
+        if fig_dx_l01:
+            sub_dx_l01 = ""
+            if stats_dx_l01:
+                med = stats_dx_l01.get("median")
+                p25v = stats_dx_l01.get("p25")
+                p75v = stats_dx_l01.get("p75")
+                if med is not None:
+                    iqr = f" (IQR {int(round(p25v))}–{int(round(p75v))})" if p25v and p75v else ""
+                    sub_dx_l01 = f"Anchored on first DX · includes L01 events before DX · median {int(round(med))}d{iqr}"
+            parts.append(_plot_box(
+                "Figure 3.1 — Time from first DX to first L01 (first to first)",
+                _fig_div(fig_dx_l01), sub=sub_dx_l01,
+            ))
 
     # MET→L01 directionality
     if directionality is not None:
@@ -1749,7 +1849,7 @@ def _s03_treatment_timing(rd: Path) -> str:
         if tbl:
             n_lbl = f"N={n_met_l01:,}" if n_met_l01 else "MET+L01 subgroup"
             parts.append(_card(
-                f"Table 3.1 — MET ↔ L01 temporal directionality (first to first)",
+                f"Table 3.2 — MET ↔ L01 temporal directionality (first to first)",
                 tbl + f'<p class="tbl-note">MET patients with L01 only ({n_lbl}). % denominated on MET+L01 subgroup. NO_EVENT = patients with MET but no L01 ever.</p>',
             ))
 
@@ -1770,7 +1870,7 @@ def _s03_treatment_timing(rd: Path) -> str:
                     iqr = f" (IQR {int(round(p25v))}–{int(round(p75v))})" if p25v and p75v else ""
                     sub_a = f"Anchored on first MET · includes L01 events before MET · median {int(round(med))}d{iqr}"
             parts.append(_plot_box(
-                "Figure 3.1a — Time from first MET to first L01",
+                "Figure 3.2a — Time from first MET to first L01",
                 _fig_div(fig_a), sub=sub_a,
             ))
 
@@ -1789,7 +1889,7 @@ def _s03_treatment_timing(rd: Path) -> str:
                     iqr = f" (IQR {int(round(p25v))}–{int(round(p75v))})" if p25v and p75v else ""
                     sub_b = f"Anchored on first MET · L01 on or after MET only · median {int(round(med))}d{iqr}"
             parts.append(_plot_box(
-                "Figure 3.1b — Time from first MET to first L01 on or after MET",
+                "Figure 3.2b — Time from first MET to first L01 on or after MET",
                 _fig_div(fig_b), sub=sub_b,
             ))
 
@@ -1886,7 +1986,7 @@ def _s03_treatment_timing(rd: Path) -> str:
                     '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
                 )
                 parts.append(_card(
-                    f"Table 3.2 — Drug-level L01 timing around MET (top {CODE_COUNTS_TOP_N})",
+                    f"Table 3.3 — Drug-level L01 timing around MET (top {CODE_COUNTS_TOP_N})",
                     _tbl_wrap(tbl),
                 ))
 

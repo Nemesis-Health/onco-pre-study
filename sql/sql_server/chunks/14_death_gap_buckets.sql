@@ -53,13 +53,17 @@ bucketed AS (
 )
 SELECT anchor_event, gap_bucket, n_patients
 FROM (
-    SELECT 'INDEX'     AS anchor_event, gap_bucket, COUNT(*) AS n_patients, MIN(sort_key) AS sort_key
+    SELECT 'INDEX' AS anchor_event, gap_bucket,
+        CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_patients,
+        MIN(sort_key) AS sort_key
     FROM bucketed
     GROUP BY gap_bucket
 
     UNION ALL
 
-    SELECT 'FIRST_MET' AS anchor_event, gap_bucket, COUNT(*) AS n_patients, MIN(sort_key) AS sort_key
+    SELECT 'FIRST_MET' AS anchor_event, gap_bucket,
+        CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_patients,
+        MIN(sort_key) AS sort_key
     FROM bucketed
     WHERE first_met_date IS NOT NULL
     GROUP BY gap_bucket

@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : spark
--- Translated     : 2026-05-07 11:48:09 BST
+-- Translated     : 2026-05-07 12:04:00 BST
 -- Source file    : sql/sql_server/chunks/03_directionality_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -23,7 +23,22 @@ WITH dx_met_base  AS (SELECT YEAR(index_date) AS index_year_int,
  WHEN days_dx_to_met <= 365 THEN 'AFTER_91_365'
  ELSE 'AFTER_GT365'
  END AS direction
- FROM qbz8duelpatient_char
+ FROM quyq3b3epatient_char
+),
+dx_l01_base AS (
+ SELECT
+ YEAR(index_date) AS index_year_int,
+ CASE
+ WHEN first_l01_date IS NULL THEN 'NO_EVENT'
+ WHEN days_dx_to_l01 < -90 THEN 'BEFORE_GT90'
+ WHEN days_dx_to_l01 < 0 THEN 'BEFORE_1_90'
+ WHEN days_dx_to_l01 = 0 THEN 'SAME_DAY'
+ WHEN days_dx_to_l01 <= 30 THEN 'AFTER_1_30'
+ WHEN days_dx_to_l01 <= 90 THEN 'AFTER_31_90'
+ WHEN days_dx_to_l01 <= 365 THEN 'AFTER_91_365'
+ ELSE 'AFTER_GT365'
+ END AS direction
+ FROM quyq3b3epatient_char
 ),
 met_l01_base AS (
  SELECT
@@ -38,7 +53,7 @@ met_l01_base AS (
  WHEN days_met_to_l01 <= 365 THEN 'AFTER_91_365'
  ELSE 'AFTER_GT365'
  END AS direction
- FROM qbz8duelpatient_char
+ FROM quyq3b3epatient_char
  WHERE first_met_date IS NOT NULL
 )
 SELECT
@@ -48,38 +63,32 @@ SELECT
  CASE WHEN x.n_patients <= @min_cell_count THEN -@min_cell_count ELSE x.n_patients END AS n_patients
 FROM (
  -- DX -> MET: OVERALL
- SELECT
- 'DX_MET' AS pair,
- 'OVERALL' AS index_year,
- direction,
- COUNT(*) AS n_patients
+ SELECT 'DX_MET' AS pair, 'OVERALL' AS index_year, direction, COUNT(*) AS n_patients
  FROM dx_met_base
  GROUP BY direction
  UNION ALL
- -- DX -> MET: by index year
- SELECT
- 'DX_MET' AS pair,
- CAST(index_year_int AS STRING) AS index_year,
- direction,
- COUNT(*) AS n_patients
+ -- DX -> MET: by DX year
+ SELECT 'DX_MET' AS pair, CAST(index_year_int AS STRING) AS index_year, direction, COUNT(*) AS n_patients
  FROM dx_met_base
  GROUP BY index_year_int, direction
  UNION ALL
+ -- DX -> L01: OVERALL
+ SELECT 'DX_L01' AS pair, 'OVERALL' AS index_year, direction, COUNT(*) AS n_patients
+ FROM dx_l01_base
+ GROUP BY direction
+ UNION ALL
+ -- DX -> L01: by DX year
+ SELECT 'DX_L01' AS pair, CAST(index_year_int AS STRING) AS index_year, direction, COUNT(*) AS n_patients
+ FROM dx_l01_base
+ GROUP BY index_year_int, direction
+ UNION ALL
  -- MET -> L01: OVERALL
- SELECT
- 'MET_L01' AS pair,
- 'OVERALL' AS index_year,
- direction,
- COUNT(*) AS n_patients
+ SELECT 'MET_L01' AS pair, 'OVERALL' AS index_year, direction, COUNT(*) AS n_patients
  FROM met_l01_base
  GROUP BY direction
  UNION ALL
- -- MET -> L01: by index year
- SELECT
- 'MET_L01' AS pair,
- CAST(index_year_int AS STRING) AS index_year,
- direction,
- COUNT(*) AS n_patients
+ -- MET -> L01: by MET year
+ SELECT 'MET_L01' AS pair, CAST(index_year_int AS STRING) AS index_year, direction, COUNT(*) AS n_patients
  FROM met_l01_base
  GROUP BY index_year_int, direction
 ) x

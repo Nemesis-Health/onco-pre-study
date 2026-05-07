@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : sqlite
--- Translated     : 2026-05-07 11:48:10 BST
+-- Translated     : 2026-05-07 12:04:01 BST
 -- Source file    : sql/sql_server/chunks/03_directionality_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -11,6 +11,7 @@
 -- 3) Temporal directionality buckets
 --    Exact patient counts by direction category for key event pairs:
 --      DX -> MET  (using index_date -> first_met_date from #patient_char)
+--      DX -> L01  (using index_date -> first_l01_date from #patient_char)
 --      MET -> L01 (using first_met_date -> first_l01_date from #patient_char)
 --
 --    Categories (days = TO_date - FROM_date):
@@ -23,7 +24,8 @@
 --      AFTER_GT365  : > 365 days after                 (days > 365)
 --      NO_EVENT     : FROM event present but TO event absent
 --
---    Stratified by OVERALL and by anchor year: DX_MET uses YEAR(index_date), MET_L01 uses YEAR(first_met_date).
+--    Stratified by OVERALL and by anchor year:
+--      DX_MET / DX_L01 use YEAR(index_date); MET_L01 uses YEAR(first_met_date).
 --    Small-cell suppression: n suppressed to -@min_cell_count when <= @min_cell_count.
 WITH dx_met_base  AS (SELECT CAST(STRFTIME('%Y', index_date, 'unixepoch') AS INT) AS index_year_int,
         CASE
@@ -33,6 +35,21 @@ WITH dx_met_base  AS (SELECT CAST(STRFTIME('%Y', index_date, 'unixepoch') AS INT
             WHEN days_dx_to_met <= 30    THEN 'AFTER_1_30'
             WHEN days_dx_to_met <= 90    THEN 'AFTER_31_90'
             WHEN days_dx_to_met <= 365   THEN 'AFTER_91_365'
+            ELSE 'AFTER_GT365'
+        END AS direction
+    FROM temp.patient_char
+),
+dx_l01_base AS (
+    SELECT
+        CAST(STRFTIME('%Y', index_date, 'unixepoch') AS INT) AS index_year_int,
+        CASE
+            WHEN first_l01_date IS NULL  THEN 'NO_EVENT'
+            WHEN days_dx_to_l01 < -90    THEN 'BEFORE_GT90'
+            WHEN days_dx_to_l01 < 0      THEN 'BEFORE_1_90'
+            WHEN days_dx_to_l01 = 0      THEN 'SAME_DAY'
+            WHEN days_dx_to_l01 <= 30    THEN 'AFTER_1_30'
+            WHEN days_dx_to_l01 <= 90    THEN 'AFTER_31_90'
+            WHEN days_dx_to_l01 <= 365   THEN 'AFTER_91_365'
             ELSE 'AFTER_GT365'
         END AS direction
     FROM temp.patient_char
@@ -60,38 +77,32 @@ SELECT
     CASE WHEN x.n_patients <= @min_cell_count THEN -@min_cell_count ELSE x.n_patients END AS n_patients
 FROM (
     -- DX -> MET: OVERALL
-    SELECT
-        'DX_MET'   AS pair,
-        'OVERALL'  AS index_year,
-        direction,
-        COUNT(*)   AS n_patients
+    SELECT 'DX_MET' AS pair, 'OVERALL' AS index_year, direction, COUNT(*) AS n_patients
     FROM dx_met_base
     GROUP BY direction
     UNION ALL
-    -- DX -> MET: by index year
-    SELECT
-        'DX_MET'                              AS pair,
-        CAST(index_year_int AS TEXT)    AS index_year,
-        direction,
-        COUNT(*)                              AS n_patients
+    -- DX -> MET: by DX year
+    SELECT 'DX_MET' AS pair, CAST(index_year_int AS TEXT) AS index_year, direction, COUNT(*) AS n_patients
     FROM dx_met_base
     GROUP BY index_year_int, direction
     UNION ALL
+    -- DX -> L01: OVERALL
+    SELECT 'DX_L01' AS pair, 'OVERALL' AS index_year, direction, COUNT(*) AS n_patients
+    FROM dx_l01_base
+    GROUP BY direction
+    UNION ALL
+    -- DX -> L01: by DX year
+    SELECT 'DX_L01' AS pair, CAST(index_year_int AS TEXT) AS index_year, direction, COUNT(*) AS n_patients
+    FROM dx_l01_base
+    GROUP BY index_year_int, direction
+    UNION ALL
     -- MET -> L01: OVERALL
-    SELECT
-        'MET_L01'  AS pair,
-        'OVERALL'  AS index_year,
-        direction,
-        COUNT(*)   AS n_patients
+    SELECT 'MET_L01' AS pair, 'OVERALL' AS index_year, direction, COUNT(*) AS n_patients
     FROM met_l01_base
     GROUP BY direction
     UNION ALL
-    -- MET -> L01: by index year
-    SELECT
-        'MET_L01'                             AS pair,
-        CAST(index_year_int AS TEXT)    AS index_year,
-        direction,
-        COUNT(*)                              AS n_patients
+    -- MET -> L01: by MET year
+    SELECT 'MET_L01' AS pair, CAST(index_year_int AS TEXT) AS index_year, direction, COUNT(*) AS n_patients
     FROM met_l01_base
     GROUP BY index_year_int, direction
 ) x

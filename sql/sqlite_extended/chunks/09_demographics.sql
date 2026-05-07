@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : sqlite extended
--- Translated     : 2026-05-07 11:48:14 BST
+-- Translated     : 2026-05-07 12:04:04 BST
 -- Source file    : sql/sql_server/chunks/09_demographics.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R

@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : sqlite
--- Translated     : 2026-05-07 11:48:10 BST
+-- Translated     : 2026-05-07 12:04:01 BST
 -- Source file    : sql/sql_server/chunks/15_l01_day_count_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -16,6 +16,7 @@
 --     Two subgroups:
 --       ALL_L01 : all DX cohort patients with any L01 record
 --       MET_L01 : patients who also have a first_met_date
+--     Small-cell suppression: n_patients <= @min_cell_count suppressed to -@min_cell_count.
 SELECT
     subgroup,
     CASE
@@ -24,7 +25,7 @@ SELECT
         WHEN n_days <= 11 THEN '7_11'
         ELSE '12plus'
     END AS days_bucket,
-    COUNT(*) AS n_patients
+    CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_patients
 FROM (
     SELECT e.person_id, COUNT(*) AS n_days, 'ALL_L01' AS subgroup
     FROM temp.l01_event_days e
