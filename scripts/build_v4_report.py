@@ -1124,7 +1124,7 @@ def _s00_overview(rd: Path) -> str:
             yearly = prev[prev[oc].astype(str).str.upper() != "OVERALL"].copy()
             fig = _prevalence_chart(yearly)
             if fig:
-                parts.append(_plot_box("Figure 0.1 — Population prevalence by calendar year", _fig_div(fig), badge="new"))
+                parts.append(_plot_box("Figure 0.1 — Population prevalence by calendar year", _fig_div(fig)))
 
     # ── Demographics table ──────────────────────────────────────────────────────
     if demo is not None:
@@ -1321,7 +1321,7 @@ def _s01_dx_met_timing(rd: Path) -> str:
         )
         if tbl:
             parts.append(_card(
-                f"Table 1.1 — DX ↔ MET temporal directionality (first to first) {_badge('new')}",
+                f"Table 1.1 — DX ↔ MET temporal directionality (first to first)",
                 tbl + '<p class="tbl-note">OVERALL cohort. % denominated on DX cohort. Suppressed rows hidden.</p>',
             ))
 
@@ -1419,7 +1419,7 @@ def _s01_dx_met_timing(rd: Path) -> str:
                         '</tbody></table></div>'
                     )
                     parts.append(_card(
-                        f"Figure 1.2 — DX→MET median days by index year (first to first) {_badge('new')}",
+                        f"Figure 1.2 — DX→MET median days by index year (first to first)",
                         tbl,
                     ))
 
@@ -1489,7 +1489,7 @@ def _s02_gdx_odx(rd: Path) -> str:
                     '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
                 )
                 parts.append(_card(
-                    f"Table 2.1 — Most frequent GDX concepts {_badge('new')}",
+                    f"Table 2.1 — Most frequent GDX concepts",
                     _tbl_wrap(tbl),
                 ))
 
@@ -1533,7 +1533,7 @@ def _s02_gdx_odx(rd: Path) -> str:
                     rows.append(f"<tr><td><code>{cid}</code> {_e(cname)}</td>{cells}</tr>")
                 tbl = header + "\n".join(rows) + "</tbody></table>"
                 parts.append(_card(
-                    f"Table 2.2 — Windowed ODX prevalence relative to DX index date (any ODX within window) {_badge('new')}",
+                    f"Table 2.2 — Windowed ODX prevalence relative to DX index date (any ODX within window)",
                     _tbl_wrap(tbl),
                 ))
 
@@ -1543,7 +1543,7 @@ def _s02_gdx_odx(rd: Path) -> str:
         if fig:
             parts.append(_plot_box(
                 "Figure 2.1 — Windowed ODX prevalence for top 5 concepts (any ODX within window)",
-                _fig_div(fig), badge="new",
+                _fig_div(fig),
                 sub="% of DX cohort with each ODX concept within each time window around DX index",
             ))
 
@@ -1609,7 +1609,7 @@ def _s03_treatment_timing(rd: Path) -> str:
         if tbl:
             n_lbl = f"N={n_met_s3:,}" if n_met_s3 else "MET subgroup"
             parts.append(_card(
-                f"Table 3.1 — MET ↔ L01 temporal directionality (first to first) {_badge('new')}",
+                f"Table 3.1 — MET ↔ L01 temporal directionality (first to first)",
                 tbl + f'<p class="tbl-note">MET subgroup only ({n_lbl}). NO_EVENT = patients with MET but no L01 ever.</p>',
             ))
 
@@ -1748,7 +1748,7 @@ def _s03_treatment_timing(rd: Path) -> str:
                     '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
                 )
                 parts.append(_card(
-                    f"Table 3.2 — Drug-level L01 timing around MET (top {CODE_COUNTS_TOP_N}) {_badge('new')}",
+                    f"Table 3.2 — Drug-level L01 timing around MET (top {CODE_COUNTS_TOP_N})",
                     _tbl_wrap(tbl),
                 ))
 
@@ -1781,8 +1781,8 @@ def _s04_longitudinal(rd: Path) -> str:
         if fig_41 or fig_42:
             parts.append(
                 f'<div class="card-grid card-grid-2" style="margin-bottom:16px;">'
-                + (_plot_box("Figure 4.1 — % cohort with L01 per 30-day window (DX anchor)", _fig_div(fig_41), badge="new") if fig_41 else "")
-                + (_plot_box("Figure 4.2 — % MET subgroup with L01 per 30-day window (MET anchor)", _fig_div(fig_42), badge="new") if fig_42 else "")
+                + (_plot_box("Figure 4.1 — % cohort with L01 per 30-day window (DX anchor)", _fig_div(fig_41)) if fig_41 else "")
+                + (_plot_box("Figure 4.2 — % MET subgroup with L01 per 30-day window (MET anchor)", _fig_div(fig_42)) if fig_42 else "")
                 + "</div>"
             )
 
@@ -1791,7 +1791,7 @@ def _s04_longitudinal(rd: Path) -> str:
         fig = _gap_bucket_chart(gap_buckets)
         if fig:
             parts.append(_plot_box(
-                "Figure 4.3 — Distribution of gaps between consecutive L01 records", _fig_div(fig), badge="new",
+                "Figure 4.3 — Distribution of gaps between consecutive L01 records", _fig_div(fig),
                 sub="All L01 patients vs MET subgroup · bimodal shape = empirical episode boundary",
             ))
 
@@ -1875,7 +1875,7 @@ def _s04_longitudinal(rd: Path) -> str:
                 + '</tbody></table>'
             )
             parts.append(_card(
-                f"Table 4.1 — L01 gap distribution summary: all L01 patients vs MET subgroup {_badge('new')}",
+                f"Table 4.1 — L01 gap distribution summary: all L01 patients vs MET subgroup",
                 _tbl_wrap(tbl),
             ))
 
@@ -2008,7 +2008,7 @@ def _s05_obs_death(rd: Path) -> str:
                     '</tr></thead><tbody>' + rows_html + '</tbody></table>'
                 )
                 parts.append(_card(
-                    f"Table 5.1 — Death vs observation period alignment {_badge('new')}",
+                    f"Table 5.1 — Death vs observation period alignment",
                     _tbl_wrap(tbl),
                 ))
 
@@ -2087,7 +2087,7 @@ def _s05_obs_death(rd: Path) -> str:
         fig = _gap_bucket_chart(gap_buckets, n_col="n_patients", group_col=None)
         if fig:
             parts.append(_plot_box(
-                "Figure 5.1 — Gap distribution: death date − obs. period end", _fig_div(fig), badge="new",
+                "Figure 5.1 — Gap distribution: death date − obs. period end", _fig_div(fig),
                 sub="Patients whose death date falls outside their observation window",
             ))
 
@@ -2254,7 +2254,7 @@ def _s06_yoy(rd: Path) -> str:
             '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
         )
         parts.append(_card(
-            f"Table 6.1 — Timing summary matrix by index year {_badge('new')}",
+            f"Table 6.1 — Timing summary matrix by index year",
             tbl,
         ))
 
@@ -2264,7 +2264,7 @@ def _s06_yoy(rd: Path) -> str:
         if fig:
             parts.append(_plot_box(
                 "Figure 6.1 — Key timing metrics by index year",
-                _fig_div(fig), badge="new",
+                _fig_div(fig),
                 sub="DX→MET and MET→L01 median days by index year · trend shifts indicate coding or guideline changes",
             ))
 
@@ -2305,7 +2305,7 @@ def _s06_yoy(rd: Path) -> str:
                         '</tr></thead><tbody>' + "\n".join(rows2) + '</tbody></table></div>'
                     )
                     parts.append(_card(
-                        f"Table 6.2 — DX→MET directionality by index year {_badge('new')}",
+                        f"Table 6.2 — DX→MET directionality by index year",
                         tbl2,
                     ))
 
