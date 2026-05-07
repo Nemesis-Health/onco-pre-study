@@ -1,6 +1,6 @@
 # SQL Translation Report
 
-Generated: 2026-05-06 20:28:01 BST
+Generated: 2026-05-07 06:29:54 BST
 Source: `sql/sql_server/`
 Dialects: oracle, postgresql, pdw, impala, netezza, bigquery, spark, sqlite, redshift, hive, sqlite extended, duckdb, snowflake, synapse, iris
 
@@ -38,6 +38,10 @@ Dialects requiring `tempEmulationSchema` at execution time (no native session te
 
 - [chunks/12_l01_gap_buckets.sql] RESIDUAL_HASH_TEMP: Residual #temp_table reference. SqlRender should have rewritten these. If they remain, confirm SqlRender version >= 1.6 and that the source SQL uses the standard #temp pattern.
 
+### oracle/chunks/15_l01_day_count_buckets.sql
+
+- [chunks/15_l01_day_count_buckets.sql] RESIDUAL_HASH_TEMP: Residual #temp_table reference. SqlRender should have rewritten these. If they remain, confirm SqlRender version >= 1.6 and that the source SQL uses the standard #temp pattern.
+
 ### postgresql/characterization_full.sql
 
 - [characterization_full.sql] YEAR_FUNC: YEAR() function may need to be rewritten as EXTRACT(YEAR FROM ...) on some dialects.
@@ -65,6 +69,10 @@ Dialects requiring `tempEmulationSchema` at execution time (no native session te
 ### postgresql/chunks/12_l01_gap_buckets.sql
 
 - [chunks/12_l01_gap_buckets.sql] RESIDUAL_HASH_TEMP: Residual #temp_table reference. SqlRender should have rewritten these. If they remain, confirm SqlRender version >= 1.6 and that the source SQL uses the standard #temp pattern.
+
+### postgresql/chunks/15_l01_day_count_buckets.sql
+
+- [chunks/15_l01_day_count_buckets.sql] RESIDUAL_HASH_TEMP: Residual #temp_table reference. SqlRender should have rewritten these. If they remain, confirm SqlRender version >= 1.6 and that the source SQL uses the standard #temp pattern.
 
 ### pdw/characterization_full.sql
 
@@ -141,6 +149,10 @@ Dialects requiring `tempEmulationSchema` at execution time (no native session te
 
 - [chunks/12_l01_gap_buckets.sql] RESIDUAL_HASH_TEMP: Residual #temp_table reference. SqlRender should have rewritten these. If they remain, confirm SqlRender version >= 1.6 and that the source SQL uses the standard #temp pattern.
 
+### impala/chunks/15_l01_day_count_buckets.sql
+
+- [chunks/15_l01_day_count_buckets.sql] RESIDUAL_HASH_TEMP: Residual #temp_table reference. SqlRender should have rewritten these. If they remain, confirm SqlRender version >= 1.6 and that the source SQL uses the standard #temp pattern.
+
 ### netezza/characterization_full.sql
 
 - [characterization_full.sql] YEAR_FUNC: YEAR() function may need to be rewritten as EXTRACT(YEAR FROM ...) on some dialects.
@@ -169,6 +181,10 @@ Dialects requiring `tempEmulationSchema` at execution time (no native session te
 
 - [chunks/12_l01_gap_buckets.sql] RESIDUAL_HASH_TEMP: Residual #temp_table reference. SqlRender should have rewritten these. If they remain, confirm SqlRender version >= 1.6 and that the source SQL uses the standard #temp pattern.
 
+### netezza/chunks/15_l01_day_count_buckets.sql
+
+- [chunks/15_l01_day_count_buckets.sql] RESIDUAL_HASH_TEMP: Residual #temp_table reference. SqlRender should have rewritten these. If they remain, confirm SqlRender version >= 1.6 and that the source SQL uses the standard #temp pattern.
+
 ### bigquery/characterization_full.sql
 
 - [characterization_full.sql] YEAR_FUNC: YEAR() function may need to be rewritten as EXTRACT(YEAR FROM ...) on some dialects.
@@ -196,6 +212,10 @@ Dialects requiring `tempEmulationSchema` at execution time (no native session te
 ### bigquery/chunks/12_l01_gap_buckets.sql
 
 - [chunks/12_l01_gap_buckets.sql] RESIDUAL_HASH_TEMP: Residual #temp_table reference. SqlRender should have rewritten these. If they remain, confirm SqlRender version >= 1.6 and that the source SQL uses the standard #temp pattern.
+
+### bigquery/chunks/15_l01_day_count_buckets.sql
+
+- [chunks/15_l01_day_count_buckets.sql] RESIDUAL_HASH_TEMP: Residual #temp_table reference. SqlRender should have rewritten these. If they remain, confirm SqlRender version >= 1.6 and that the source SQL uses the standard #temp pattern.
 
 ### spark/characterization_full.sql
 
@@ -268,6 +288,10 @@ Dialects requiring `tempEmulationSchema` at execution time (no native session te
 
 - [chunks/12_l01_gap_buckets.sql] RESIDUAL_HASH_TEMP: Residual #temp_table reference. SqlRender should have rewritten these. If they remain, confirm SqlRender version >= 1.6 and that the source SQL uses the standard #temp pattern.
 
+### sqlite/chunks/15_l01_day_count_buckets.sql
+
+- [chunks/15_l01_day_count_buckets.sql] RESIDUAL_HASH_TEMP: Residual #temp_table reference. SqlRender should have rewritten these. If they remain, confirm SqlRender version >= 1.6 and that the source SQL uses the standard #temp pattern.
+
 ### redshift/characterization_full.sql
 
 - [characterization_full.sql] DATEDIFF_3ARG: DATEDIFF(DAY, start, end) was not rewritten. Most dialects use date subtraction or their own function instead.
@@ -336,6 +360,10 @@ Dialects requiring `tempEmulationSchema` at execution time (no native session te
 
 - [chunks/12_l01_gap_buckets.sql] RESIDUAL_HASH_TEMP: Residual #temp_table reference. SqlRender should have rewritten these. If they remain, confirm SqlRender version >= 1.6 and that the source SQL uses the standard #temp pattern.
 
+### hive/chunks/15_l01_day_count_buckets.sql
+
+- [chunks/15_l01_day_count_buckets.sql] RESIDUAL_HASH_TEMP: Residual #temp_table reference. SqlRender should have rewritten these. If they remain, confirm SqlRender version >= 1.6 and that the source SQL uses the standard #temp pattern.
+
 ### sqlite_extended/characterization_full.sql
 
 - [characterization_full.sql] TRY_CAST: TRY_CAST was left in translated SQL. SqlRender should rewrite it, but if it remains, the query will fail on dialects that don't support it. Even when rewritten to CAST, invalid values will raise errors rather than returning NULL — validate upstream data quality.
@@ -391,6 +419,10 @@ Dialects requiring `tempEmulationSchema` at execution time (no native session te
 
 - [chunks/14_death_gap_buckets.sql] DATEDIFF_3ARG: DATEDIFF(DAY, start, end) was not rewritten. Most dialects use date subtraction or their own function instead.
 
+### sqlite_extended/chunks/15_l01_day_count_buckets.sql
+
+- [chunks/15_l01_day_count_buckets.sql] RESIDUAL_HASH_TEMP: Residual #temp_table reference. SqlRender should have rewritten these. If they remain, confirm SqlRender version >= 1.6 and that the source SQL uses the standard #temp pattern.
+
 ### duckdb/characterization_full.sql
 
 - [characterization_full.sql] YEAR_FUNC: YEAR() function may need to be rewritten as EXTRACT(YEAR FROM ...) on some dialects.
@@ -423,6 +455,10 @@ Dialects requiring `tempEmulationSchema` at execution time (no native session te
 ### duckdb/chunks/12_l01_gap_buckets.sql
 
 - [chunks/12_l01_gap_buckets.sql] RESIDUAL_HASH_TEMP: Residual #temp_table reference. SqlRender should have rewritten these. If they remain, confirm SqlRender version >= 1.6 and that the source SQL uses the standard #temp pattern.
+
+### duckdb/chunks/15_l01_day_count_buckets.sql
+
+- [chunks/15_l01_day_count_buckets.sql] RESIDUAL_HASH_TEMP: Residual #temp_table reference. SqlRender should have rewritten these. If they remain, confirm SqlRender version >= 1.6 and that the source SQL uses the standard #temp pattern.
 
 ### snowflake/characterization_full.sql
 
@@ -480,6 +516,10 @@ Dialects requiring `tempEmulationSchema` at execution time (no native session te
 ### snowflake/chunks/14_death_gap_buckets.sql
 
 - [chunks/14_death_gap_buckets.sql] DATEDIFF_3ARG: DATEDIFF(DAY, start, end) was not rewritten. Most dialects use date subtraction or their own function instead.
+
+### snowflake/chunks/15_l01_day_count_buckets.sql
+
+- [chunks/15_l01_day_count_buckets.sql] RESIDUAL_HASH_TEMP: Residual #temp_table reference. SqlRender should have rewritten these. If they remain, confirm SqlRender version >= 1.6 and that the source SQL uses the standard #temp pattern.
 
 ### synapse/characterization_full.sql
 
@@ -575,4 +615,8 @@ Dialects requiring `tempEmulationSchema` at execution time (no native session te
 ### iris/chunks/14_death_gap_buckets.sql
 
 - [chunks/14_death_gap_buckets.sql] DATEDIFF_3ARG: DATEDIFF(DAY, start, end) was not rewritten. Most dialects use date subtraction or their own function instead.
+
+### iris/chunks/15_l01_day_count_buckets.sql
+
+- [chunks/15_l01_day_count_buckets.sql] RESIDUAL_HASH_TEMP: Residual #temp_table reference. SqlRender should have rewritten these. If they remain, confirm SqlRender version >= 1.6 and that the source SQL uses the standard #temp pattern.
 
