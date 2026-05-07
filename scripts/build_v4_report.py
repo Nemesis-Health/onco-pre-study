@@ -1473,8 +1473,62 @@ def _s01_dx_met_timing(rd: Path) -> str:
                         '</tbody></table></div>'
                     )
                     parts.append(_card(
-                        f"Figure 1.2 — DX→MET median days by index year (first to first)",
+                        f"Figure 1.2a — DX→MET median days by index year (first to first)",
                         tbl,
+                    ))
+
+    # Figure 1.2b — MET→DX median days by year (mirror direction)
+    if by_year is not None:
+        ttc = _col(by_year, "timing_type")
+        fc = _col(by_year, "from_event")
+        tc = _col(by_year, "to_event")
+        yc = _col(by_year, "index_year")
+        mc = _col(by_year, "p50_days")
+        if all([fc, tc, yc, mc]):
+            sub_b = by_year.copy()
+            if ttc:
+                sub_b = sub_b[sub_b[ttc].astype(str).str.lower() == "first_to_first"]
+            sub_b = sub_b[
+                sub_b[fc].astype(str).str.upper().eq("MET") &
+                sub_b[tc].astype(str).str.upper().eq("DX")
+            ].copy()
+            sub_b["__y"] = pd.to_numeric(sub_b[yc].astype(str), errors="coerce")
+            sub_b = sub_b[sub_b["__y"] >= PREVALENCE_YEAR_MIN].sort_values("__y")
+            if not sub_b.empty:
+                years_b = sub_b["__y"].astype(int).tolist()
+                meds_b = pd.to_numeric(sub_b[mc], errors="coerce").tolist()
+                valid_meds_b = [m for m in meds_b if not pd.isna(m)]
+                if valid_meds_b:
+                    mn_b, mx_b = min(valid_meds_b), max(valid_meds_b)
+                    span_b = max(1, mx_b - mn_b)
+
+                    def _hm_cls_b(v: float | None) -> str:
+                        if v is None or pd.isna(v):
+                            return "hm-0"
+                        idx = int(5 * (v - mn_b) / span_b)
+                        return f"hm-{min(5, max(1, idx))}"
+
+                    cells_b = "".join(
+                        f'<td class="{_hm_cls_b(m)}">{_round_day(m) if m is not None and not pd.isna(m) else "—"}</td>'
+                        for m in meds_b
+                    )
+                    ths_b = "".join(f"<th>{y}</th>" for y in years_b)
+                    nwpc_b = _col(sub_b, "n_patients_with_pair")
+                    npair_cells_b = "".join(
+                        f'<td>{_fmt_n(_safe_int(r[nwpc_b])) if nwpc_b else "—"}</td>'
+                        for _, r in sub_b.iterrows()
+                    )
+                    tbl_b = (
+                        '<div class="hm-wrap"><table class="hm-table"><thead><tr>'
+                        f'<th class="row-head">MET→DX median days</th>{ths_b}'
+                        f'</tr></thead><tbody>'
+                        f'<tr><td class="hm-table" style="text-align:left;">N_pairs</td>{npair_cells_b}</tr>'
+                        f'<tr><td class="hm-table" style="text-align:left;">Median</td>{cells_b}</tr>'
+                        '</tbody></table></div>'
+                    )
+                    parts.append(_card(
+                        "Figure 1.2b — MET→DX median days by index year (first to first; negative = MET precedes DX)",
+                        tbl_b,
                     ))
 
     if not parts:
@@ -1601,25 +1655,39 @@ def _s02_gdx_odx(rd: Path) -> str:
                 sub="% of DX cohort with each ODX concept within each time window around DX index",
             ))
 
-    # Figure 2.2 — ODX timing density histogram (full distribution)
+    # Figures 2.2a/b — ODX timing density histogram split by anchor (DX vs MET)
     if timing is not None:
-        fig2, stats2 = _density_histogram_chart(timing, "DX", "ODX", "first_to_first",
-                                                color_fill="rgba(124,58,237,0.20)",
-                                                color_line="rgba(124,58,237,0.55)",
-                                                from_label="DX", to_label="ODX")
-        if fig2:
-            sub2 = ""
-            if stats2:
-                med2 = stats2.get("median")
-                p25v2 = stats2.get("p25")
-                p75v2 = stats2.get("p75")
-                if med2 is not None:
-                    iqr2 = f" (IQR {int(round(p25v2))}–{int(round(p75v2))})" if p25v2 and p75v2 else ""
-                    sub2 = f"Anchored on DX · days positive = ODX after DX · median {int(round(med2))}d{iqr2}"
-            parts.append(_plot_box(
-                "Figure 2.2 — ODX timing relative to DX index (first to first)",
-                _fig_div(fig2), sub=sub2,
-            ))
+        def _fig22_panel(from_ev: str, to_ev: str, fill: str, line: str, anchor_label: str) -> tuple[str, str]:
+            fig22, stats22 = _density_histogram_chart(
+                timing, from_ev, to_ev, "first_to_first",
+                color_fill=fill, color_line=line,
+                from_label=anchor_label, to_label="ODX",
+            )
+            if not fig22:
+                return "", ""
+            sub22 = ""
+            if stats22:
+                med22 = stats22.get("median")
+                p25v22 = stats22.get("p25")
+                p75v22 = stats22.get("p75")
+                if med22 is not None:
+                    iqr22 = f" (IQR {int(round(p25v22))}–{int(round(p75v22))})" if p25v22 and p75v22 else ""
+                    sub22 = f"Anchored on {anchor_label} · days positive = ODX after {anchor_label} · median {int(round(med22))}d{iqr22}"
+            return _fig_div(fig22), sub22
+
+        div_a, sub_a = _fig22_panel("DX",  "ODX", "rgba(124,58,237,0.20)", "rgba(124,58,237,0.55)", "DX")
+        div_b, sub_b = _fig22_panel("MET", "ODX", "rgba(180,83,9,0.20)",   "rgba(180,83,9,0.55)",   "MET")
+
+        if div_a or div_b:
+            panels = []
+            if div_a:
+                panels.append(_plot_box("Figure 2.2a — ODX timing relative to DX index (first to first)", div_a, sub=sub_a))
+            if div_b:
+                panels.append(_plot_box("Figure 2.2b — ODX timing relative to MET index (first to first)", div_b, sub=sub_b))
+            if len(panels) == 2:
+                parts.append(f'<div class="card-grid card-grid-2" style="margin-bottom:16px;">{"".join(panels)}</div>')
+            else:
+                parts.extend(panels)
 
     if not parts:
         parts.append('<p style="color:var(--text-3);font-style:italic;">GDX/ODX data not yet available.</p>')
