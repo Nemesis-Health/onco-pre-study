@@ -736,7 +736,17 @@ def _density_histogram_chart(
         (p40, p50, 10), (p50, p60, 10), (p60, p70, 10), (p70, p80, 10),
         (p80, p90, 10), (p90, p95, 5),
     ]
-    bins = [(lo, hi, pct) for lo, hi, pct in raw_bins if abs(hi - lo) > 0.1]
+    # Merge zero-width bins into the next bin so no patients are silently dropped
+    bins: list[tuple[float, float, int]] = []
+    carry = 0
+    for lo, hi, pct in raw_bins:
+        carry += pct
+        if abs(hi - lo) > 0.1:
+            bins.append((lo, hi, carry))
+            carry = 0
+    if carry > 0 and bins:
+        lo, hi, pct = bins[-1]
+        bins[-1] = (lo, hi, pct + carry)
     if not bins:
         return None, None
 
