@@ -72,6 +72,28 @@ _MET_L01_IMPLICATION = {
     "NO_EVENT":     "<strong>Investigational drug / trial enrollment signal</strong> — or true treatment-naive / supportive care only",
 }
 
+_DX_L01_DIR_LABELS = {
+    "BEFORE_GT90":  ("before", "L01 > 90 d before DX"),
+    "BEFORE_1_90":  ("before", "L01 1–90 d before DX"),
+    "SAME_DAY":     ("same",   "Same calendar day"),
+    "AFTER_1_30":   ("after",  "L01 within 30 d after DX"),
+    "AFTER_31_90":  ("after",  "L01 31–90 d after DX"),
+    "AFTER_91_365": ("after",  "L01 91–365 d after DX"),
+    "AFTER_GT365":  ("after",  "L01 > 365 d after DX"),
+    "NO_EVENT":     ("none",   "No L01 ever recorded"),
+}
+
+_DX_L01_IMPLICATION = {
+    "BEFORE_GT90":  "Treatment preceded DX by >90 d — prior line or neoadjuvant; review cohort index logic",
+    "BEFORE_1_90":  "Treatment just before DX — likely neoadjuvant or index date capture issue",
+    "SAME_DAY":     "Treatment co-coded on DX encounter — staging day initiation",
+    "AFTER_1_30":   "Rapid initiation within 30 d of diagnosis",
+    "AFTER_31_90":  "Standard first-line window — 1–3 months post DX",
+    "AFTER_91_365": "Delayed initiation — 3 months to 1 year post DX",
+    "AFTER_GT365":  "Very delayed treatment — >1 year post DX; late-stage detection or watchful waiting",
+    "NO_EVENT":     "No L01 code in observation period — trial enrolment, supportive care, or data gap",
+}
+
 # ── Column resolution ───────────────────────────────────────────────────────────
 
 def _col(df: pd.DataFrame, name: str) -> str | None:
@@ -1764,7 +1786,59 @@ def _s03_treatment_timing(rd: Path) -> str:
             if total > 0:
                 n_met_l01 = total
 
+    # DX patients with L01 (for denominator)
+    n_dx_l01: int | None = None
+    if directionality is not None:
+        pc = _col(directionality, "pair")
+        yc = _col(directionality, "index_year")
+        dc = _col(directionality, "direction")
+        nc = _col(directionality, "n_patients")
+        if pc and yc and dc and nc:
+            sub = directionality[
+                (directionality[pc].astype(str).str.upper() == "DX_L01") &
+                (directionality[yc].astype(str).str.upper() == "OVERALL") &
+                (directionality[dc].astype(str).str.upper() != "NO_EVENT")
+            ]
+            vals = pd.to_numeric(sub[nc], errors="coerce").dropna()
+            total = int(vals[vals > 0].sum())
+            if total > 0:
+                n_dx_l01 = total
+
     parts: list[str] = []
+
+    # DX→L01 directionality
+    if directionality is not None:
+        tbl = _directionality_table(
+            directionality, "DX_L01", _DX_L01_DIR_LABELS,
+            n_total=n_dx_l01, interp=_DX_L01_IMPLICATION, col4_header="Implication",
+        )
+        if tbl:
+            n_lbl = f"N={n_dx_l01:,}" if n_dx_l01 else "DX+L01 subgroup"
+            parts.append(_card(
+                "Table 3.1 — DX ↔ L01 temporal directionality (first to first)",
+                tbl + f'<p class="tbl-note">DX patients with any L01 ({n_lbl}). % denominated on DX+L01 subgroup. NO_EVENT = patients with DX but no L01 ever.</p>',
+            ))
+
+    # DX→L01 timing distribution
+    if timing is not None:
+        fig_dx_l01, stats_dx_l01 = _density_histogram_chart(
+            timing, "DX", "L01", "first_to_first",
+            color_fill="rgba(13,148,136,0.20)", color_line="rgba(13,148,136,0.55)",
+            from_label="DX", to_label="L01",
+        )
+        if fig_dx_l01:
+            sub_dx_l01 = ""
+            if stats_dx_l01:
+                med = stats_dx_l01.get("median")
+                p25v = stats_dx_l01.get("p25")
+                p75v = stats_dx_l01.get("p75")
+                if med is not None:
+                    iqr = f" (IQR {int(round(p25v))}–{int(round(p75v))})" if p25v and p75v else ""
+                    sub_dx_l01 = f"Anchored on first DX · includes L01 events before DX · median {int(round(med))}d{iqr}"
+            parts.append(_plot_box(
+                "Figure 3.1 — Time from first DX to first L01 (first to first)",
+                _fig_div(fig_dx_l01), sub=sub_dx_l01,
+            ))
 
     # MET→L01 directionality
     if directionality is not None:
@@ -1775,7 +1849,7 @@ def _s03_treatment_timing(rd: Path) -> str:
         if tbl:
             n_lbl = f"N={n_met_l01:,}" if n_met_l01 else "MET+L01 subgroup"
             parts.append(_card(
-                f"Table 3.1 — MET ↔ L01 temporal directionality (first to first)",
+                f"Table 3.2 — MET ↔ L01 temporal directionality (first to first)",
                 tbl + f'<p class="tbl-note">MET patients with L01 only ({n_lbl}). % denominated on MET+L01 subgroup. NO_EVENT = patients with MET but no L01 ever.</p>',
             ))
 
@@ -1796,7 +1870,7 @@ def _s03_treatment_timing(rd: Path) -> str:
                     iqr = f" (IQR {int(round(p25v))}–{int(round(p75v))})" if p25v and p75v else ""
                     sub_a = f"Anchored on first MET · includes L01 events before MET · median {int(round(med))}d{iqr}"
             parts.append(_plot_box(
-                "Figure 3.1a — Time from first MET to first L01",
+                "Figure 3.2a — Time from first MET to first L01",
                 _fig_div(fig_a), sub=sub_a,
             ))
 
@@ -1815,7 +1889,7 @@ def _s03_treatment_timing(rd: Path) -> str:
                     iqr = f" (IQR {int(round(p25v))}–{int(round(p75v))})" if p25v and p75v else ""
                     sub_b = f"Anchored on first MET · L01 on or after MET only · median {int(round(med))}d{iqr}"
             parts.append(_plot_box(
-                "Figure 3.1b — Time from first MET to first L01 on or after MET",
+                "Figure 3.2b — Time from first MET to first L01 on or after MET",
                 _fig_div(fig_b), sub=sub_b,
             ))
 
@@ -1912,7 +1986,7 @@ def _s03_treatment_timing(rd: Path) -> str:
                     '</tr></thead><tbody>' + "\n".join(rows) + '</tbody></table>'
                 )
                 parts.append(_card(
-                    f"Table 3.2 — Drug-level L01 timing around MET (top {CODE_COUNTS_TOP_N})",
+                    f"Table 3.3 — Drug-level L01 timing around MET (top {CODE_COUNTS_TOP_N})",
                     _tbl_wrap(tbl),
                 ))
 

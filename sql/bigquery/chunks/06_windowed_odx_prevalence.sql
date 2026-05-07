@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-07 11:58:18 BST
+-- Translated     : 2026-05-07 12:03:59 BST
 -- Source file    : sql/sql_server/chunks/06_windowed_odx_prevalence.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -38,27 +38,27 @@
 with index_events as (
     select 'INDEX' as anchor_event, 'ODX' as event_family, e.concept_id, e.person_id,
         DATE_DIFF(IF(SAFE_CAST(e.event_date  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(e.event_date  AS STRING)),SAFE_CAST(e.event_date  AS DATE)), IF(SAFE_CAST(c.index_date  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(c.index_date  AS STRING)),SAFE_CAST(c.index_date  AS DATE)), DAY) as days_from_anchor
-    from y8hp12zkother_dx_events e
-    join y8hp12zkcohort c on e.person_id = c.person_id
+    from quyq3b3eother_dx_events e
+    join quyq3b3ecohort c on e.person_id = c.person_id
     union all
     select 'INDEX' as anchor_event, 'GDX' as event_family, e.concept_id, e.person_id,
         DATE_DIFF(IF(SAFE_CAST(e.event_date  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(e.event_date  AS STRING)),SAFE_CAST(e.event_date  AS DATE)), IF(SAFE_CAST(c.index_date  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(c.index_date  AS STRING)),SAFE_CAST(c.index_date  AS DATE)), DAY) as days_from_anchor
-    from y8hp12zkgen_cancer_events e
-    join y8hp12zkcohort c on e.person_id = c.person_id
+    from quyq3b3egen_cancer_events e
+    join quyq3b3ecohort c on e.person_id = c.person_id
 ),
 met_events as (
     select 'FIRST_MET' as anchor_event, 'ODX' as event_family, e.concept_id, e.person_id,
         DATE_DIFF(IF(SAFE_CAST(e.event_date  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(e.event_date  AS STRING)),SAFE_CAST(e.event_date  AS DATE)), IF(SAFE_CAST(ms.first_met_date  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(ms.first_met_date  AS STRING)),SAFE_CAST(ms.first_met_date  AS DATE)), DAY) as days_from_anchor
-    from y8hp12zkother_dx_events e
-    join y8hp12zkcohort c on e.person_id = c.person_id
-    join y8hp12zkmet_summary ms on ms.person_id = c.person_id
+    from quyq3b3eother_dx_events e
+    join quyq3b3ecohort c on e.person_id = c.person_id
+    join quyq3b3emet_summary ms on ms.person_id = c.person_id
     where ms.first_met_date is not null
     union all
     select 'FIRST_MET' as anchor_event, 'GDX' as event_family, e.concept_id, e.person_id,
         DATE_DIFF(IF(SAFE_CAST(e.event_date  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(e.event_date  AS STRING)),SAFE_CAST(e.event_date  AS DATE)), IF(SAFE_CAST(ms.first_met_date  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(ms.first_met_date  AS STRING)),SAFE_CAST(ms.first_met_date  AS DATE)), DAY) as days_from_anchor
-    from y8hp12zkgen_cancer_events e
-    join y8hp12zkcohort c on e.person_id = c.person_id
-    join y8hp12zkmet_summary ms on ms.person_id = c.person_id
+    from quyq3b3egen_cancer_events e
+    join quyq3b3ecohort c on e.person_id = c.person_id
+    join quyq3b3emet_summary ms on ms.person_id = c.person_id
     where ms.first_met_date is not null
 ),
 all_events as (

@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-07 11:58:18 BST
+-- Translated     : 2026-05-07 12:03:59 BST
 -- Source file    : sql/sql_server/chunks/12_l01_gap_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -29,7 +29,7 @@
         else 'ge365d'
     end as gap_bucket,
     case when count(*) <= @min_cell_count then -@min_cell_count else count(*) end as n_gaps
-   from y8hp12zkl01_consecutive_gaps
+   from quyq3b3el01_consecutive_gaps
   group by  1, 2   order by  1, min(case
         when gap_days <  30  then 1
         when gap_days <  60  then 2

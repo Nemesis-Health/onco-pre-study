@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : snowflake
--- Translated     : 2026-05-07 11:58:25 BST
+-- Translated     : 2026-05-07 12:04:05 BST
 -- Source file    : sql/sql_server/chunks/06_windowed_odx_prevalence.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -32,27 +32,27 @@
 --    Small-cell suppression: each count <= @min_cell_count suppressed to -@min_cell_count.
 WITH index_events  AS (SELECT  CAST('INDEX' as TEXT) AS anchor_event, 'ODX' AS event_family, e.concept_id, e.person_id,
         DATEDIFF(DAY, c.index_date, e.event_date) AS days_from_anchor
-    FROM y8hp12zkother_dx_events e
-    JOIN y8hp12zkcohort c ON e.person_id = c.person_id
+    FROM quyq3b3eother_dx_events e
+    JOIN quyq3b3ecohort c ON e.person_id = c.person_id
     UNION ALL
     SELECT 'INDEX' AS anchor_event, 'GDX' AS event_family, e.concept_id, e.person_id,
         DATEDIFF(DAY, c.index_date, e.event_date) AS days_from_anchor
-    FROM y8hp12zkgen_cancer_events e
-    JOIN y8hp12zkcohort c ON e.person_id = c.person_id
+    FROM quyq3b3egen_cancer_events e
+    JOIN quyq3b3ecohort c ON e.person_id = c.person_id
 ),
 met_events AS (
     SELECT 'FIRST_MET' AS anchor_event, 'ODX' AS event_family, e.concept_id, e.person_id,
         DATEDIFF(DAY, ms.first_met_date, e.event_date) AS days_from_anchor
-    FROM y8hp12zkother_dx_events e
-    JOIN y8hp12zkcohort c ON e.person_id = c.person_id
-    JOIN y8hp12zkmet_summary ms ON ms.person_id = c.person_id
+    FROM quyq3b3eother_dx_events e
+    JOIN quyq3b3ecohort c ON e.person_id = c.person_id
+    JOIN quyq3b3emet_summary ms ON ms.person_id = c.person_id
     WHERE ms.first_met_date IS NOT NULL
     UNION ALL
     SELECT 'FIRST_MET' AS anchor_event, 'GDX' AS event_family, e.concept_id, e.person_id,
         DATEDIFF(DAY, ms.first_met_date, e.event_date) AS days_from_anchor
-    FROM y8hp12zkgen_cancer_events e
-    JOIN y8hp12zkcohort c ON e.person_id = c.person_id
-    JOIN y8hp12zkmet_summary ms ON ms.person_id = c.person_id
+    FROM quyq3b3egen_cancer_events e
+    JOIN quyq3b3ecohort c ON e.person_id = c.person_id
+    JOIN quyq3b3emet_summary ms ON ms.person_id = c.person_id
     WHERE ms.first_met_date IS NOT NULL
 ),
 all_events AS (

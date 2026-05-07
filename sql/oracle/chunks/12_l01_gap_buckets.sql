@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : oracle
--- Translated     : 2026-05-07 11:58:11 BST
+-- Translated     : 2026-05-07 12:03:53 BST
 -- Source file    : sql/sql_server/chunks/12_l01_gap_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -28,7 +28,7 @@ SELECT subgroup,
         ELSE 'ge365d'
     END AS gap_bucket,
     CASE WHEN  COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*)  END AS n_gaps
-FROM y8hp12zkl01_consecutive_gaps
+FROM quyq3b3el01_consecutive_gaps
 GROUP BY subgroup,
     CASE
         WHEN gap_days <  30  THEN 'lt30d'

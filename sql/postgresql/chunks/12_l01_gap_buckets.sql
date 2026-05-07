@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : postgresql
--- Translated     : 2026-05-07 11:58:12 BST
+-- Translated     : 2026-05-07 12:03:54 BST
 -- Source file    : sql/sql_server/chunks/12_l01_gap_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R

@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : impala
--- Translated     : 2026-05-07 11:58:14 BST
+-- Translated     : 2026-05-07 12:03:56 BST
 -- Source file    : sql/sql_server/chunks/14_death_gap_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -23,7 +23,7 @@ WITH patient_obs AS (
         MIN(observation_period_start_date) AS first_obs_start,
         MAX(observation_period_end_date)   AS last_obs_end
     FROM @cdm_database_schema.observation_period
-    WHERE person_id IN (SELECT person_id FROM y8hp12zkcohort)
+    WHERE person_id IN (SELECT person_id FROM quyq3b3ecohort)
     GROUP BY person_id
 ),
 death_obs_gaps AS (
@@ -35,9 +35,9 @@ death_obs_gaps AS (
                 THEN DATEDIFF(CASE TYPEOF(dos.death_date ) WHEN 'TIMESTAMP' THEN CAST(dos.death_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(dos.death_date  AS STRING), 1, 4), SUBSTR(CAST(dos.death_date  AS STRING), 5, 2), SUBSTR(CAST(dos.death_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(po.last_obs_end ) WHEN 'TIMESTAMP' THEN CAST(po.last_obs_end  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(po.last_obs_end  AS STRING), 1, 4), SUBSTR(CAST(po.last_obs_end  AS STRING), 5, 2), SUBSTR(CAST(po.last_obs_end  AS STRING), 7, 2)), 'UTC') END)
             ELSE NULL
         END AS gap_death_after_obs
-    FROM y8hp12zkcohort c
-    INNER JOIN y8hp12zkdeath_obs_status dos ON dos.person_id = c.person_id
-    LEFT JOIN y8hp12zkmet_summary ms        ON ms.person_id  = c.person_id
+    FROM quyq3b3ecohort c
+    INNER JOIN quyq3b3edeath_obs_status dos ON dos.person_id = c.person_id
+    LEFT JOIN quyq3b3emet_summary ms        ON ms.person_id  = c.person_id
     LEFT JOIN patient_obs po         ON po.person_id  = c.person_id
 ),
 bucketed AS (
