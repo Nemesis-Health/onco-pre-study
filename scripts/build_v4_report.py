@@ -1418,7 +1418,7 @@ def _s01_dx_met_timing(rd: Path) -> str:
                         '</tbody></table></div>'
                     )
                     parts.append(_card(
-                        f"Figure 1.2 — DX→MET median days by index year {_badge('new')}",
+                        f"Figure 1.2 — DX→MET median days by index year (first to first) {_badge('new')}",
                         tbl,
                     ))
 
