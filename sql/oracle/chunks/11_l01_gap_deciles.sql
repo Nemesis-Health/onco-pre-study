@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : oracle
--- Translated     : 2026-05-07 12:03:53 BST
+-- Translated     : 2026-05-07 12:40:10 BST
 -- Source file    : sql/sql_server/chunks/11_l01_gap_deciles.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -25,8 +25,8 @@
 --     Small-cell suppression: n_gaps <= @min_cell_count suppresses percentiles to NULL
 --     and replaces counts with -@min_cell_count.
 SELECT subgroup,
-     CASE WHEN  COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*)  END AS n_gaps,
-    CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(DISTINCT person_id) END AS n_patients_with_gaps,
+     CASE WHEN  COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*)  END AS n_gaps,
+    CASE WHEN COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(DISTINCT person_id) END AS n_patients_with_gaps,
     MIN(CASE WHEN cnt > @min_cell_count AND 10.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT) END) AS p10_days,
     MIN(CASE WHEN cnt > @min_cell_count AND  4.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT) END) AS p25_days,
     MIN(CASE WHEN cnt > @min_cell_count AND  2.0 * rn >= cnt      THEN CAST(gap_days AS FLOAT) END) AS p50_days,
@@ -35,7 +35,7 @@ SELECT subgroup,
 FROM (SELECT subgroup, person_id, gap_days,
         ROW_NUMBER() OVER (PARTITION BY subgroup ORDER BY gap_days) AS rn,
         COUNT(*)     OVER (PARTITION BY subgroup)                   AS cnt
-    FROM quyq3b3el01_consecutive_gaps
+    FROM a9of9doxl01_consecutive_gaps
  ) x
 GROUP BY subgroup
 ORDER BY subgroup

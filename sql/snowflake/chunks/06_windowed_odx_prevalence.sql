@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : snowflake
--- Translated     : 2026-05-07 12:04:05 BST
+-- Translated     : 2026-05-07 12:40:28 BST
 -- Source file    : sql/sql_server/chunks/06_windowed_odx_prevalence.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -32,27 +32,27 @@
 --    Small-cell suppression: each count <= @min_cell_count suppressed to -@min_cell_count.
 WITH index_events  AS (SELECT  CAST('INDEX' as TEXT) AS anchor_event, 'ODX' AS event_family, e.concept_id, e.person_id,
         DATEDIFF(DAY, c.index_date, e.event_date) AS days_from_anchor
-    FROM quyq3b3eother_dx_events e
-    JOIN quyq3b3ecohort c ON e.person_id = c.person_id
+    FROM a9of9doxother_dx_events e
+    JOIN a9of9doxcohort c ON e.person_id = c.person_id
     UNION ALL
     SELECT 'INDEX' AS anchor_event, 'GDX' AS event_family, e.concept_id, e.person_id,
         DATEDIFF(DAY, c.index_date, e.event_date) AS days_from_anchor
-    FROM quyq3b3egen_cancer_events e
-    JOIN quyq3b3ecohort c ON e.person_id = c.person_id
+    FROM a9of9doxgen_cancer_events e
+    JOIN a9of9doxcohort c ON e.person_id = c.person_id
 ),
 met_events AS (
     SELECT 'FIRST_MET' AS anchor_event, 'ODX' AS event_family, e.concept_id, e.person_id,
         DATEDIFF(DAY, ms.first_met_date, e.event_date) AS days_from_anchor
-    FROM quyq3b3eother_dx_events e
-    JOIN quyq3b3ecohort c ON e.person_id = c.person_id
-    JOIN quyq3b3emet_summary ms ON ms.person_id = c.person_id
+    FROM a9of9doxother_dx_events e
+    JOIN a9of9doxcohort c ON e.person_id = c.person_id
+    JOIN a9of9doxmet_summary ms ON ms.person_id = c.person_id
     WHERE ms.first_met_date IS NOT NULL
     UNION ALL
     SELECT 'FIRST_MET' AS anchor_event, 'GDX' AS event_family, e.concept_id, e.person_id,
         DATEDIFF(DAY, ms.first_met_date, e.event_date) AS days_from_anchor
-    FROM quyq3b3egen_cancer_events e
-    JOIN quyq3b3ecohort c ON e.person_id = c.person_id
-    JOIN quyq3b3emet_summary ms ON ms.person_id = c.person_id
+    FROM a9of9doxgen_cancer_events e
+    JOIN a9of9doxcohort c ON e.person_id = c.person_id
+    JOIN a9of9doxmet_summary ms ON ms.person_id = c.person_id
     WHERE ms.first_met_date IS NOT NULL
 ),
 all_events AS (
@@ -95,13 +95,13 @@ SELECT
     a.anchor_event,
     a.event_family,
     a.concept_id,
-    CASE WHEN a.n_ever        <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever        END AS n_ever,
-    CASE WHEN a.n_pm30d       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm30d       END AS n_pm30d,
-    CASE WHEN a.n_pm90d       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm90d       END AS n_pm90d,
-    CASE WHEN a.n_pm180d      <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm180d      END AS n_pm180d,
-    CASE WHEN a.n_pm1yr       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm1yr       END AS n_pm1yr,
-    CASE WHEN a.n_ever_before <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_before END AS n_ever_before,
-    CASE WHEN a.n_ever_after  <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_after  END AS n_ever_after
+    CASE WHEN a.n_ever        > 0 AND a.n_ever        <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever        END AS n_ever,
+    CASE WHEN a.n_pm30d       > 0 AND a.n_pm30d       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm30d       END AS n_pm30d,
+    CASE WHEN a.n_pm90d       > 0 AND a.n_pm90d       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm90d       END AS n_pm90d,
+    CASE WHEN a.n_pm180d      > 0 AND a.n_pm180d      <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm180d      END AS n_pm180d,
+    CASE WHEN a.n_pm1yr       > 0 AND a.n_pm1yr       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm1yr       END AS n_pm1yr,
+    CASE WHEN a.n_ever_before > 0 AND a.n_ever_before <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_before END AS n_ever_before,
+    CASE WHEN a.n_ever_after  > 0 AND a.n_ever_after  <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_after  END AS n_ever_after
 FROM agg a
 ORDER BY
     CASE WHEN a.anchor_event = 'INDEX' THEN 0 ELSE 1 END,

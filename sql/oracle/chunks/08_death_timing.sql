@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : oracle
--- Translated     : 2026-05-07 12:03:52 BST
+-- Translated     : 2026-05-07 12:40:10 BST
 -- Source file    : sql/sql_server/chunks/08_death_timing.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -30,11 +30,11 @@ SELECT s.prevalence_year,
     CASE WHEN s.n_patients <= @min_cell_count THEN NULL ELSE f.lq_followup_days END AS lq_followup_days,
     CASE WHEN s.n_patients <= @min_cell_count THEN NULL ELSE f.median_followup_days END AS median_followup_days,
     CASE WHEN s.n_patients <= @min_cell_count THEN NULL ELSE f.uq_followup_days END AS uq_followup_days
-FROM quyq3b3edeath_stratum_counts s
-LEFT JOIN quyq3b3edeath_timing_quantiles q
+FROM a9of9doxdeath_stratum_counts s
+LEFT JOIN a9of9doxdeath_timing_quantiles q
   ON s.prevalence_year = q.prevalence_year
  AND s.anchor_event = q.anchor_event
-LEFT JOIN quyq3b3efollowup_quantiles f
+LEFT JOIN a9of9doxfollowup_quantiles f
   ON s.prevalence_year = f.prevalence_year
  AND s.anchor_event = f.anchor_event
 ORDER BY

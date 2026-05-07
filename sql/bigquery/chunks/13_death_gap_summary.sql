@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-07 12:03:59 BST
+-- Translated     : 2026-05-07 12:40:20 BST
 -- Source file    : sql/sql_server/chunks/13_death_gap_summary.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -29,7 +29,7 @@ with patient_obs as (
         min(observation_period_start_date) as first_obs_start,
         max(observation_period_end_date)   as last_obs_end
      from @cdm_database_schema.observation_period
-    where person_id in (select person_id from quyq3b3ecohort)
+    where person_id in (select person_id from a9of9doxcohort)
      group by  1 ),
 death_obs_gaps as (
     select
@@ -49,19 +49,19 @@ death_obs_gaps as (
                 then 1
             else 0
         end as death_before_obs
-    from quyq3b3ecohort c
-    inner join quyq3b3edeath_obs_status dos on dos.person_id = c.person_id
-    left join quyq3b3emet_summary ms on ms.person_id = c.person_id
+    from a9of9doxcohort c
+    inner join a9of9doxdeath_obs_status dos on dos.person_id = c.person_id
+    left join a9of9doxmet_summary ms on ms.person_id = c.person_id
     left join patient_obs po  on po.person_id  = c.person_id
 )
 select
     anchor_event,
-    case when n_death_before_obs <= @min_cell_count then -@min_cell_count else n_death_before_obs end as n_death_before_obs,
-    case when n_death_after_obs  <= @min_cell_count then -@min_cell_count else n_death_after_obs  end as n_death_after_obs,
-    case when n_death_after_obs  <= @min_cell_count then null else lq_gap_days     end as lq_gap_days,
-    case when n_death_after_obs  <= @min_cell_count then null else median_gap_days end as median_gap_days,
-    case when n_death_after_obs  <= @min_cell_count then null else uq_gap_days     end as uq_gap_days,
-    case when n_death_after_obs  <= @min_cell_count then null else p90_gap_days    end as p90_gap_days
+    case when n_death_before_obs > 0 and n_death_before_obs <= @min_cell_count then -@min_cell_count else n_death_before_obs end as n_death_before_obs,
+    case when n_death_after_obs  > 0 and n_death_after_obs  <= @min_cell_count then -@min_cell_count else n_death_after_obs  end as n_death_after_obs,
+    case when n_death_after_obs  > 0 and n_death_after_obs  <= @min_cell_count then null else lq_gap_days     end as lq_gap_days,
+    case when n_death_after_obs  > 0 and n_death_after_obs  <= @min_cell_count then null else median_gap_days end as median_gap_days,
+    case when n_death_after_obs  > 0 and n_death_after_obs  <= @min_cell_count then null else uq_gap_days     end as uq_gap_days,
+    case when n_death_after_obs  > 0 and n_death_after_obs  <= @min_cell_count then null else p90_gap_days    end as p90_gap_days
 from (
     select
         'INDEX' as anchor_event,

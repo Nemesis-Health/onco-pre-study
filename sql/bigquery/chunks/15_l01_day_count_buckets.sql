@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-07 12:03:59 BST
+-- Translated     : 2026-05-07 12:40:20 BST
 -- Source file    : sql/sql_server/chunks/15_l01_day_count_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -29,15 +29,15 @@
         when n_days <= 11 then '7_11'
         else '12plus'
     end as days_bucket,
-    case when count(*) <= @min_cell_count then -@min_cell_count else count(*) end as n_patients
+    case when count(*) > 0 and count(*) <= @min_cell_count then -@min_cell_count else count(*) end as n_patients
    from (
      select e.person_id, count(*) as n_days, 'ALL_L01' as subgroup
-     from quyq3b3el01_event_days e
+     from a9of9doxl01_event_days e
      group by  e.person_id
     union all
      select e.person_id, count(*) as n_days, 'MET_L01' as subgroup
-     from quyq3b3el01_event_days e
-    join quyq3b3emet_summary ms on e.person_id = ms.person_id and ms.first_met_date is not null
+     from a9of9doxl01_event_days e
+    join a9of9doxmet_summary ms on e.person_id = ms.person_id and ms.first_met_date is not null
      group by  e.person_id
   ) x
   group by  2, 2   order by  1, min(n_days)

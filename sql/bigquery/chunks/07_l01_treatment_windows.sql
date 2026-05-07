@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-07 12:03:59 BST
+-- Translated     : 2026-05-07 12:40:20 BST
 -- Source file    : sql/sql_server/chunks/07_l01_treatment_windows.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -39,7 +39,7 @@ with window_bounds as (
         c.person_id,
         c.index_date as anchor_date,
         w.window_index
-    from quyq3b3ecohort c
+    from a9of9doxcohort c
     cross join (
         select -12 as window_index union all select -11 union all select -10
         union all select -9  union all select -8  union all select -7
@@ -68,7 +68,7 @@ with window_bounds as (
         ms.person_id,
         ms.first_met_date as anchor_date,
         w.window_index
-    from quyq3b3emet_summary ms
+    from a9of9doxmet_summary ms
     cross join (
         select -6  as window_index union all select -5  union all select -4
         union all select -3  union all select -2  union all select -1
@@ -97,7 +97,7 @@ window_l01 as (
             end
         ) as has_l01_in_window
      from window_bounds wb
-    left join quyq3b3el01_events le
+    left join a9of9doxl01_events le
       on wb.person_id = le.person_id
      group by  wb.anchor_event, wb.person_id, wb.window_index, wb.anchor_date
  ),

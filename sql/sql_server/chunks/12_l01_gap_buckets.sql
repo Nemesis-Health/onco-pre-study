@@ -15,7 +15,7 @@ SELECT
         WHEN gap_days < 365  THEN '180_364d'
         ELSE 'ge365d'
     END AS gap_bucket,
-    CASE WHEN COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_gaps
+    CASE WHEN COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*) END AS n_gaps
 FROM #l01_consecutive_gaps
 GROUP BY
     subgroup,
