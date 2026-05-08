@@ -1,50 +1,8 @@
 # onco-pre-study
 
-OMOP characterization scripts for urothelial carcinoma (UC) malignant neoplasm cohorts.
+OMOP characterization scripts for oncology cohorts defined by a configurable anchor diagnosis.
 Produces population prevalence, event code counts, pairwise timing, and death metrics
 across anchor families (DX, ODX, GDX, MET, L01).
-
-## Repository layout
-
-```
-sql/
-└── sql_server/
-    ├── characterization_full.sql     # Complete monolithic query (auto-built from chunks)
-    └── chunks/
-        ├── 00_setup.sql              # Concept sets, event tables, cohort, summaries (no SELECT output)
-        ├── 01_population_prevalence.sql
-        ├── 02_code_counts.sql
-        ├── 03_directionality_buckets.sql
-        ├── 04_timing_pairwise.sql
-        ├── 05_timing_by_year.sql
-        ├── 06_windowed_odx_prevalence.sql
-        ├── 07_l01_treatment_windows.sql
-        ├── 08_death_timing.sql
-        ├── 09_demographics.sql
-        ├── 10_anchor_dx_codes.sql
-        ├── 11_l01_gap_deciles.sql
-        ├── 12_l01_gap_buckets.sql
-        ├── 13_death_gap_summary.sql
-        ├── 14_death_gap_buckets.sql
-        └── 15_l01_day_count_buckets.sql
-
-scripts/
-├── build_full_sql.py                 # Concatenates chunks → characterization_full.sql
-├── translate_sql_dialects.R          # Translates to 15 other dialects via SqlRender
-└── build_v4_report.py               # Generates summary_report_v4.html in the outputs directory
-
-outputs_v*/               # CSV results land here; summary_report_v4.html is generated here
-```
-
-## Generating the report
-
-Place the characterization CSVs in an outputs directory (see [Result chunks](#result-chunks) for filenames), then run:
-
-```bash
-python3 scripts/build_v4_report.py <outputs_dir>
-```
-
-The report is written to `<outputs_dir>/summary_report_v4.html`. Chunks whose CSVs are absent degrade gracefully with amber callouts in the report rather than erroring.
 
 ## SQL dialect
 
@@ -63,12 +21,6 @@ translated <- translate(rendered, targetDialect = "postgresql")
 
 ## The characterization query
 
-**Version:** v2 — dual concept-level event-code timing (FIRST + CLOSEST)
-
-**Cohort anchor:** UC malignant neoplasm (UC.json concept set id 7), expanded via
-`concept_ancestor`. Excludes renal pelvis / ureteral / overlapping-site concepts
-per the exclusion list in section A.
-
 **Event families tracked:**
 
 
@@ -85,8 +37,6 @@ per the exclusion list in section A.
 
 - **FIRST** — earliest `event_date` per (anchor, family, concept, patient)
 - **CLOSEST** — minimum `|days_diff|` to anchor date, tie-break by event_date
-
-**Privacy:** small cells ≤ `@min_cell_count` are replaced with `-@min_cell_count` sentinels.
 
 ### Setup chunk (`00_setup.sql`)
 
