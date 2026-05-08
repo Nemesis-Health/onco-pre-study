@@ -4,6 +4,16 @@ OMOP characterization scripts for oncology cohorts defined by a configurable anc
 Produces population prevalence, event code counts, pairwise timing, and death metrics
 across anchor families (DX, ODX, GDX, MET, L01).
 
+## Quick start
+
+```r
+source("run.R")   # runs all SQL chunks and writes CSVs to outputs/
+```
+
+Configure the connection and parameters at the top of `run.R` before running.
+Translated SQL chunks (BigQuery, DuckDB, Hive, Spark, etc.) are pre-generated in
+`sql/<dialect>/` and can be inspected or run directly against those engines.
+
 ## SQL dialect
 
 The primary dialect is **SQL Server** (T-SQL) with [SqlRender](https://github.com/OHDSI/SqlRender)-style

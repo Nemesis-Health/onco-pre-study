@@ -94,6 +94,26 @@ _DX_L01_IMPLICATION = {
     "NO_EVENT":     "No L01 code in observation period — trial enrolment, supportive care, or data gap",
 }
 
+# ── CSV name aliases (numeric-prefix names produced by run.R) ──────────────────
+_CSV_ALIASES: dict[str, str] = {
+    "final_cohort_attrition.csv":          "00b_cohort_attrition.csv",
+    "final_population_prevalence.csv":     "01_population_prevalence.csv",
+    "final_code_counts.csv":               "02_code_counts.csv",
+    "final_directionality.csv":            "03_directionality_buckets.csv",
+    "final_timing_pairwise.csv":           "04_timing_pairwise.csv",
+    "final_timing_by_year.csv":            "05_timing_by_year.csv",
+    "final_windowed_odx_prevalence.csv":   "06_windowed_odx_prevalence.csv",
+    "final_l01_treatment_windows.csv":     "07_l01_treatment_windows.csv",
+    "final_death_from_anchors.csv":        "08_death_timing.csv",
+    "final_demographics_from_anchors.csv": "09_demographics.csv",
+    "final_anchor_dx_concept_counts.csv":  "10_anchor_dx_codes.csv",
+    "final_l01_gap_deciles.csv":           "11_l01_gap_deciles.csv",
+    "final_l01_gap_buckets.csv":           "12_l01_gap_buckets.csv",
+    "final_death_gap_summary.csv":         "13_death_gap_summary.csv",
+    "final_death_gap_buckets.csv":         "14_death_gap_buckets.csv",
+    "final_l01_day_count_buckets.csv":     "15_l01_day_count_buckets.csv",
+}
+
 # ── Column resolution ───────────────────────────────────────────────────────────
 
 def _col(df: pd.DataFrame, name: str) -> str | None:
@@ -105,13 +125,14 @@ def _col(df: pd.DataFrame, name: str) -> str | None:
 
 
 def _read(rd: Path, fname: str) -> pd.DataFrame | None:
-    p = rd / fname
-    if not p.exists():
-        return None
-    try:
-        return pd.read_csv(p)
-    except Exception:
-        return None
+    for candidate in (_CSV_ALIASES.get(fname, fname), fname):
+        p = rd / candidate
+        if p.exists():
+            try:
+                return pd.read_csv(p)
+            except Exception:
+                return None
+    return None
 
 
 # ── Number utilities ────────────────────────────────────────────────────────────
