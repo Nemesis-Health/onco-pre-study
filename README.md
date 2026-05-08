@@ -4,15 +4,19 @@ OMOP characterization scripts for oncology cohorts defined by a configurable anc
 Produces population prevalence, event code counts, pairwise timing, and death metrics
 across anchor families (DX, ODX, GDX, MET, L01).
 
-## Quick start
+## Running
 
-```r
-source("run.R")   # runs all SQL chunks and writes CSVs to outputs/
-```
+Open `run.R` and step through it block by block — do not `source()` it in one shot, as a failed query mid-loop will leave partial outputs with no clear indication of where it stopped.
 
-Configure the connection and parameters at the top of `run.R` before running.
-Translated SQL chunks (BigQuery, DuckDB, Hive, Spark, etc.) are pre-generated in
-`sql/<dialect>/` and can be inspected or run directly against those engines.
+**1. Configuration** — Set your CDM schema, target dialect, `min_cell_count`, and output directory. Fill in `DatabaseConnector::createConnectionDetails()` with your driver, server, port, and credentials.
+
+**2. Connect** — `DatabaseConnector::connect()` opens the connection. An `on.exit()` call ensures it is closed even if a later step errors.
+
+**3. Setup** — `DatabaseConnector::executeSql()` runs `00_setup.sql`, which builds all intermediate temp tables. This must complete successfully before any result chunk is run.
+
+**4. Result loop** — For each numbered chunk (`01_` → `15_`), the helper calls `SqlRender::render()` to substitute `@cdm_database_schema` and `@min_cell_count`, then `SqlRender::translate()` to convert to the target dialect. `DatabaseConnector::querySql()` executes the translated SQL and returns a data frame, which is written to `outputs/<chunk_name>.csv`.
+
+You can run the loop one iteration at a time if you want to inspect results as you go, or skip chunks that are not relevant.
 
 ## SQL dialect
 
@@ -28,20 +32,6 @@ sql <- readSql("sql/sql_server/characterization_full.sql")
 rendered <- render(sql, cdm_database_schema = "cdm", min_cell_count = 5)
 translated <- translate(rendered, targetDialect = "postgresql")
 ```
-
-## Running the characterization
-
-Open `run.R` and step through it block by block — do not `source()` it in one shot, as a failed query mid-loop will leave partial outputs with no clear indication of where it stopped.
-
-**1. Configuration** — Set your CDM schema, target dialect, `min_cell_count`, and output directory. Fill in `DatabaseConnector::createConnectionDetails()` with your driver, server, port, and credentials.
-
-**2. Connect** — `DatabaseConnector::connect()` opens the connection. An `on.exit()` call ensures it is closed even if a later step errors.
-
-**3. Setup** — `DatabaseConnector::executeSql()` runs `00_setup.sql`, which builds all intermediate temp tables. This must complete successfully before any result chunk is run.
-
-**4. Result loop** — For each numbered chunk (`01_` → `15_`), the helper calls `SqlRender::render()` to substitute `@cdm_database_schema` and `@min_cell_count`, then `SqlRender::translate()` to convert to the target dialect. `DatabaseConnector::querySql()` executes the translated SQL and returns a data frame, which is written to `outputs/<chunk_name>.csv`.
-
-You can run the loop one iteration at a time if you want to inspect results as you go, or skip chunks that are not relevant.
 
 ## The characterization query
 
