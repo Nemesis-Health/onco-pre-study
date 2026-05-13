@@ -1,8 +1,6 @@
 # onco-pre-study
 
-OMOP characterization scripts for oncology cohorts defined by a configurable anchor diagnosis.
-Produces population prevalence, event code counts, pairwise timing, and death metrics
-across anchor families (DX, ODX, GDX, MET, L01).
+onco-pre-study is a pre-study diagnostics package for observational cancer research on OMOP CDM.onco-pre-study is a pre-study diagnostics package for observational cancer research on OMOP CDM. It runs a configurable SQL analysis across a network of OMOP databases and produces a structured set of outputs documenting the empirical properties of a cancer cohort at each site: diagnosis coding patterns, metastasis timing, treatment records, co-occurring cancers, and mortality. It takes a data-driven approach to phenotype development: rather than inheriting assumptions from prior work, researchers can see how each database in the network represents the disease before defining inclusion and exclusion criteria and temporal logic. Cross-site comparison informs phenotype definitions that are robust across the network.
 
 ## Running
 
