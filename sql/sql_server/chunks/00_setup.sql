@@ -232,6 +232,61 @@ JOIN #l01_ancestor_concepts a
 
 
 ------------------------------------------------------------
+-- E2) DRUG THERAPY PROCEDURE CONCEPTS (PROCEDURE_OCCURRENCE)
+--     Added for Analysis G. Antineoplastic treatment recorded as a procedure
+--     rather than a drug_exposure. Four Drug Therapy procedure roots and their
+--     descendants. Same ancestor-then-descendants build as the L01 concept set
+--     in section E: #dtp_ancestor_concepts holds the roots; #dtp_concepts expands
+--     to descendants via concept_ancestor (which includes each root itself at
+--     level 0, so the roots are in #dtp_concepts too). This is the only concept
+--     set that reads procedure_occurrence.
+--
+--     #dtp_concepts additionally carries the root each descendant maps to
+--     (root_concept_id), so Analysis G can report per category (Chemotherapy /
+--     Immunological therapy / Targeted chemotherapy for cancer / Hormone therapy).
+--     This is a small extension of the plain concept-id list used for L01; it is
+--     needed because G's Part 1b and Part 3 are per-concept. A descendant that
+--     falls under more than one root appears once per root, so a patient can be
+--     counted under more than one category and the per-category counts overlap
+--     and need not sum, matching the approved mock.
+--
+--     No procedure event table is materialised here. Like Analyses D and H, G's
+--     denominator is the full ungated population (all patients who carry a MET
+--     code, or all patients who carry the procedure), so the G chunks read
+--     procedure_occurrence directly rather than through a DX-cohort-gated event
+--     table (the #*_events tables in section F are all gated to #anchor_person).
+------------------------------------------------------------
+DROP TABLE IF EXISTS #dtp_ancestor_concepts;
+CREATE TABLE #dtp_ancestor_concepts (
+    ancestor_concept_id BIGINT
+);
+
+-- EDIT THIS LIST
+-- Chemotherapy 4273629, Immunological therapy 4295112,
+-- Targeted chemotherapy for cancer 37158316, Hormone therapy 4061650.
+INSERT INTO #dtp_ancestor_concepts (ancestor_concept_id)
+VALUES
+    (4273629),
+    (4295112),
+    (37158316),
+    (4061650)
+;
+
+DROP TABLE IF EXISTS #dtp_concepts;
+CREATE TABLE #dtp_concepts (
+    concept_id      BIGINT,
+    root_concept_id BIGINT
+);
+
+INSERT INTO #dtp_concepts (concept_id, root_concept_id)
+SELECT DISTINCT ca.descendant_concept_id, a.ancestor_concept_id
+FROM @cdm_database_schema.concept_ancestor ca
+JOIN #dtp_ancestor_concepts a
+  ON ca.ancestor_concept_id = a.ancestor_concept_id
+;
+
+
+------------------------------------------------------------
 -- F) EVENT TABLES
 ------------------------------------------------------------
 DROP TABLE IF EXISTS #dx_events;
