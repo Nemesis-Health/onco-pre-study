@@ -2,9 +2,9 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : oracle
--- Translated     : 2026-05-07 12:40:09 BST
+-- Translated     : 2026-07-15 15:36:49 CEST
 -- Source file    : sql/sql_server/characterization_full.sql
--- DO NOT EDIT — edit the sql_server source and re-run
+-- DO NOT EDIT <e2><80><94> edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
 -- ============================================================
 -- WARNING: This dialect (oracle) does not support native session
@@ -59,12 +59,12 @@ Cross-dialect / SqlRender
 ------------------------------------------------------------
 -- A) ANCHOR DIAGNOSIS CONCEPTS (DX)
 -- Anchor cohort = patients with any of these condition_concept_id values
--- Source: cohort_definitions/UC.json — ConceptSets id 7 "UC - Malignant neoplasm"
+-- Source: cohort_definitions/UC.json <U+2014> ConceptSets id 7 "UC - Malignant neoplasm"
 -- Expanded with concept_ancestor (includeDescendants / isExcluded match Atlas).
 ------------------------------------------------------------
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdx_anchor_include';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdx_anchor_include';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdx_anchor_include';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdx_anchor_include';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -72,37 +72,37 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdx_anchor_include';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdx_anchor_include';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdx_anchor_include';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdx_anchor_include';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxdx_anchor_include (
+CREATE TABLE vcbo5u4zdx_anchor_include (
     concept_id NUMBER(19) NOT NULL,
     include_descendants SMALLINT NOT NULL
 );
 INSERT ALL
-INTO a9of9doxdx_anchor_include        (concept_id, include_descendants) VALUES (INTO a9of9doxdx_anchor_include      (concept_id, include_descendants) VALUES (INTO a9of9doxdx_anchor_include    (concept_id, include_descendants) VALUES (INTO a9of9doxdx_anchor_include  (concept_id, include_descendants) VALUES (197508, 1)
- INTO a9of9doxdx_anchor_include  (concept_id, include_descendants) VALUES (4181357, 1)
+INTO vcbo5u4zdx_anchor_include        (concept_id, include_descendants) VALUES (INTO vcbo5u4zdx_anchor_include      (concept_id, include_descendants) VALUES (INTO vcbo5u4zdx_anchor_include    (concept_id, include_descendants) VALUES (INTO vcbo5u4zdx_anchor_include  (concept_id, include_descendants) VALUES (197508, 1)
+ INTO vcbo5u4zdx_anchor_include  (concept_id, include_descendants) VALUES (4181357, 1)
 )
- INTO a9of9doxdx_anchor_include   (concept_id, include_descendants) VALUES (4177230, 1)
+ INTO vcbo5u4zdx_anchor_include   (concept_id, include_descendants) VALUES (4177230, 1)
 )
- INTO a9of9doxdx_anchor_include    (concept_id, include_descendants) VALUES (37163176, 1)
+ INTO vcbo5u4zdx_anchor_include    (concept_id, include_descendants) VALUES (37163176, 1)
 )
- INTO a9of9doxdx_anchor_include     (concept_id, include_descendants) VALUES (4178972, 1)
+ INTO vcbo5u4zdx_anchor_include     (concept_id, include_descendants) VALUES (4178972, 1)
 )
- INTO a9of9doxdx_anchor_include      (concept_id, include_descendants) VALUES (4091486, 0)
+ INTO vcbo5u4zdx_anchor_include      (concept_id, include_descendants) VALUES (4091486, 0)
 )
- INTO a9of9doxdx_anchor_include       (concept_id, include_descendants) VALUES (44501785, 0)
+ INTO vcbo5u4zdx_anchor_include       (concept_id, include_descendants) VALUES (44501785, 0)
 )
- INTO a9of9doxdx_anchor_include        (concept_id, include_descendants) VALUES (37110270, 1)
+ INTO vcbo5u4zdx_anchor_include        (concept_id, include_descendants) VALUES (37110270, 1)
 SELECT *   FROM DUAL;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdx_anchor_exclude';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdx_anchor_exclude';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdx_anchor_exclude';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdx_anchor_exclude';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -110,39 +110,39 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdx_anchor_exclude';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdx_anchor_exclude';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdx_anchor_exclude';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdx_anchor_exclude';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxdx_anchor_exclude (
+CREATE TABLE vcbo5u4zdx_anchor_exclude (
     concept_id NUMBER(19) NOT NULL,
     include_descendants SMALLINT NOT NULL
 );
 INSERT ALL
-INTO a9of9doxdx_anchor_exclude         (concept_id, include_descendants) VALUES (INTO a9of9doxdx_anchor_exclude       (concept_id, include_descendants) VALUES (INTO a9of9doxdx_anchor_exclude     (concept_id, include_descendants) VALUES (INTO a9of9doxdx_anchor_exclude   (concept_id, include_descendants) VALUES (4280899, 1)
- INTO a9of9doxdx_anchor_exclude  (concept_id, include_descendants) VALUES (4289374, 1)
+INTO vcbo5u4zdx_anchor_exclude         (concept_id, include_descendants) VALUES (INTO vcbo5u4zdx_anchor_exclude       (concept_id, include_descendants) VALUES (INTO vcbo5u4zdx_anchor_exclude     (concept_id, include_descendants) VALUES (INTO vcbo5u4zdx_anchor_exclude   (concept_id, include_descendants) VALUES (4280899, 1)
+ INTO vcbo5u4zdx_anchor_exclude  (concept_id, include_descendants) VALUES (4289374, 1)
 )
- INTO a9of9doxdx_anchor_exclude   (concept_id, include_descendants) VALUES (4280900, 1)
+ INTO vcbo5u4zdx_anchor_exclude   (concept_id, include_descendants) VALUES (4280900, 1)
 )
- INTO a9of9doxdx_anchor_exclude    (concept_id, include_descendants) VALUES (4283614, 1)
+ INTO vcbo5u4zdx_anchor_exclude    (concept_id, include_descendants) VALUES (4283614, 1)
 )
- INTO a9of9doxdx_anchor_exclude     (concept_id, include_descendants) VALUES (4289097, 1)
+ INTO vcbo5u4zdx_anchor_exclude     (concept_id, include_descendants) VALUES (4289097, 1)
 )
- INTO a9of9doxdx_anchor_exclude      (concept_id, include_descendants) VALUES (4280901, 1)
+ INTO vcbo5u4zdx_anchor_exclude      (concept_id, include_descendants) VALUES (4280901, 1)
 )
- INTO a9of9doxdx_anchor_exclude       (concept_id, include_descendants) VALUES (4289376, 1)
+ INTO vcbo5u4zdx_anchor_exclude       (concept_id, include_descendants) VALUES (4289376, 1)
 )
- INTO a9of9doxdx_anchor_exclude        (concept_id, include_descendants) VALUES (4280897, 1)
+ INTO vcbo5u4zdx_anchor_exclude        (concept_id, include_descendants) VALUES (4280897, 1)
 )
- INTO a9of9doxdx_anchor_exclude         (concept_id, include_descendants) VALUES (4200889, 1)
+ INTO vcbo5u4zdx_anchor_exclude         (concept_id, include_descendants) VALUES (4200889, 1)
 SELECT *   FROM DUAL;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdx_anchor_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdx_anchor_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdx_anchor_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdx_anchor_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -150,29 +150,29 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdx_anchor_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdx_anchor_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdx_anchor_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdx_anchor_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxdx_anchor_concepts (
+CREATE TABLE vcbo5u4zdx_anchor_concepts (
     concept_id NUMBER(19)
 );
-INSERT INTO a9of9doxdx_anchor_concepts (concept_id)
+INSERT INTO vcbo5u4zdx_anchor_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
-FROM a9of9doxdx_anchor_include i
+FROM vcbo5u4zdx_anchor_include i
 JOIN @cdm_database_schema.concept_ancestor ca
   ON ca.ancestor_concept_id = i.concept_id
  AND (i.include_descendants = 1 OR ca.descendant_concept_id = i.concept_id) ;
-DELETE FROM a9of9doxdx_anchor_concepts
+DELETE FROM vcbo5u4zdx_anchor_concepts
 WHERE EXISTS (SELECT 1
-    FROM a9of9doxdx_anchor_exclude e
+    FROM vcbo5u4zdx_anchor_exclude e
     JOIN @cdm_database_schema.concept_ancestor ca
       ON ca.ancestor_concept_id = e.concept_id
-     AND a9of9doxdx_anchor_concepts.concept_id = ca.descendant_concept_id
+     AND vcbo5u4zdx_anchor_concepts.concept_id = ca.descendant_concept_id
      AND (e.include_descendants = 1 OR ca.descendant_concept_id = e.concept_id)
  );
 ------------------------------------------------------------
@@ -182,8 +182,8 @@ WHERE EXISTS (SELECT 1
 -- (concept_ancestor includes self-links; we only want broader/generalized codes).
 ------------------------------------------------------------
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxgen_cancer_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxgen_cancer_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zgen_cancer_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zgen_cancer_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -191,27 +191,27 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxgen_cancer_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxgen_cancer_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zgen_cancer_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zgen_cancer_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxgen_cancer_concepts (
+CREATE TABLE vcbo5u4zgen_cancer_concepts (
     concept_id NUMBER(19)
 );
-INSERT INTO a9of9doxgen_cancer_concepts (concept_id)
+INSERT INTO vcbo5u4zgen_cancer_concepts (concept_id)
 SELECT DISTINCT ca.ancestor_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
-JOIN a9of9doxdx_anchor_concepts d
+JOIN vcbo5u4zdx_anchor_concepts d
   ON ca.descendant_concept_id = d.concept_id
 JOIN @cdm_database_schema.concept_ancestor malign
   ON malign.ancestor_concept_id = 443392
  AND malign.descendant_concept_id = ca.ancestor_concept_id
   WHERE NOT EXISTS (SELECT 1
-    FROM a9of9doxdx_anchor_concepts dx
+    FROM vcbo5u4zdx_anchor_concepts dx
       WHERE dx.concept_id = ca.ancestor_concept_id
  )
  ;
@@ -220,8 +220,8 @@ JOIN @cdm_database_schema.concept_ancestor malign
 -- Default: descendants of 443392 excluding DX + GDX sets.
 ------------------------------------------------------------
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxother_dx_ancestor_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxother_dx_ancestor_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zother_dx_ancestor_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zother_dx_ancestor_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -229,25 +229,25 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxother_dx_ancestor_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxother_dx_ancestor_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zother_dx_ancestor_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zother_dx_ancestor_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxother_dx_ancestor_concepts (
+CREATE TABLE vcbo5u4zother_dx_ancestor_concepts (
     ancestor_concept_id NUMBER(19)
 );
 -- EDIT THIS LIST
-INSERT INTO a9of9doxother_dx_ancestor_concepts (ancestor_concept_id)
+INSERT INTO vcbo5u4zother_dx_ancestor_concepts (ancestor_concept_id)
 VALUES
     (443392) -- Malignant neoplastic disease
 ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxother_dx_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxother_dx_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zother_dx_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zother_dx_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -255,25 +255,25 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxother_dx_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxother_dx_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zother_dx_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zother_dx_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxother_dx_concepts (
+CREATE TABLE vcbo5u4zother_dx_concepts (
     concept_id NUMBER(19)
 );
-INSERT INTO a9of9doxother_dx_concepts (concept_id)
+INSERT INTO vcbo5u4zother_dx_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
-JOIN a9of9doxother_dx_ancestor_concepts a
+JOIN vcbo5u4zother_dx_ancestor_concepts a
   ON ca.ancestor_concept_id = a.ancestor_concept_id
-LEFT JOIN a9of9doxdx_anchor_concepts dx
+LEFT JOIN vcbo5u4zdx_anchor_concepts dx
   ON dx.concept_id = ca.descendant_concept_id
-LEFT JOIN a9of9doxgen_cancer_concepts gdx
+LEFT JOIN vcbo5u4zgen_cancer_concepts gdx
   ON gdx.concept_id = ca.descendant_concept_id
   WHERE dx.concept_id IS NULL
   AND gdx.concept_id IS NULL
@@ -283,8 +283,8 @@ LEFT JOIN a9of9doxgen_cancer_concepts gdx
 -- Define via ancestor IDs (descendants pulled from concept_ancestor)
 ------------------------------------------------------------
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxmet_ancestor_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxmet_ancestor_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zmet_ancestor_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zmet_ancestor_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -292,27 +292,27 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxmet_ancestor_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxmet_ancestor_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zmet_ancestor_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zmet_ancestor_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxmet_ancestor_concepts (
+CREATE TABLE vcbo5u4zmet_ancestor_concepts (
     ancestor_concept_id NUMBER(19)
 );
 -- Default: concept set "Secondary malignancy" from cohort_definitions/Target_Cohort_2B.json
 INSERT ALL
-INTO a9of9doxmet_ancestor_concepts   (ancestor_concept_id) VALUES (1633308)
- INTO a9of9doxmet_ancestor_concepts  (ancestor_concept_id) VALUES (1635142)
+INTO vcbo5u4zmet_ancestor_concepts   (ancestor_concept_id) VALUES (1633308)
+ INTO vcbo5u4zmet_ancestor_concepts  (ancestor_concept_id) VALUES (1635142)
 )
- INTO a9of9doxmet_ancestor_concepts   (ancestor_concept_id) VALUES (36769180)
+ INTO vcbo5u4zmet_ancestor_concepts   (ancestor_concept_id) VALUES (36769180)
 SELECT *   FROM DUAL;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxmet_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxmet_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zmet_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zmet_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -320,29 +320,29 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxmet_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxmet_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zmet_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zmet_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxmet_concepts (
+CREATE TABLE vcbo5u4zmet_concepts (
     concept_id NUMBER(19)
 );
-INSERT INTO a9of9doxmet_concepts (concept_id)
+INSERT INTO vcbo5u4zmet_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
-JOIN a9of9doxmet_ancestor_concepts a
+JOIN vcbo5u4zmet_ancestor_concepts a
   ON ca.ancestor_concept_id = a.ancestor_concept_id
  ;
 ------------------------------------------------------------
 -- E) L01 TREATMENT CONCEPTS (DRUG_EXPOSURE)
 ------------------------------------------------------------
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxl01_ancestor_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxl01_ancestor_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zl01_ancestor_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zl01_ancestor_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -350,25 +350,25 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxl01_ancestor_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxl01_ancestor_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zl01_ancestor_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zl01_ancestor_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxl01_ancestor_concepts (
+CREATE TABLE vcbo5u4zl01_ancestor_concepts (
     ancestor_concept_id NUMBER(19)
 );
 -- EDIT THIS LIST
-INSERT INTO a9of9doxl01_ancestor_concepts (ancestor_concept_id)
+INSERT INTO vcbo5u4zl01_ancestor_concepts (ancestor_concept_id)
 VALUES
     (21601387)
 ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxl01_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxl01_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zl01_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zl01_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -376,29 +376,114 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxl01_concepts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxl01_concepts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zl01_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zl01_concepts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxl01_concepts (
+CREATE TABLE vcbo5u4zl01_concepts (
     concept_id NUMBER(19)
 );
-INSERT INTO a9of9doxl01_concepts (concept_id)
+INSERT INTO vcbo5u4zl01_concepts (concept_id)
 SELECT DISTINCT ca.descendant_concept_id
 FROM @cdm_database_schema.concept_ancestor ca
-JOIN a9of9doxl01_ancestor_concepts a
+JOIN vcbo5u4zl01_ancestor_concepts a
+  ON ca.ancestor_concept_id = a.ancestor_concept_id
+ ;
+------------------------------------------------------------
+-- E2) DRUG THERAPY PROCEDURE CONCEPTS (PROCEDURE_OCCURRENCE)
+--     Added for Analysis G. Antineoplastic treatment recorded as a procedure
+--     rather than a drug_exposure. Four Drug Therapy procedure roots and their
+--     descendants. Same ancestor-then-descendants build as the L01 concept set
+--     in section E: #dtp_ancestor_concepts holds the roots; #dtp_concepts expands
+--     to descendants via concept_ancestor (which includes each root itself at
+--     level 0, so the roots are in #dtp_concepts too). This is the only concept
+--     set that reads procedure_occurrence.
+--
+--     #dtp_concepts additionally carries the root each descendant maps to
+--     (root_concept_id), so Analysis G can report per category (Chemotherapy /
+--     Immunological therapy / Targeted chemotherapy for cancer / Hormone therapy).
+--     This is a small extension of the plain concept-id list used for L01; it is
+--     needed because G's Part 1b and Part 3 are per-concept. A descendant that
+--     falls under more than one root appears once per root, so a patient can be
+--     counted under more than one category and the per-category counts overlap
+--     and need not sum, matching the approved mock.
+--
+--     No procedure event table is materialised here. Like Analyses D and H, G's
+--     denominator is the full ungated population (all patients who carry a MET
+--     code, or all patients who carry the procedure), so the G chunks read
+--     procedure_occurrence directly rather than through a DX-cohort-gated event
+--     table (the #*_events tables in section F are all gated to #anchor_person).
+------------------------------------------------------------
+BEGIN
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdtp_ancestor_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdtp_ancestor_concepts';
+EXCEPTION
+  WHEN OTHERS THEN
+    IF SQLCODE != -942 THEN
+      RAISE;
+    END IF;
+END;
+BEGIN
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdtp_ancestor_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdtp_ancestor_concepts';
+EXCEPTION
+  WHEN OTHERS THEN
+    IF SQLCODE != -942 THEN
+      RAISE;
+    END IF;
+END;
+CREATE TABLE vcbo5u4zdtp_ancestor_concepts (
+    ancestor_concept_id NUMBER(19)
+);
+-- EDIT THIS LIST
+-- Chemotherapy 4273629, Immunological therapy 4295112,
+-- Targeted chemotherapy for cancer 37158316, Hormone therapy 4061650.
+INSERT ALL
+INTO vcbo5u4zdtp_ancestor_concepts    (ancestor_concept_id) VALUES (INTO vcbo5u4zdtp_ancestor_concepts  (ancestor_concept_id) VALUES (4273629)
+ INTO vcbo5u4zdtp_ancestor_concepts  (ancestor_concept_id) VALUES (4295112)
+)
+ INTO vcbo5u4zdtp_ancestor_concepts   (ancestor_concept_id) VALUES (37158316)
+)
+ INTO vcbo5u4zdtp_ancestor_concepts    (ancestor_concept_id) VALUES (4061650)
+SELECT *   FROM DUAL;
+BEGIN
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdtp_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdtp_concepts';
+EXCEPTION
+  WHEN OTHERS THEN
+    IF SQLCODE != -942 THEN
+      RAISE;
+    END IF;
+END;
+BEGIN
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdtp_concepts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdtp_concepts';
+EXCEPTION
+  WHEN OTHERS THEN
+    IF SQLCODE != -942 THEN
+      RAISE;
+    END IF;
+END;
+CREATE TABLE vcbo5u4zdtp_concepts (
+    concept_id      NUMBER(19),
+    root_concept_id NUMBER(19)
+);
+INSERT INTO vcbo5u4zdtp_concepts (concept_id, root_concept_id)
+SELECT DISTINCT ca.descendant_concept_id, a.ancestor_concept_id
+FROM @cdm_database_schema.concept_ancestor ca
+JOIN vcbo5u4zdtp_ancestor_concepts a
   ON ca.ancestor_concept_id = a.ancestor_concept_id
  ;
 ------------------------------------------------------------
 -- F) EVENT TABLES
 ------------------------------------------------------------
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdx_events';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdx_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdx_events';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdx_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -406,31 +491,31 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdx_events';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdx_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdx_events';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdx_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxdx_events (
+CREATE TABLE vcbo5u4zdx_events (
     person_id NUMBER(19),
     event_date DATE,
     concept_id NUMBER(19)
 );
-INSERT INTO a9of9doxdx_events (person_id, event_date, concept_id)
+INSERT INTO vcbo5u4zdx_events (person_id, event_date, concept_id)
 SELECT co.person_id,
     co.condition_start_date,
     co.condition_concept_id
 FROM @cdm_database_schema.condition_occurrence co
-JOIN a9of9doxdx_anchor_concepts d
+JOIN vcbo5u4zdx_anchor_concepts d
   ON co.condition_concept_id = d.concept_id
  ;
 -- Distinct anchor cohort persons; limits later F) pulls to rows that downstream joins to #cohort use anyway.
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxanchor_person';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxanchor_person';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zanchor_person';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zanchor_person';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -438,24 +523,24 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxanchor_person';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxanchor_person';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zanchor_person';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zanchor_person';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxanchor_person (
+CREATE TABLE vcbo5u4zanchor_person (
     person_id NUMBER(19)
 );
-INSERT INTO a9of9doxanchor_person (person_id)
+INSERT INTO vcbo5u4zanchor_person (person_id)
 SELECT DISTINCT person_id
-FROM a9of9doxdx_events
+FROM vcbo5u4zdx_events
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxother_dx_events';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxother_dx_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zother_dx_events';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zother_dx_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -463,32 +548,32 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxother_dx_events';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxother_dx_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zother_dx_events';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zother_dx_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxother_dx_events (
+CREATE TABLE vcbo5u4zother_dx_events (
     person_id NUMBER(19),
     event_date DATE,
     concept_id NUMBER(19)
 );
-INSERT INTO a9of9doxother_dx_events (person_id, event_date, concept_id)
+INSERT INTO vcbo5u4zother_dx_events (person_id, event_date, concept_id)
 SELECT co.person_id,
     co.condition_start_date,
     co.condition_concept_id
 FROM @cdm_database_schema.condition_occurrence co
-JOIN a9of9doxanchor_person ap
+JOIN vcbo5u4zanchor_person ap
   ON co.person_id = ap.person_id
-JOIN a9of9doxother_dx_concepts d
+JOIN vcbo5u4zother_dx_concepts d
   ON co.condition_concept_id = d.concept_id
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxgen_cancer_events';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxgen_cancer_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zgen_cancer_events';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zgen_cancer_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -496,32 +581,32 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxgen_cancer_events';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxgen_cancer_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zgen_cancer_events';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zgen_cancer_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxgen_cancer_events (
+CREATE TABLE vcbo5u4zgen_cancer_events (
     person_id NUMBER(19),
     event_date DATE,
     concept_id NUMBER(19)
 );
-INSERT INTO a9of9doxgen_cancer_events (person_id, event_date, concept_id)
+INSERT INTO vcbo5u4zgen_cancer_events (person_id, event_date, concept_id)
 SELECT co.person_id,
     co.condition_start_date,
     co.condition_concept_id
 FROM @cdm_database_schema.condition_occurrence co
-JOIN a9of9doxanchor_person ap
+JOIN vcbo5u4zanchor_person ap
   ON co.person_id = ap.person_id
-JOIN a9of9doxgen_cancer_concepts g
+JOIN vcbo5u4zgen_cancer_concepts g
   ON co.condition_concept_id = g.concept_id
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxmet_events';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxmet_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zmet_events';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zmet_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -529,32 +614,32 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxmet_events';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxmet_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zmet_events';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zmet_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxmet_events (
+CREATE TABLE vcbo5u4zmet_events (
     person_id NUMBER(19),
     event_date DATE,
     concept_id NUMBER(19)
 );
-INSERT INTO a9of9doxmet_events (person_id, event_date, concept_id)
+INSERT INTO vcbo5u4zmet_events (person_id, event_date, concept_id)
 SELECT m.person_id,
     m.measurement_date,
     m.measurement_concept_id
 FROM @cdm_database_schema.measurement m
-JOIN a9of9doxanchor_person ap
+JOIN vcbo5u4zanchor_person ap
   ON m.person_id = ap.person_id
-JOIN a9of9doxmet_concepts mc
+JOIN vcbo5u4zmet_concepts mc
   ON m.measurement_concept_id = mc.concept_id
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxl01_events';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxl01_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zl01_events';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zl01_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -562,33 +647,33 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxl01_events';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxl01_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zl01_events';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zl01_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxl01_events (
+CREATE TABLE vcbo5u4zl01_events (
     person_id NUMBER(19),
     event_date DATE,
     concept_id NUMBER(19)
 );
-INSERT INTO a9of9doxl01_events (person_id, event_date, concept_id)
+INSERT INTO vcbo5u4zl01_events (person_id, event_date, concept_id)
 SELECT de.person_id,
     de.drug_exposure_start_date,
     de.drug_concept_id
 FROM @cdm_database_schema.drug_exposure de
-JOIN a9of9doxanchor_person ap
+JOIN vcbo5u4zanchor_person ap
   ON de.person_id = ap.person_id
-JOIN a9of9doxl01_concepts l
+JOIN vcbo5u4zl01_concepts l
   ON de.drug_concept_id = l.concept_id
  ;
 -- Ingredient-level L01 events used for concept-level code counts/timing.
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxl01_ingredient_events';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxl01_ingredient_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zl01_ingredient_events';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zl01_ingredient_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -596,28 +681,28 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxl01_ingredient_events';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxl01_ingredient_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zl01_ingredient_events';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zl01_ingredient_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxl01_ingredient_events (
+CREATE TABLE vcbo5u4zl01_ingredient_events (
     person_id NUMBER(19),
     event_date DATE,
     concept_id NUMBER(19)
 );
-INSERT INTO a9of9doxl01_ingredient_events (person_id, event_date, concept_id)
+INSERT INTO vcbo5u4zl01_ingredient_events (person_id, event_date, concept_id)
 SELECT DISTINCT
     de.person_id,
     de.drug_exposure_start_date,
     ca.ancestor_concept_id
 FROM @cdm_database_schema.drug_exposure de
-JOIN a9of9doxanchor_person ap
+JOIN vcbo5u4zanchor_person ap
   ON de.person_id = ap.person_id
-JOIN a9of9doxl01_concepts l
+JOIN vcbo5u4zl01_concepts l
   ON de.drug_concept_id = l.concept_id
 JOIN @cdm_database_schema.concept_ancestor ca
   ON ca.descendant_concept_id = de.drug_concept_id
@@ -631,8 +716,8 @@ JOIN @cdm_database_schema.concept ing
 -- Track attrition: count all patients with a qualifying DX before the
 -- obs-period filter so the report can show how many were excluded.
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxcohort_attrition';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxcohort_attrition';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zcohort_attrition';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zcohort_attrition';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -640,23 +725,23 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxcohort_attrition';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxcohort_attrition';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zcohort_attrition';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zcohort_attrition';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxcohort_attrition (
+CREATE TABLE vcbo5u4zcohort_attrition (
     stage      VARCHAR(50),
     n_patients INT
 );
-INSERT INTO a9of9doxcohort_attrition (stage, n_patients)
-SELECT 'dx_any', COUNT(DISTINCT person_id) FROM a9of9doxdx_events ;
+INSERT INTO vcbo5u4zcohort_attrition (stage, n_patients)
+SELECT 'dx_any', COUNT(DISTINCT person_id) FROM vcbo5u4zdx_events ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxcohort';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxcohort';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zcohort';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zcohort';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -664,35 +749,35 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxcohort';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxcohort';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zcohort';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zcohort';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxcohort (
+CREATE TABLE vcbo5u4zcohort (
     person_id NUMBER(19),
     index_date DATE
 );
 -- Index date = earliest qualifying DX that falls within an observation period.
 -- Patients with no obs-period-covered DX are excluded entirely.
-INSERT INTO a9of9doxcohort (person_id, index_date)
+INSERT INTO vcbo5u4zcohort (person_id, index_date)
 SELECT dx.person_id,
     MIN(dx.event_date) AS index_date
-FROM a9of9doxdx_events dx
+FROM vcbo5u4zdx_events dx
 INNER JOIN @cdm_database_schema.observation_period op
     ON  op.person_id = dx.person_id
     AND dx.event_date BETWEEN op.observation_period_start_date
                           AND op.observation_period_end_date
 GROUP BY dx.person_id
  ;
-INSERT INTO a9of9doxcohort_attrition (stage, n_patients)
-SELECT 'dx_in_obs', COUNT(*) FROM a9of9doxcohort ;
+INSERT INTO vcbo5u4zcohort_attrition (stage, n_patients)
+SELECT 'dx_in_obs', COUNT(*) FROM vcbo5u4zcohort ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdx_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdx_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdx_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdx_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -700,31 +785,31 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdx_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdx_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdx_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdx_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxdx_summary (
+CREATE TABLE vcbo5u4zdx_summary (
     person_id NUMBER(19),
     n_dx_records INT,
     n_dx_codes INT
 );
-INSERT INTO a9of9doxdx_summary (person_id, n_dx_records, n_dx_codes)
+INSERT INTO vcbo5u4zdx_summary (person_id, n_dx_records, n_dx_codes)
 SELECT e.person_id,
     COUNT(*) AS n_dx_records,
     COUNT(DISTINCT e.concept_id) AS n_dx_codes
-FROM a9of9doxdx_events e
-JOIN a9of9doxcohort c
+FROM vcbo5u4zdx_events e
+JOIN vcbo5u4zcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxother_dx_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxother_dx_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zother_dx_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zother_dx_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -732,33 +817,33 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxother_dx_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxother_dx_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zother_dx_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zother_dx_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxother_dx_summary (
+CREATE TABLE vcbo5u4zother_dx_summary (
     person_id NUMBER(19),
     first_other_dx_date DATE,
     n_other_dx_records INT,
     n_other_dx_codes INT
 );
-INSERT INTO a9of9doxother_dx_summary (person_id, first_other_dx_date, n_other_dx_records, n_other_dx_codes)
+INSERT INTO vcbo5u4zother_dx_summary (person_id, first_other_dx_date, n_other_dx_records, n_other_dx_codes)
 SELECT e.person_id,
     MIN(e.event_date) AS first_other_dx_date,
     COUNT(*) AS n_other_dx_records,
     COUNT(DISTINCT e.concept_id) AS n_other_dx_codes
-FROM a9of9doxother_dx_events e
-JOIN a9of9doxcohort c
+FROM vcbo5u4zother_dx_events e
+JOIN vcbo5u4zcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxgen_cancer_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxgen_cancer_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zgen_cancer_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zgen_cancer_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -766,33 +851,33 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxgen_cancer_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxgen_cancer_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zgen_cancer_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zgen_cancer_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxgen_cancer_summary (
+CREATE TABLE vcbo5u4zgen_cancer_summary (
     person_id NUMBER(19),
     first_gen_cancer_date DATE,
     n_gen_cancer_records INT,
     n_gen_cancer_codes INT
 );
-INSERT INTO a9of9doxgen_cancer_summary (person_id, first_gen_cancer_date, n_gen_cancer_records, n_gen_cancer_codes)
+INSERT INTO vcbo5u4zgen_cancer_summary (person_id, first_gen_cancer_date, n_gen_cancer_records, n_gen_cancer_codes)
 SELECT e.person_id,
     MIN(e.event_date) AS first_gen_cancer_date,
     COUNT(*) AS n_gen_cancer_records,
     COUNT(DISTINCT e.concept_id) AS n_gen_cancer_codes
-FROM a9of9doxgen_cancer_events e
-JOIN a9of9doxcohort c
+FROM vcbo5u4zgen_cancer_events e
+JOIN vcbo5u4zcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxmet_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxmet_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zmet_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zmet_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -800,31 +885,31 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxmet_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxmet_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zmet_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zmet_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxmet_summary (
+CREATE TABLE vcbo5u4zmet_summary (
     person_id NUMBER(19),
     first_met_date DATE,
     n_met_records INT
 );
-INSERT INTO a9of9doxmet_summary (person_id, first_met_date, n_met_records)
+INSERT INTO vcbo5u4zmet_summary (person_id, first_met_date, n_met_records)
 SELECT e.person_id,
     MIN(e.event_date) AS first_met_date,
     COUNT(*) AS n_met_records
-FROM a9of9doxmet_events e
-JOIN a9of9doxcohort c
+FROM vcbo5u4zmet_events e
+JOIN vcbo5u4zcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxl01_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxl01_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zl01_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zl01_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -832,33 +917,33 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxl01_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxl01_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zl01_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zl01_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxl01_summary (
+CREATE TABLE vcbo5u4zl01_summary (
     person_id NUMBER(19),
     first_l01_date DATE,
     n_l01_exposures INT
 );
-INSERT INTO a9of9doxl01_summary (person_id, first_l01_date, n_l01_exposures)
+INSERT INTO vcbo5u4zl01_summary (person_id, first_l01_date, n_l01_exposures)
 SELECT e.person_id,
     MIN(e.event_date) AS first_l01_date,
     COUNT(*) AS n_l01_exposures
-FROM a9of9doxl01_events e
-JOIN a9of9doxcohort c
+FROM vcbo5u4zl01_events e
+JOIN vcbo5u4zcohort c
   ON e.person_id = c.person_id
 GROUP BY e.person_id
  ;
 -- H) EVENT CODE COUNTS (single table across event families)
 ------------------------------------------------------------
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_counts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_counts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_counts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_counts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -866,85 +951,85 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_counts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_counts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_counts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_counts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxevent_code_counts (
+CREATE TABLE vcbo5u4zevent_code_counts (
     anchor_event VARCHAR(20), -- INDEX or FIRST_MET
     event_family VARCHAR(20),
     concept_id NUMBER(19),
     n_records INT,
     n_patients INT
 );
-INSERT INTO a9of9doxevent_code_counts (anchor_event, event_family, concept_id, n_records, n_patients)
+INSERT INTO vcbo5u4zevent_code_counts (anchor_event, event_family, concept_id, n_records, n_patients)
 SELECT 'INDEX', 'DX', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM a9of9doxdx_events
-    WHERE person_id IN (SELECT person_id FROM a9of9doxcohort )
+FROM vcbo5u4zdx_events
+    WHERE person_id IN (SELECT person_id FROM vcbo5u4zcohort )
 GROUP BY concept_id
    UNION ALL
 SELECT 'INDEX', 'ODX', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM a9of9doxother_dx_events
-    WHERE person_id IN (SELECT person_id FROM a9of9doxcohort )
+FROM vcbo5u4zother_dx_events
+    WHERE person_id IN (SELECT person_id FROM vcbo5u4zcohort )
 GROUP BY concept_id
    UNION ALL
 SELECT 'INDEX', 'GDX', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM a9of9doxgen_cancer_events
-    WHERE person_id IN (SELECT person_id FROM a9of9doxcohort )
+FROM vcbo5u4zgen_cancer_events
+    WHERE person_id IN (SELECT person_id FROM vcbo5u4zcohort )
 GROUP BY concept_id
    UNION ALL
 SELECT 'INDEX', 'MET', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM a9of9doxmet_events
-    WHERE person_id IN (SELECT person_id FROM a9of9doxcohort )
+FROM vcbo5u4zmet_events
+    WHERE person_id IN (SELECT person_id FROM vcbo5u4zcohort )
 GROUP BY concept_id
    UNION ALL
 SELECT 'INDEX', 'L01', concept_id, COUNT(*), COUNT(DISTINCT person_id)
-FROM a9of9doxl01_ingredient_events
-    WHERE person_id IN (SELECT person_id FROM a9of9doxcohort )
+FROM vcbo5u4zl01_ingredient_events
+    WHERE person_id IN (SELECT person_id FROM vcbo5u4zcohort )
 GROUP BY concept_id
    UNION ALL
 SELECT 'FIRST_MET', 'DX', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM a9of9doxdx_events e
-JOIN a9of9doxmet_summary ms
+FROM vcbo5u4zdx_events e
+JOIN vcbo5u4zmet_summary ms
   ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
    UNION ALL
 SELECT 'FIRST_MET', 'ODX', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM a9of9doxother_dx_events e
-JOIN a9of9doxmet_summary ms
+FROM vcbo5u4zother_dx_events e
+JOIN vcbo5u4zmet_summary ms
   ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
    UNION ALL
 SELECT 'FIRST_MET', 'GDX', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM a9of9doxgen_cancer_events e
-JOIN a9of9doxmet_summary ms
+FROM vcbo5u4zgen_cancer_events e
+JOIN vcbo5u4zmet_summary ms
   ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
    UNION ALL
 SELECT 'FIRST_MET', 'MET', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM a9of9doxmet_events e
-JOIN a9of9doxmet_summary ms
+FROM vcbo5u4zmet_events e
+JOIN vcbo5u4zmet_summary ms
   ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
    UNION ALL
 SELECT 'FIRST_MET', 'L01', concept_id, COUNT(*), COUNT(DISTINCT e.person_id)
-FROM a9of9doxl01_ingredient_events e
-JOIN a9of9doxmet_summary ms
+FROM vcbo5u4zl01_ingredient_events e
+JOIN vcbo5u4zmet_summary ms
   ON e.person_id = ms.person_id
   WHERE ms.first_met_date IS NOT NULL
 GROUP BY concept_id
                    ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_counts_before_after';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_counts_before_after';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_counts_before_after';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_counts_before_after';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -952,15 +1037,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_counts_before_after';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_counts_before_after';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_counts_before_after';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_counts_before_after';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxevent_code_counts_before_after (
+CREATE TABLE vcbo5u4zevent_code_counts_before_after (
     anchor_event VARCHAR(20), -- INDEX
     event_family VARCHAR(20),
     time_relative VARCHAR(10), -- BEFORE or AFTER (relative to index_date)
@@ -968,15 +1053,15 @@ CREATE TABLE a9of9doxevent_code_counts_before_after (
     n_records INT,
     n_patients INT
 );
-INSERT INTO a9of9doxevent_code_counts_before_after (anchor_event, event_family, time_relative, concept_id, n_records, n_patients)
+INSERT INTO vcbo5u4zevent_code_counts_before_after (anchor_event, event_family, time_relative, concept_id, n_records, n_patients)
 SELECT 'INDEX',
        'DX',
         CASE WHEN CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)) < 0 THEN 'BEFORE' ELSE 'AFTER' END AS time_relative,
        e.concept_id,
         COUNT(*) AS n_records,
        COUNT(DISTINCT e.person_id) AS n_patients
-FROM a9of9doxdx_events e
-JOIN a9of9doxcohort c
+FROM vcbo5u4zdx_events e
+JOIN vcbo5u4zcohort c
   ON e.person_id = c.person_id
 GROUP BY
     CASE WHEN CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)) < 0 THEN 'BEFORE' ELSE 'AFTER'  END ,
@@ -988,8 +1073,8 @@ SELECT 'INDEX',
        e.concept_id,
         COUNT(*) ,
        COUNT(DISTINCT e.person_id)
-FROM a9of9doxother_dx_events e
-JOIN a9of9doxcohort c
+FROM vcbo5u4zother_dx_events e
+JOIN vcbo5u4zcohort c
   ON e.person_id = c.person_id
 GROUP BY
     CASE WHEN CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)) < 0 THEN 'BEFORE' ELSE 'AFTER'  END ,
@@ -1001,8 +1086,8 @@ SELECT 'INDEX',
        e.concept_id,
         COUNT(*) ,
        COUNT(DISTINCT e.person_id)
-FROM a9of9doxgen_cancer_events e
-JOIN a9of9doxcohort c
+FROM vcbo5u4zgen_cancer_events e
+JOIN vcbo5u4zcohort c
   ON e.person_id = c.person_id
 GROUP BY
     CASE WHEN CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)) < 0 THEN 'BEFORE' ELSE 'AFTER'  END ,
@@ -1014,8 +1099,8 @@ SELECT 'INDEX',
        e.concept_id,
         COUNT(*) ,
        COUNT(DISTINCT e.person_id)
-FROM a9of9doxmet_events e
-JOIN a9of9doxcohort c
+FROM vcbo5u4zmet_events e
+JOIN vcbo5u4zcohort c
   ON e.person_id = c.person_id
 GROUP BY
     CASE WHEN CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)) < 0 THEN 'BEFORE' ELSE 'AFTER'  END ,
@@ -1027,15 +1112,15 @@ SELECT 'INDEX',
        e.concept_id,
         COUNT(*) ,
        COUNT(DISTINCT e.person_id)
-FROM a9of9doxl01_ingredient_events e
-JOIN a9of9doxcohort c
+FROM vcbo5u4zl01_ingredient_events e
+JOIN vcbo5u4zcohort c
   ON e.person_id = c.person_id
 GROUP BY CASE WHEN CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)) < 0 THEN 'BEFORE' ELSE 'AFTER'  END ,
     e.concept_id
              GROUP BY 1 ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_counts_before_after_first_met';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_counts_before_after_first_met';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_counts_before_after_first_met';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_counts_before_after_first_met';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1043,15 +1128,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_counts_before_after_first_met';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_counts_before_after_first_met';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_counts_before_after_first_met';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_counts_before_after_first_met';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxevent_code_counts_before_after_first_met (
+CREATE TABLE vcbo5u4zevent_code_counts_before_after_first_met (
     anchor_event VARCHAR(20), -- FIRST_MET
     event_family VARCHAR(20),
     time_relative VARCHAR(10), -- BEFORE or AFTER (relative to first_met_date)
@@ -1059,15 +1144,15 @@ CREATE TABLE a9of9doxevent_code_counts_before_after_first_met (
     n_records INT,
     n_patients INT
 );
-INSERT INTO a9of9doxevent_code_counts_before_after_first_met (anchor_event, event_family, time_relative, concept_id, n_records, n_patients)
+INSERT INTO vcbo5u4zevent_code_counts_before_after_first_met (anchor_event, event_family, time_relative, concept_id, n_records, n_patients)
 SELECT 'FIRST_MET',
        'DX',
         CASE WHEN CEIL(CAST(e.event_date AS DATE) - CAST(ms.first_met_date AS DATE)) < 0 THEN 'BEFORE' ELSE 'AFTER' END AS time_relative,
        e.concept_id,
         COUNT(*) AS n_records,
        COUNT(DISTINCT e.person_id) AS n_patients
-FROM a9of9doxdx_events e
-JOIN a9of9doxmet_summary ms
+FROM vcbo5u4zdx_events e
+JOIN vcbo5u4zmet_summary ms
   ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
 GROUP BY
@@ -1080,8 +1165,8 @@ SELECT 'FIRST_MET',
        e.concept_id,
         COUNT(*) ,
        COUNT(DISTINCT e.person_id)
-FROM a9of9doxother_dx_events e
-JOIN a9of9doxmet_summary ms
+FROM vcbo5u4zother_dx_events e
+JOIN vcbo5u4zmet_summary ms
   ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
 GROUP BY
@@ -1094,8 +1179,8 @@ SELECT 'FIRST_MET',
        e.concept_id,
         COUNT(*) ,
        COUNT(DISTINCT e.person_id)
-FROM a9of9doxgen_cancer_events e
-JOIN a9of9doxmet_summary ms
+FROM vcbo5u4zgen_cancer_events e
+JOIN vcbo5u4zmet_summary ms
   ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
 GROUP BY
@@ -1108,8 +1193,8 @@ SELECT 'FIRST_MET',
        e.concept_id,
         COUNT(*) ,
        COUNT(DISTINCT e.person_id)
-FROM a9of9doxmet_events e
-JOIN a9of9doxmet_summary ms
+FROM vcbo5u4zmet_events e
+JOIN vcbo5u4zmet_summary ms
   ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
 GROUP BY
@@ -1122,16 +1207,16 @@ SELECT 'FIRST_MET',
        e.concept_id,
         COUNT(*) ,
        COUNT(DISTINCT e.person_id)
-FROM a9of9doxl01_ingredient_events e
-JOIN a9of9doxmet_summary ms
+FROM vcbo5u4zl01_ingredient_events e
+JOIN vcbo5u4zmet_summary ms
   ON e.person_id = ms.person_id
   WHERE ms.first_met_date IS NOT NULL
 GROUP BY CASE WHEN CEIL(CAST(e.event_date AS DATE) - CAST(ms.first_met_date AS DATE)) < 0 THEN 'BEFORE' ELSE 'AFTER'  END ,
     e.concept_id
              GROUP BY 1 ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_all_events';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_all_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_all_events';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_all_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1139,15 +1224,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_all_events';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_all_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_all_events';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_all_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxevent_code_all_events (
+CREATE TABLE vcbo5u4zevent_code_all_events (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     concept_id NUMBER(19),
@@ -1155,57 +1240,57 @@ CREATE TABLE a9of9doxevent_code_all_events (
     days_diff INT,
     event_date DATE
 );
-INSERT INTO a9of9doxevent_code_all_events (
+INSERT INTO vcbo5u4zevent_code_all_events (
     anchor_event, event_family, concept_id, person_id, days_diff, event_date
 )
 SELECT 'INDEX' AS anchor_event, 'DX' AS event_family, e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)) AS days_diff, e.event_date
-FROM a9of9doxdx_events e
-JOIN a9of9doxcohort c ON e.person_id = c.person_id
+FROM vcbo5u4zdx_events e
+JOIN vcbo5u4zcohort c ON e.person_id = c.person_id
   UNION ALL
 SELECT 'INDEX', 'ODX', e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)), e.event_date
-FROM a9of9doxother_dx_events e
-JOIN a9of9doxcohort c ON e.person_id = c.person_id
+FROM vcbo5u4zother_dx_events e
+JOIN vcbo5u4zcohort c ON e.person_id = c.person_id
   UNION ALL
 SELECT 'INDEX', 'GDX', e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)), e.event_date
-FROM a9of9doxgen_cancer_events e
-JOIN a9of9doxcohort c ON e.person_id = c.person_id
+FROM vcbo5u4zgen_cancer_events e
+JOIN vcbo5u4zcohort c ON e.person_id = c.person_id
   UNION ALL
 SELECT 'INDEX', 'MET', e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)), e.event_date
-FROM a9of9doxmet_events e
-JOIN a9of9doxcohort c ON e.person_id = c.person_id
+FROM vcbo5u4zmet_events e
+JOIN vcbo5u4zcohort c ON e.person_id = c.person_id
   UNION ALL
 SELECT 'INDEX', 'L01', e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)), e.event_date
-FROM a9of9doxl01_ingredient_events e
-JOIN a9of9doxcohort c ON e.person_id = c.person_id
+FROM vcbo5u4zl01_ingredient_events e
+JOIN vcbo5u4zcohort c ON e.person_id = c.person_id
   UNION ALL
 SELECT 'FIRST_MET', 'DX', e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(ms.first_met_date AS DATE)), e.event_date
-FROM a9of9doxdx_events e
-JOIN a9of9doxmet_summary ms ON e.person_id = ms.person_id
+FROM vcbo5u4zdx_events e
+JOIN vcbo5u4zmet_summary ms ON e.person_id = ms.person_id
                         WHERE ms.first_met_date IS NOT NULL
         UNION ALL
 SELECT 'FIRST_MET', 'ODX', e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(ms.first_met_date AS DATE)), e.event_date
-FROM a9of9doxother_dx_events e
-JOIN a9of9doxmet_summary ms ON e.person_id = ms.person_id
+FROM vcbo5u4zother_dx_events e
+JOIN vcbo5u4zmet_summary ms ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
    UNION ALL
 SELECT 'FIRST_MET', 'GDX', e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(ms.first_met_date AS DATE)), e.event_date
-FROM a9of9doxgen_cancer_events e
-JOIN a9of9doxmet_summary ms ON e.person_id = ms.person_id
+FROM vcbo5u4zgen_cancer_events e
+JOIN vcbo5u4zmet_summary ms ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
    UNION ALL
 SELECT 'FIRST_MET', 'MET', e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(ms.first_met_date AS DATE)), e.event_date
-FROM a9of9doxmet_events e
-JOIN a9of9doxmet_summary ms ON e.person_id = ms.person_id
+FROM vcbo5u4zmet_events e
+JOIN vcbo5u4zmet_summary ms ON e.person_id = ms.person_id
     WHERE ms.first_met_date IS NOT NULL
    UNION ALL
 SELECT 'FIRST_MET', 'L01', e.concept_id, e.person_id, CEIL(CAST(e.event_date AS DATE) - CAST(ms.first_met_date AS DATE)), e.event_date
-FROM a9of9doxl01_ingredient_events e
-JOIN a9of9doxmet_summary ms ON e.person_id = ms.person_id
+FROM vcbo5u4zl01_ingredient_events e
+JOIN vcbo5u4zmet_summary ms ON e.person_id = ms.person_id
   WHERE ms.first_met_date IS NOT NULL
                    ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_patient_chosen_first';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_patient_chosen_first';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_patient_chosen_first';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_patient_chosen_first';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1213,22 +1298,22 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_patient_chosen_first';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_patient_chosen_first';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_patient_chosen_first';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_patient_chosen_first';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxevent_code_patient_chosen_first (
+CREATE TABLE vcbo5u4zevent_code_patient_chosen_first (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     concept_id NUMBER(19),
     person_id NUMBER(19),
     days_diff INT
 );
-INSERT INTO a9of9doxevent_code_patient_chosen_first (anchor_event, event_family, concept_id, person_id, days_diff)
+INSERT INTO vcbo5u4zevent_code_patient_chosen_first (anchor_event, event_family, concept_id, person_id, days_diff)
 SELECT anchor_event, event_family, concept_id, person_id, days_diff
 FROM (SELECT anchor_event,
         event_family,
@@ -1239,13 +1324,13 @@ FROM (SELECT anchor_event,
             PARTITION BY anchor_event, event_family, concept_id, person_id
             ORDER BY CEIL(CAST(event_date AS DATE) - CAST(TO_DATE('1900-01-01', 'YYYYMMDD') AS DATE)) ASC, event_date ASC
         ) AS rn
-    FROM a9of9doxevent_code_all_events
+    FROM vcbo5u4zevent_code_all_events
  ) x
   WHERE rn = 1
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_patient_chosen_closest';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_patient_chosen_closest';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_patient_chosen_closest';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_patient_chosen_closest';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1253,22 +1338,22 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_patient_chosen_closest';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_patient_chosen_closest';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_patient_chosen_closest';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_patient_chosen_closest';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxevent_code_patient_chosen_closest (
+CREATE TABLE vcbo5u4zevent_code_patient_chosen_closest (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     concept_id NUMBER(19),
     person_id NUMBER(19),
     days_diff INT
 );
-INSERT INTO a9of9doxevent_code_patient_chosen_closest (anchor_event, event_family, concept_id, person_id, days_diff)
+INSERT INTO vcbo5u4zevent_code_patient_chosen_closest (anchor_event, event_family, concept_id, person_id, days_diff)
 SELECT anchor_event, event_family, concept_id, person_id, days_diff
 FROM (SELECT anchor_event,
         event_family,
@@ -1279,13 +1364,13 @@ FROM (SELECT anchor_event,
             PARTITION BY anchor_event, event_family, concept_id, person_id
             ORDER BY ABS(days_diff) ASC, event_date ASC
         ) AS rn
-    FROM a9of9doxevent_code_all_events
+    FROM vcbo5u4zevent_code_all_events
  ) x
   WHERE rn = 1
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_timing_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_timing_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_timing_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_timing_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1293,15 +1378,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_timing_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_timing_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_timing_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_timing_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxevent_code_timing_summary (
+CREATE TABLE vcbo5u4zevent_code_timing_summary (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     concept_id NUMBER(19),
@@ -1313,7 +1398,7 @@ CREATE TABLE a9of9doxevent_code_timing_summary (
     median_days_closest FLOAT,
     uq_days_closest FLOAT
 );
-INSERT INTO a9of9doxevent_code_timing_summary (
+INSERT INTO vcbo5u4zevent_code_timing_summary (
     anchor_event,
     event_family,
     concept_id,
@@ -1345,7 +1430,7 @@ FROM (SELECT anchor_event,
     FROM (SELECT anchor_event, event_family, concept_id, days_diff,
             ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, concept_id ORDER BY days_diff) AS rn,
             COUNT(*)     OVER (PARTITION BY anchor_event, event_family, concept_id)                    AS cnt
-        FROM a9of9doxevent_code_patient_chosen_first
+        FROM vcbo5u4zevent_code_patient_chosen_first
      ) x
     GROUP BY anchor_event, event_family, concept_id
  ) f
@@ -1358,7 +1443,7 @@ INNER JOIN (SELECT anchor_event,
     FROM (SELECT anchor_event, event_family, concept_id, days_diff,
             ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, concept_id ORDER BY days_diff) AS rn,
             COUNT(*)     OVER (PARTITION BY anchor_event, event_family, concept_id)                    AS cnt
-        FROM a9of9doxevent_code_patient_chosen_closest
+        FROM vcbo5u4zevent_code_patient_chosen_closest
      ) x
     GROUP BY anchor_event, event_family, concept_id
  ) k
@@ -1367,8 +1452,8 @@ INNER JOIN (SELECT anchor_event,
  AND f.concept_id = k.concept_id
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_ba_events';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_ba_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_ba_events';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_ba_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1376,15 +1461,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_ba_events';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_ba_events';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_ba_events';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_ba_events';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxevent_code_ba_events (
+CREATE TABLE vcbo5u4zevent_code_ba_events (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     time_relative VARCHAR(10),
@@ -1393,7 +1478,7 @@ CREATE TABLE a9of9doxevent_code_ba_events (
     days_diff INT,
     event_date DATE
 );
-INSERT INTO a9of9doxevent_code_ba_events (
+INSERT INTO vcbo5u4zevent_code_ba_events (
     anchor_event, event_family, time_relative, concept_id, person_id, days_diff, event_date
 )
 SELECT anchor_event,
@@ -1403,11 +1488,11 @@ SELECT anchor_event,
     person_id,
     days_diff,
     event_date
-FROM a9of9doxevent_code_all_events
+FROM vcbo5u4zevent_code_all_events
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_patient_chosen_before_after_first';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_patient_chosen_before_after_first';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_patient_chosen_before_after_first';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_patient_chosen_before_after_first';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1415,15 +1500,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_patient_chosen_before_after_first';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_patient_chosen_before_after_first';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_patient_chosen_before_after_first';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_patient_chosen_before_after_first';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxevent_code_patient_chosen_before_after_first (
+CREATE TABLE vcbo5u4zevent_code_patient_chosen_before_after_first (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     time_relative VARCHAR(10),
@@ -1431,7 +1516,7 @@ CREATE TABLE a9of9doxevent_code_patient_chosen_before_after_first (
     person_id NUMBER(19),
     days_diff INT
 );
-INSERT INTO a9of9doxevent_code_patient_chosen_before_after_first (
+INSERT INTO vcbo5u4zevent_code_patient_chosen_before_after_first (
     anchor_event, event_family, time_relative, concept_id, person_id, days_diff
 )
 SELECT anchor_event, event_family, time_relative, concept_id, person_id, days_diff
@@ -1445,13 +1530,13 @@ FROM (SELECT anchor_event,
             PARTITION BY anchor_event, event_family, time_relative, concept_id, person_id
             ORDER BY CEIL(CAST(event_date AS DATE) - CAST(TO_DATE('1900-01-01', 'YYYYMMDD') AS DATE)) ASC, event_date ASC
         ) AS rn
-    FROM a9of9doxevent_code_ba_events
+    FROM vcbo5u4zevent_code_ba_events
  ) x
   WHERE rn = 1
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_patient_chosen_before_after_closest';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_patient_chosen_before_after_closest';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_patient_chosen_before_after_closest';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_patient_chosen_before_after_closest';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1459,15 +1544,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_patient_chosen_before_after_closest';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_patient_chosen_before_after_closest';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_patient_chosen_before_after_closest';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_patient_chosen_before_after_closest';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxevent_code_patient_chosen_before_after_closest (
+CREATE TABLE vcbo5u4zevent_code_patient_chosen_before_after_closest (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     time_relative VARCHAR(10),
@@ -1475,7 +1560,7 @@ CREATE TABLE a9of9doxevent_code_patient_chosen_before_after_closest (
     person_id NUMBER(19),
     days_diff INT
 );
-INSERT INTO a9of9doxevent_code_patient_chosen_before_after_closest (
+INSERT INTO vcbo5u4zevent_code_patient_chosen_before_after_closest (
     anchor_event, event_family, time_relative, concept_id, person_id, days_diff
 )
 SELECT anchor_event, event_family, time_relative, concept_id, person_id, days_diff
@@ -1489,13 +1574,13 @@ FROM (SELECT anchor_event,
             PARTITION BY anchor_event, event_family, time_relative, concept_id, person_id
             ORDER BY ABS(days_diff) ASC, event_date ASC
         ) AS rn
-    FROM a9of9doxevent_code_ba_events
+    FROM vcbo5u4zevent_code_ba_events
  ) x
   WHERE rn = 1
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_timing_before_after_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_timing_before_after_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_timing_before_after_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_timing_before_after_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1503,15 +1588,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_code_timing_before_after_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_code_timing_before_after_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_code_timing_before_after_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_code_timing_before_after_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxevent_code_timing_before_after_summary (
+CREATE TABLE vcbo5u4zevent_code_timing_before_after_summary (
     anchor_event VARCHAR(20),
     event_family VARCHAR(20),
     time_relative VARCHAR(10),
@@ -1524,7 +1609,7 @@ CREATE TABLE a9of9doxevent_code_timing_before_after_summary (
     median_days_closest FLOAT,
     uq_days_closest FLOAT
 );
-INSERT INTO a9of9doxevent_code_timing_before_after_summary (
+INSERT INTO vcbo5u4zevent_code_timing_before_after_summary (
     anchor_event,
     event_family,
     time_relative,
@@ -1559,7 +1644,7 @@ FROM (SELECT anchor_event,
     FROM (SELECT anchor_event, event_family, time_relative, concept_id, days_diff,
             ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id ORDER BY days_diff) AS rn,
             COUNT(*)     OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id)                    AS cnt
-        FROM a9of9doxevent_code_patient_chosen_before_after_first
+        FROM vcbo5u4zevent_code_patient_chosen_before_after_first
      ) x
     GROUP BY anchor_event, event_family, time_relative, concept_id
  ) f
@@ -1573,7 +1658,7 @@ INNER JOIN (SELECT anchor_event,
     FROM (SELECT anchor_event, event_family, time_relative, concept_id, days_diff,
             ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id ORDER BY days_diff) AS rn,
             COUNT(*)     OVER (PARTITION BY anchor_event, event_family, time_relative, concept_id)                    AS cnt
-        FROM a9of9doxevent_code_patient_chosen_before_after_closest
+        FROM vcbo5u4zevent_code_patient_chosen_before_after_closest
      ) x
     GROUP BY anchor_event, event_family, time_relative, concept_id
  ) k
@@ -1586,8 +1671,8 @@ INNER JOIN (SELECT anchor_event,
 -- I) PATIENT-LEVEL TABLE
 ------------------------------------------------------------
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxpatient_char';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxpatient_char';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zpatient_char';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zpatient_char';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1595,15 +1680,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxpatient_char';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxpatient_char';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zpatient_char';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zpatient_char';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxpatient_char (
+CREATE TABLE vcbo5u4zpatient_char (
     person_id NUMBER(19),
     index_date DATE,
     n_dx_records INT,
@@ -1624,7 +1709,7 @@ CREATE TABLE a9of9doxpatient_char (
     days_dx_to_gen_cancer INT,
     days_met_to_l01 INT
 );
-INSERT INTO a9of9doxpatient_char (
+INSERT INTO vcbo5u4zpatient_char (
     person_id,
     index_date,
     n_dx_records,
@@ -1664,24 +1749,24 @@ SELECT c.person_id,
     CASE WHEN odx.first_other_dx_date IS NOT NULL THEN CEIL(CAST(odx.first_other_dx_date AS DATE) - CAST(c.index_date AS DATE)) END AS days_dx_to_other_dx,
     CASE WHEN gdx.first_gen_cancer_date IS NOT NULL THEN CEIL(CAST(gdx.first_gen_cancer_date AS DATE) - CAST(c.index_date AS DATE)) END AS days_dx_to_gen_cancer,
     CASE WHEN mt.first_met_date IS NOT NULL AND l01.first_l01_date IS NOT NULL THEN CEIL(CAST(l01.first_l01_date AS DATE) - CAST(mt.first_met_date AS DATE)) END AS days_met_to_l01
-FROM a9of9doxcohort c
-LEFT JOIN a9of9doxdx_summary dx
+FROM vcbo5u4zcohort c
+LEFT JOIN vcbo5u4zdx_summary dx
        ON c.person_id = dx.person_id
-LEFT JOIN a9of9doxother_dx_summary odx
+LEFT JOIN vcbo5u4zother_dx_summary odx
        ON c.person_id = odx.person_id
-LEFT JOIN a9of9doxgen_cancer_summary gdx
+LEFT JOIN vcbo5u4zgen_cancer_summary gdx
        ON c.person_id = gdx.person_id
-LEFT JOIN a9of9doxmet_summary mt
+LEFT JOIN vcbo5u4zmet_summary mt
        ON c.person_id = mt.person_id
-LEFT JOIN a9of9doxl01_summary l01
+LEFT JOIN vcbo5u4zl01_summary l01
        ON c.person_id = l01.person_id
  ;
 ------------------------------------------------------------
 -- J) FULL CROSSWISE TIMING PAIRS
 ------------------------------------------------------------
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxpatient_timing_pairs';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxpatient_timing_pairs';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zpatient_timing_pairs';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zpatient_timing_pairs';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1689,30 +1774,30 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxpatient_timing_pairs';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxpatient_timing_pairs';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zpatient_timing_pairs';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zpatient_timing_pairs';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxpatient_timing_pairs (
+CREATE TABLE vcbo5u4zpatient_timing_pairs (
     person_id NUMBER(19),
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     days_diff INT
 );
-INSERT INTO a9of9doxpatient_timing_pairs (person_id, from_event, to_event, days_diff)
- WITH events  AS (SELECT person_id, 'DX' AS event_name, index_date AS event_date FROM a9of9doxpatient_char
+INSERT INTO vcbo5u4zpatient_timing_pairs (person_id, from_event, to_event, days_diff)
+ WITH events  AS (SELECT person_id, 'DX' AS event_name, index_date AS event_date FROM vcbo5u4zpatient_char
       UNION ALL
-    SELECT person_id, 'ODX', first_other_dx_date FROM a9of9doxpatient_char
+    SELECT person_id, 'ODX', first_other_dx_date FROM vcbo5u4zpatient_char
       UNION ALL
-    SELECT person_id, 'GDX', first_gen_cancer_date FROM a9of9doxpatient_char
+    SELECT person_id, 'GDX', first_gen_cancer_date FROM vcbo5u4zpatient_char
       UNION ALL
-    SELECT person_id, 'MET', first_met_date FROM a9of9doxpatient_char
+    SELECT person_id, 'MET', first_met_date FROM vcbo5u4zpatient_char
       UNION ALL
-    SELECT person_id, 'L01', first_l01_date FROM a9of9doxpatient_char
+    SELECT person_id, 'L01', first_l01_date FROM vcbo5u4zpatient_char
  )
  SELECT e1.person_id,
     e1.event_name AS from_event,
@@ -1726,8 +1811,8 @@ JOIN events e2
   AND e2.event_date IS NOT NULL
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxtiming_pair_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxtiming_pair_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4ztiming_pair_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4ztiming_pair_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1735,15 +1820,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxtiming_pair_summary';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxtiming_pair_summary';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4ztiming_pair_summary';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4ztiming_pair_summary';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxtiming_pair_summary (
+CREATE TABLE vcbo5u4ztiming_pair_summary (
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     n_patients_with_pair INT,
@@ -1761,7 +1846,7 @@ CREATE TABLE a9of9doxtiming_pair_summary (
     p90_days FLOAT,
     p95_days FLOAT
 );
-INSERT INTO a9of9doxtiming_pair_summary (
+INSERT INTO vcbo5u4ztiming_pair_summary (
     from_event,
     to_event,
     n_patients_with_pair,
@@ -1798,13 +1883,13 @@ SELECT from_event,
 FROM (SELECT from_event, to_event, days_diff,
         ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
         COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
-    FROM a9of9doxpatient_timing_pairs
+    FROM vcbo5u4zpatient_timing_pairs
  ) x
 GROUP BY from_event, to_event
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxall_events_for_pairs';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxall_events_for_pairs';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zall_events_for_pairs';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zall_events_for_pairs';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1812,33 +1897,33 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxall_events_for_pairs';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxall_events_for_pairs';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zall_events_for_pairs';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zall_events_for_pairs';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxall_events_for_pairs (
+CREATE TABLE vcbo5u4zall_events_for_pairs (
     person_id NUMBER(19),
     event_family VARCHAR(10),
     event_date DATE
 );
-INSERT INTO a9of9doxall_events_for_pairs (person_id, event_family, event_date)
-SELECT person_id, 'DX', event_date FROM a9of9doxdx_events
+INSERT INTO vcbo5u4zall_events_for_pairs (person_id, event_family, event_date)
+SELECT person_id, 'DX', event_date FROM vcbo5u4zdx_events
   UNION ALL
-SELECT person_id, 'ODX', event_date FROM a9of9doxother_dx_events
+SELECT person_id, 'ODX', event_date FROM vcbo5u4zother_dx_events
   UNION ALL
-SELECT person_id, 'GDX', event_date FROM a9of9doxgen_cancer_events
+SELECT person_id, 'GDX', event_date FROM vcbo5u4zgen_cancer_events
   UNION ALL
-SELECT person_id, 'MET', event_date FROM a9of9doxmet_events
+SELECT person_id, 'MET', event_date FROM vcbo5u4zmet_events
   UNION ALL
-SELECT person_id, 'L01', event_date FROM a9of9doxl01_events
+SELECT person_id, 'L01', event_date FROM vcbo5u4zl01_events
          ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxfirst_event_dates';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxfirst_event_dates';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zfirst_event_dates';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zfirst_event_dates';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1846,33 +1931,33 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxfirst_event_dates';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxfirst_event_dates';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zfirst_event_dates';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zfirst_event_dates';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxfirst_event_dates (
+CREATE TABLE vcbo5u4zfirst_event_dates (
     person_id NUMBER(19),
     from_event VARCHAR(10),
     from_first_date DATE
 );
-INSERT INTO a9of9doxfirst_event_dates (person_id, from_event, from_first_date)
-SELECT person_id, 'DX', index_date FROM a9of9doxpatient_char
+INSERT INTO vcbo5u4zfirst_event_dates (person_id, from_event, from_first_date)
+SELECT person_id, 'DX', index_date FROM vcbo5u4zpatient_char
   UNION ALL
-SELECT person_id, 'ODX', first_other_dx_date FROM a9of9doxpatient_char         WHERE first_other_dx_date IS NOT NULL
+SELECT person_id, 'ODX', first_other_dx_date FROM vcbo5u4zpatient_char         WHERE first_other_dx_date IS NOT NULL
     UNION ALL
-SELECT person_id, 'GDX', first_gen_cancer_date FROM a9of9doxpatient_char     WHERE first_gen_cancer_date IS NOT NULL
+SELECT person_id, 'GDX', first_gen_cancer_date FROM vcbo5u4zpatient_char     WHERE first_gen_cancer_date IS NOT NULL
    UNION ALL
-SELECT person_id, 'MET', first_met_date FROM a9of9doxpatient_char     WHERE first_met_date IS NOT NULL
+SELECT person_id, 'MET', first_met_date FROM vcbo5u4zpatient_char     WHERE first_met_date IS NOT NULL
    UNION ALL
-SELECT person_id, 'L01', first_l01_date FROM a9of9doxpatient_char   WHERE first_l01_date IS NOT NULL
+SELECT person_id, 'L01', first_l01_date FROM vcbo5u4zpatient_char   WHERE first_l01_date IS NOT NULL
          ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxpatient_timing_pairs_first_to_closest';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxpatient_timing_pairs_first_to_closest';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zpatient_timing_pairs_first_to_closest';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zpatient_timing_pairs_first_to_closest';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1880,21 +1965,21 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxpatient_timing_pairs_first_to_closest';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxpatient_timing_pairs_first_to_closest';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zpatient_timing_pairs_first_to_closest';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zpatient_timing_pairs_first_to_closest';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxpatient_timing_pairs_first_to_closest (
+CREATE TABLE vcbo5u4zpatient_timing_pairs_first_to_closest (
     person_id NUMBER(19),
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     days_diff INT
 );
-INSERT INTO a9of9doxpatient_timing_pairs_first_to_closest (person_id, from_event, to_event, days_diff)
+INSERT INTO vcbo5u4zpatient_timing_pairs_first_to_closest (person_id, from_event, to_event, days_diff)
  WITH ranked  AS (SELECT f.person_id,
         f.from_event,
         a.event_family AS to_event,
@@ -1903,8 +1988,8 @@ INSERT INTO a9of9doxpatient_timing_pairs_first_to_closest (person_id, from_event
             PARTITION BY f.person_id, f.from_event, a.event_family
             ORDER BY ABS(CEIL(CAST(a.event_date AS DATE) - CAST(f.from_first_date AS DATE))), a.event_date
         ) AS rn
-    FROM a9of9doxfirst_event_dates f
-    JOIN a9of9doxall_events_for_pairs a
+    FROM vcbo5u4zfirst_event_dates f
+    JOIN vcbo5u4zall_events_for_pairs a
       ON f.person_id = a.person_id
      AND f.from_event <> a.event_family
  )
@@ -1916,8 +2001,8 @@ FROM ranked
   WHERE rn = 1
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxtiming_pair_summary_first_to_closest';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxtiming_pair_summary_first_to_closest';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4ztiming_pair_summary_first_to_closest';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4ztiming_pair_summary_first_to_closest';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -1925,15 +2010,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxtiming_pair_summary_first_to_closest';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxtiming_pair_summary_first_to_closest';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4ztiming_pair_summary_first_to_closest';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4ztiming_pair_summary_first_to_closest';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxtiming_pair_summary_first_to_closest (
+CREATE TABLE vcbo5u4ztiming_pair_summary_first_to_closest (
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     n_patients_with_pair INT,
@@ -1951,7 +2036,7 @@ CREATE TABLE a9of9doxtiming_pair_summary_first_to_closest (
     p90_days FLOAT,
     p95_days FLOAT
 );
-INSERT INTO a9of9doxtiming_pair_summary_first_to_closest (
+INSERT INTO vcbo5u4ztiming_pair_summary_first_to_closest (
     from_event,
     to_event,
     n_patients_with_pair,
@@ -1988,13 +2073,13 @@ SELECT from_event,
 FROM (SELECT from_event, to_event, days_diff,
         ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
         COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
-    FROM a9of9doxpatient_timing_pairs_first_to_closest
+    FROM vcbo5u4zpatient_timing_pairs_first_to_closest
  ) x
 GROUP BY from_event, to_event
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxpatient_timing_pairs_first_to_closest_before';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxpatient_timing_pairs_first_to_closest_before';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zpatient_timing_pairs_first_to_closest_before';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zpatient_timing_pairs_first_to_closest_before';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2002,21 +2087,21 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxpatient_timing_pairs_first_to_closest_before';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxpatient_timing_pairs_first_to_closest_before';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zpatient_timing_pairs_first_to_closest_before';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zpatient_timing_pairs_first_to_closest_before';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxpatient_timing_pairs_first_to_closest_before (
+CREATE TABLE vcbo5u4zpatient_timing_pairs_first_to_closest_before (
     person_id NUMBER(19),
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     days_diff INT
 );
-INSERT INTO a9of9doxpatient_timing_pairs_first_to_closest_before (person_id, from_event, to_event, days_diff)
+INSERT INTO vcbo5u4zpatient_timing_pairs_first_to_closest_before (person_id, from_event, to_event, days_diff)
  WITH ranked_before  AS (SELECT f.person_id,
         f.from_event,
         a.event_family AS to_event,
@@ -2025,8 +2110,8 @@ INSERT INTO a9of9doxpatient_timing_pairs_first_to_closest_before (person_id, fro
             PARTITION BY f.person_id, f.from_event, a.event_family
             ORDER BY ABS(CEIL(CAST(a.event_date AS DATE) - CAST(f.from_first_date AS DATE))), a.event_date DESC
         ) AS rn
-    FROM a9of9doxfirst_event_dates f
-    JOIN a9of9doxall_events_for_pairs a
+    FROM vcbo5u4zfirst_event_dates f
+    JOIN vcbo5u4zall_events_for_pairs a
       ON f.person_id = a.person_id
      AND f.from_event <> a.event_family
       WHERE CEIL(CAST(a.event_date AS DATE) - CAST(f.from_first_date AS DATE)) < 0
@@ -2039,8 +2124,8 @@ FROM ranked_before
   WHERE rn = 1
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxtiming_pair_summary_first_to_closest_before';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxtiming_pair_summary_first_to_closest_before';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4ztiming_pair_summary_first_to_closest_before';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4ztiming_pair_summary_first_to_closest_before';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2048,15 +2133,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxtiming_pair_summary_first_to_closest_before';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxtiming_pair_summary_first_to_closest_before';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4ztiming_pair_summary_first_to_closest_before';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4ztiming_pair_summary_first_to_closest_before';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxtiming_pair_summary_first_to_closest_before (
+CREATE TABLE vcbo5u4ztiming_pair_summary_first_to_closest_before (
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     n_patients_with_pair INT,
@@ -2074,7 +2159,7 @@ CREATE TABLE a9of9doxtiming_pair_summary_first_to_closest_before (
     p90_days FLOAT,
     p95_days FLOAT
 );
-INSERT INTO a9of9doxtiming_pair_summary_first_to_closest_before (
+INSERT INTO vcbo5u4ztiming_pair_summary_first_to_closest_before (
     from_event,
     to_event,
     n_patients_with_pair,
@@ -2111,13 +2196,13 @@ SELECT from_event,
 FROM (SELECT from_event, to_event, days_diff,
         ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
         COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
-    FROM a9of9doxpatient_timing_pairs_first_to_closest_before
+    FROM vcbo5u4zpatient_timing_pairs_first_to_closest_before
  ) x
 GROUP BY from_event, to_event
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxpatient_timing_pairs_first_to_closest_after';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxpatient_timing_pairs_first_to_closest_after';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zpatient_timing_pairs_first_to_closest_after';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zpatient_timing_pairs_first_to_closest_after';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2125,21 +2210,21 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxpatient_timing_pairs_first_to_closest_after';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxpatient_timing_pairs_first_to_closest_after';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zpatient_timing_pairs_first_to_closest_after';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zpatient_timing_pairs_first_to_closest_after';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxpatient_timing_pairs_first_to_closest_after (
+CREATE TABLE vcbo5u4zpatient_timing_pairs_first_to_closest_after (
     person_id NUMBER(19),
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     days_diff INT
 );
-INSERT INTO a9of9doxpatient_timing_pairs_first_to_closest_after (person_id, from_event, to_event, days_diff)
+INSERT INTO vcbo5u4zpatient_timing_pairs_first_to_closest_after (person_id, from_event, to_event, days_diff)
  WITH ranked_after  AS (SELECT f.person_id,
         f.from_event,
         a.event_family AS to_event,
@@ -2148,8 +2233,8 @@ INSERT INTO a9of9doxpatient_timing_pairs_first_to_closest_after (person_id, from
             PARTITION BY f.person_id, f.from_event, a.event_family
             ORDER BY CEIL(CAST(a.event_date AS DATE) - CAST(f.from_first_date AS DATE)), a.event_date
         ) AS rn
-    FROM a9of9doxfirst_event_dates f
-    JOIN a9of9doxall_events_for_pairs a
+    FROM vcbo5u4zfirst_event_dates f
+    JOIN vcbo5u4zall_events_for_pairs a
       ON f.person_id = a.person_id
      AND f.from_event <> a.event_family
       WHERE CEIL(CAST(a.event_date AS DATE) - CAST(f.from_first_date AS DATE)) >= 0
@@ -2162,8 +2247,8 @@ FROM ranked_after
   WHERE rn = 1
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxtiming_pair_summary_first_to_closest_after';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxtiming_pair_summary_first_to_closest_after';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4ztiming_pair_summary_first_to_closest_after';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4ztiming_pair_summary_first_to_closest_after';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2171,15 +2256,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxtiming_pair_summary_first_to_closest_after';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxtiming_pair_summary_first_to_closest_after';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4ztiming_pair_summary_first_to_closest_after';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4ztiming_pair_summary_first_to_closest_after';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxtiming_pair_summary_first_to_closest_after (
+CREATE TABLE vcbo5u4ztiming_pair_summary_first_to_closest_after (
     from_event VARCHAR(10),
     to_event VARCHAR(10),
     n_patients_with_pair INT,
@@ -2197,7 +2282,7 @@ CREATE TABLE a9of9doxtiming_pair_summary_first_to_closest_after (
     p90_days FLOAT,
     p95_days FLOAT
 );
-INSERT INTO a9of9doxtiming_pair_summary_first_to_closest_after (
+INSERT INTO vcbo5u4ztiming_pair_summary_first_to_closest_after (
     from_event,
     to_event,
     n_patients_with_pair,
@@ -2234,13 +2319,13 @@ SELECT from_event,
 FROM (SELECT from_event, to_event, days_diff,
         ROW_NUMBER() OVER (PARTITION BY from_event, to_event ORDER BY days_diff) AS rn,
         COUNT(*)     OVER (PARTITION BY from_event, to_event)                    AS cnt
-    FROM a9of9doxpatient_timing_pairs_first_to_closest_after
+    FROM vcbo5u4zpatient_timing_pairs_first_to_closest_after
  ) x
 GROUP BY from_event, to_event
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_presence';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_presence';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_presence';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_presence';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2248,15 +2333,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxevent_presence';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxevent_presence';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zevent_presence';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zevent_presence';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxevent_presence (
+CREATE TABLE vcbo5u4zevent_presence (
     person_id NUMBER(19),
     has_dx INT,
     has_odx INT,
@@ -2264,7 +2349,7 @@ CREATE TABLE a9of9doxevent_presence (
     has_met INT,
     has_l01 INT
 );
-INSERT INTO a9of9doxevent_presence (
+INSERT INTO vcbo5u4zevent_presence (
     person_id, has_dx, has_odx, has_gdx, has_met, has_l01
 )
 SELECT person_id,
@@ -2273,7 +2358,7 @@ SELECT person_id,
     CASE WHEN first_gen_cancer_date IS NOT NULL THEN 1 ELSE 0 END,
     CASE WHEN first_met_date IS NOT NULL THEN 1 ELSE 0 END,
     CASE WHEN first_l01_date IS NOT NULL THEN 1 ELSE 0 END
-FROM a9of9doxpatient_char
+FROM vcbo5u4zpatient_char
  ;
 ------------------------------------------------------------
 -- J-bis) DEATH TIMING FROM INDEX AND FIRST_MET ANCHORS
@@ -2281,8 +2366,8 @@ FROM a9of9doxpatient_char
 -- Pre-compute each cohort patient's earliest death date and whether it
 -- falls within any of their observation periods.
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdeath_obs_status';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdeath_obs_status';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdeath_obs_status';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdeath_obs_status';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2290,20 +2375,20 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdeath_obs_status';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdeath_obs_status';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdeath_obs_status';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdeath_obs_status';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxdeath_obs_status (
+CREATE TABLE vcbo5u4zdeath_obs_status (
     person_id NUMBER(19),
     death_date DATE,
     death_in_obs SMALLINT
 );
-INSERT INTO a9of9doxdeath_obs_status (person_id, death_date, death_in_obs)
+INSERT INTO vcbo5u4zdeath_obs_status (person_id, death_date, death_in_obs)
 SELECT d.person_id,
     d.death_date,
     CASE WHEN EXISTS (SELECT 1
@@ -2316,11 +2401,11 @@ FROM (SELECT person_id, MIN(death_date) AS death_date
     FROM @cdm_database_schema.death
     GROUP BY person_id
  ) d
-  WHERE d.person_id IN (SELECT person_id FROM a9of9doxcohort )
+  WHERE d.person_id IN (SELECT person_id FROM vcbo5u4zcohort )
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdeath_index_long';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdeath_index_long';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdeath_index_long';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdeath_index_long';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2328,32 +2413,32 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdeath_index_long';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdeath_index_long';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdeath_index_long';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdeath_index_long';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxdeath_index_long (
+CREATE TABLE vcbo5u4zdeath_index_long (
     prevalence_year VARCHAR(20),
     days_to_death INT
 );
-INSERT INTO a9of9doxdeath_index_long (prevalence_year, days_to_death)
+INSERT INTO vcbo5u4zdeath_index_long (prevalence_year, days_to_death)
 SELECT 'OVERALL', CEIL(CAST(dos.death_date AS DATE) - CAST(c.index_date AS DATE))
-FROM a9of9doxcohort c
-INNER JOIN a9of9doxdeath_obs_status dos ON dos.person_id = c.person_id
+FROM vcbo5u4zcohort c
+INNER JOIN vcbo5u4zdeath_obs_status dos ON dos.person_id = c.person_id
     WHERE dos.death_date >= c.index_date
    UNION ALL
 SELECT CAST(EXTRACT(YEAR FROM c.index_date) AS VARCHAR(4)), CEIL(CAST(dos.death_date AS DATE) - CAST(c.index_date AS DATE))
-FROM a9of9doxcohort c
-INNER JOIN a9of9doxdeath_obs_status dos ON dos.person_id = c.person_id
+FROM vcbo5u4zcohort c
+INNER JOIN vcbo5u4zdeath_obs_status dos ON dos.person_id = c.person_id
   WHERE dos.death_date >= c.index_date
    ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdeath_first_met_long';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdeath_first_met_long';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdeath_first_met_long';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdeath_first_met_long';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2361,34 +2446,34 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdeath_first_met_long';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdeath_first_met_long';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdeath_first_met_long';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdeath_first_met_long';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxdeath_first_met_long (
+CREATE TABLE vcbo5u4zdeath_first_met_long (
     prevalence_year VARCHAR(20),
     days_to_death INT
 );
-INSERT INTO a9of9doxdeath_first_met_long (prevalence_year, days_to_death)
+INSERT INTO vcbo5u4zdeath_first_met_long (prevalence_year, days_to_death)
 SELECT 'OVERALL', CEIL(CAST(dos.death_date AS DATE) - CAST(ms.first_met_date AS DATE))
-FROM a9of9doxcohort c
-INNER JOIN a9of9doxmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
-INNER JOIN a9of9doxdeath_obs_status dos ON dos.person_id = c.person_id
+FROM vcbo5u4zcohort c
+INNER JOIN vcbo5u4zmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+INNER JOIN vcbo5u4zdeath_obs_status dos ON dos.person_id = c.person_id
     WHERE dos.death_date >= ms.first_met_date
    UNION ALL
 SELECT CAST(EXTRACT(YEAR FROM ms.first_met_date) AS VARCHAR(4)), CEIL(CAST(dos.death_date AS DATE) - CAST(ms.first_met_date AS DATE))
-FROM a9of9doxcohort c
-INNER JOIN a9of9doxmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
-INNER JOIN a9of9doxdeath_obs_status dos ON dos.person_id = c.person_id
+FROM vcbo5u4zcohort c
+INNER JOIN vcbo5u4zmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+INNER JOIN vcbo5u4zdeath_obs_status dos ON dos.person_id = c.person_id
   WHERE dos.death_date >= ms.first_met_date
    ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdeath_stratum_counts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdeath_stratum_counts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdeath_stratum_counts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdeath_stratum_counts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2396,15 +2481,15 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdeath_stratum_counts';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdeath_stratum_counts';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdeath_stratum_counts';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdeath_stratum_counts';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxdeath_stratum_counts (
+CREATE TABLE vcbo5u4zdeath_stratum_counts (
     prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     n_patients INT,
@@ -2412,7 +2497,7 @@ CREATE TABLE a9of9doxdeath_stratum_counts (
     n_deaths_in_obs INT,
     n_deaths_out_obs INT
 );
-INSERT INTO a9of9doxdeath_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
+INSERT INTO vcbo5u4zdeath_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
 SELECT CASE
         WHEN GROUPING(EXTRACT(YEAR FROM c.index_date)) = 1 THEN 'OVERALL'
         ELSE CAST(EXTRACT(YEAR FROM c.index_date) AS VARCHAR(4))
@@ -2422,11 +2507,11 @@ SELECT CASE
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= c.index_date THEN 1 ELSE 0 END),
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= c.index_date AND dos.death_in_obs = 1 THEN 1 ELSE 0 END),
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= c.index_date AND dos.death_in_obs = 0 THEN 1 ELSE 0 END)
-FROM a9of9doxcohort c
-LEFT JOIN a9of9doxdeath_obs_status dos ON dos.person_id = c.person_id
+FROM vcbo5u4zcohort c
+LEFT JOIN vcbo5u4zdeath_obs_status dos ON dos.person_id = c.person_id
 GROUP BY GROUPING SETS ((), (EXTRACT(YEAR FROM c.index_date)))
  ;
-INSERT INTO a9of9doxdeath_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
+INSERT INTO vcbo5u4zdeath_stratum_counts (prevalence_year, anchor_event, n_patients, n_deaths, n_deaths_in_obs, n_deaths_out_obs)
 SELECT CASE
         WHEN GROUPING(EXTRACT(YEAR FROM ms.first_met_date)) = 1 THEN 'OVERALL'
         ELSE CAST(EXTRACT(YEAR FROM ms.first_met_date) AS VARCHAR(4))
@@ -2436,14 +2521,14 @@ SELECT CASE
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= ms.first_met_date THEN 1 ELSE 0 END),
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= ms.first_met_date AND dos.death_in_obs = 1 THEN 1 ELSE 0 END),
     SUM(CASE WHEN dos.death_date IS NOT NULL AND dos.death_date >= ms.first_met_date AND dos.death_in_obs = 0 THEN 1 ELSE 0 END)
-FROM a9of9doxcohort c
-INNER JOIN a9of9doxmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
-LEFT JOIN a9of9doxdeath_obs_status dos ON dos.person_id = c.person_id
+FROM vcbo5u4zcohort c
+INNER JOIN vcbo5u4zmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+LEFT JOIN vcbo5u4zdeath_obs_status dos ON dos.person_id = c.person_id
 GROUP BY GROUPING SETS ((), (EXTRACT(YEAR FROM ms.first_met_date)))
  ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdeath_timing_long';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdeath_timing_long';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdeath_timing_long';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdeath_timing_long';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2451,27 +2536,27 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdeath_timing_long';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdeath_timing_long';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdeath_timing_long';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdeath_timing_long';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxdeath_timing_long (
+CREATE TABLE vcbo5u4zdeath_timing_long (
     prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     days_to_death INT
 );
-INSERT INTO a9of9doxdeath_timing_long (prevalence_year, anchor_event, days_to_death)
-SELECT prevalence_year, 'INDEX', days_to_death FROM a9of9doxdeath_index_long
+INSERT INTO vcbo5u4zdeath_timing_long (prevalence_year, anchor_event, days_to_death)
+SELECT prevalence_year, 'INDEX', days_to_death FROM vcbo5u4zdeath_index_long
   UNION ALL
-SELECT prevalence_year, 'FIRST_MET', days_to_death FROM a9of9doxdeath_first_met_long
+SELECT prevalence_year, 'FIRST_MET', days_to_death FROM vcbo5u4zdeath_first_met_long
    ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdeath_timing_quantiles';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdeath_timing_quantiles';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdeath_timing_quantiles';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdeath_timing_quantiles';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2479,22 +2564,22 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxdeath_timing_quantiles';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxdeath_timing_quantiles';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zdeath_timing_quantiles';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zdeath_timing_quantiles';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxdeath_timing_quantiles (
+CREATE TABLE vcbo5u4zdeath_timing_quantiles (
     prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     lq_days FLOAT,
     median_days FLOAT,
     uq_days FLOAT
 );
-INSERT INTO a9of9doxdeath_timing_quantiles (
+INSERT INTO vcbo5u4zdeath_timing_quantiles (
     prevalence_year,
     anchor_event,
     lq_days,
@@ -2509,15 +2594,15 @@ SELECT prevalence_year,
 FROM (SELECT prevalence_year, anchor_event, days_to_death,
         ROW_NUMBER() OVER (PARTITION BY prevalence_year, anchor_event ORDER BY days_to_death) AS rn,
         COUNT(*)     OVER (PARTITION BY prevalence_year, anchor_event)                        AS cnt
-    FROM a9of9doxdeath_timing_long
+    FROM vcbo5u4zdeath_timing_long
  ) x
 GROUP BY prevalence_year, anchor_event
  ;
 -- Follow-up duration from anchor date to last observation period end,
 -- for all patients with at least one observation period covering or after anchor.
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxfollowup_long';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxfollowup_long';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zfollowup_long';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zfollowup_long';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2525,23 +2610,23 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxfollowup_long';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxfollowup_long';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zfollowup_long';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zfollowup_long';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxfollowup_long (
+CREATE TABLE vcbo5u4zfollowup_long (
     prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     followup_days INT
 );
-INSERT INTO a9of9doxfollowup_long (prevalence_year, anchor_event, followup_days)
+INSERT INTO vcbo5u4zfollowup_long (prevalence_year, anchor_event, followup_days)
 SELECT 'OVERALL', 'INDEX',
        CEIL(CAST(MAX(op.observation_period_end_date) AS DATE) - CAST(c.index_date AS DATE))
-FROM a9of9doxcohort c
+FROM vcbo5u4zcohort c
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= c.index_date
@@ -2549,7 +2634,7 @@ GROUP BY c.person_id, c.index_date
   UNION ALL
 SELECT CAST(EXTRACT(YEAR FROM c.index_date) AS VARCHAR(4)), 'INDEX',
        CEIL(CAST(MAX(op.observation_period_end_date) AS DATE) - CAST(c.index_date AS DATE))
-FROM a9of9doxcohort c
+FROM vcbo5u4zcohort c
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= c.index_date
@@ -2557,8 +2642,8 @@ GROUP BY c.person_id, c.index_date, EXTRACT(YEAR FROM c.index_date)
   UNION ALL
 SELECT 'OVERALL', 'FIRST_MET',
        CEIL(CAST(MAX(op.observation_period_end_date) AS DATE) - CAST(ms.first_met_date AS DATE))
-FROM a9of9doxcohort c
-INNER JOIN a9of9doxmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+FROM vcbo5u4zcohort c
+INNER JOIN vcbo5u4zmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= ms.first_met_date
@@ -2566,16 +2651,16 @@ GROUP BY c.person_id, ms.first_met_date
   UNION ALL
 SELECT CAST(EXTRACT(YEAR FROM ms.first_met_date) AS VARCHAR(4)), 'FIRST_MET',
        CEIL(CAST(MAX(op.observation_period_end_date) AS DATE) - CAST(ms.first_met_date AS DATE))
-FROM a9of9doxcohort c
-INNER JOIN a9of9doxmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+FROM vcbo5u4zcohort c
+INNER JOIN vcbo5u4zmet_summary ms ON c.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
 INNER JOIN @cdm_database_schema.observation_period op
   ON op.person_id = c.person_id
  AND op.observation_period_end_date >= ms.first_met_date
 GROUP BY c.person_id, ms.first_met_date, EXTRACT(YEAR FROM ms.first_met_date)
        ;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxfollowup_quantiles';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxfollowup_quantiles';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zfollowup_quantiles';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zfollowup_quantiles';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2583,22 +2668,22 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxfollowup_quantiles';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxfollowup_quantiles';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zfollowup_quantiles';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zfollowup_quantiles';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxfollowup_quantiles (
+CREATE TABLE vcbo5u4zfollowup_quantiles (
     prevalence_year VARCHAR(20),
     anchor_event VARCHAR(20),
     lq_followup_days FLOAT,
     median_followup_days FLOAT,
     uq_followup_days FLOAT
 );
-INSERT INTO a9of9doxfollowup_quantiles (
+INSERT INTO vcbo5u4zfollowup_quantiles (
     prevalence_year,
     anchor_event,
     lq_followup_days,
@@ -2613,7 +2698,7 @@ SELECT prevalence_year,
 FROM (SELECT prevalence_year, anchor_event, followup_days,
         ROW_NUMBER() OVER (PARTITION BY prevalence_year, anchor_event ORDER BY followup_days) AS rn,
         COUNT(*)     OVER (PARTITION BY prevalence_year, anchor_event)                        AS cnt
-    FROM a9of9doxfollowup_long
+    FROM vcbo5u4zfollowup_long
  ) x
 GROUP BY prevalence_year, anchor_event
  ;
@@ -2622,8 +2707,8 @@ GROUP BY prevalence_year, anchor_event
 ------------------------------------------------------------
 -- Deduplicated L01 event days per patient (one row per patient-day)
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxl01_event_days';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxl01_event_days';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zl01_event_days';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zl01_event_days';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2631,27 +2716,27 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxl01_event_days';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxl01_event_days';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zl01_event_days';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zl01_event_days';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxl01_event_days (
+CREATE TABLE vcbo5u4zl01_event_days (
     person_id  NUMBER(19),
     event_day  DATE
 );
-INSERT INTO a9of9doxl01_event_days (person_id, event_day)
+INSERT INTO vcbo5u4zl01_event_days (person_id, event_day)
 SELECT DISTINCT person_id, event_date
-FROM a9of9doxl01_events
-  WHERE person_id IN (SELECT person_id FROM a9of9doxcohort )
+FROM vcbo5u4zl01_events
+  WHERE person_id IN (SELECT person_id FROM vcbo5u4zcohort )
  ;
 -- Consecutive gaps between L01 event days per patient
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxl01_consecutive_gaps';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxl01_consecutive_gaps';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zl01_consecutive_gaps';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zl01_consecutive_gaps';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
@@ -2659,24 +2744,24 @@ EXCEPTION
     END IF;
 END;
 BEGIN
-  EXECUTE IMMEDIATE 'TRUNCATE TABLE a9of9doxl01_consecutive_gaps';
-  EXECUTE IMMEDIATE 'DROP TABLE a9of9doxl01_consecutive_gaps';
+  EXECUTE IMMEDIATE 'TRUNCATE TABLE vcbo5u4zl01_consecutive_gaps';
+  EXECUTE IMMEDIATE 'DROP TABLE vcbo5u4zl01_consecutive_gaps';
 EXCEPTION
   WHEN OTHERS THEN
     IF SQLCODE != -942 THEN
       RAISE;
     END IF;
 END;
-CREATE TABLE a9of9doxl01_consecutive_gaps (
+CREATE TABLE vcbo5u4zl01_consecutive_gaps (
     person_id  NUMBER(19),
     subgroup   VARCHAR(12),
     gap_days   INT
 );
-INSERT INTO a9of9doxl01_consecutive_gaps (person_id, subgroup, gap_days)
+INSERT INTO vcbo5u4zl01_consecutive_gaps (person_id, subgroup, gap_days)
  WITH ranked  AS (SELECT e.person_id,
         e.event_day,
         LEAD(e.event_day) OVER (PARTITION BY e.person_id ORDER BY e.event_day) AS next_day
-    FROM a9of9doxl01_event_days e
+    FROM vcbo5u4zl01_event_days e
  ),
 gaps AS (SELECT person_id,
         CEIL(CAST(next_day AS DATE) - CAST(event_day AS DATE)) AS gap_days
@@ -2687,17 +2772,17 @@ gaps AS (SELECT person_id,
   UNION ALL
 SELECT g.person_id, 'MET_L01', g.gap_days
 FROM gaps g
-JOIN a9of9doxmet_summary ms ON g.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+JOIN vcbo5u4zmet_summary ms ON g.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
    ;
--- Max gap per patient (one row per patient; used for MAX-gap subgroups in chunks 11–12)
-INSERT INTO a9of9doxl01_consecutive_gaps (person_id, subgroup, gap_days)
+-- Max gap per patient (one row per patient; used for MAX-gap subgroups in chunks 11<U+2013>12)
+INSERT INTO vcbo5u4zl01_consecutive_gaps (person_id, subgroup, gap_days)
 SELECT person_id, 'ALL_L01_MAX', MAX(gap_days)
-FROM a9of9doxl01_consecutive_gaps
+FROM vcbo5u4zl01_consecutive_gaps
     WHERE subgroup = 'ALL_L01'
 GROUP BY person_id
    UNION ALL
 SELECT person_id, 'MET_L01_MAX', MAX(gap_days)
-FROM a9of9doxl01_consecutive_gaps
+FROM vcbo5u4zl01_consecutive_gaps
   WHERE subgroup = 'MET_L01'
 GROUP BY person_id
    ;
@@ -2711,7 +2796,7 @@ SELECT SUM(CASE WHEN stage = 'dx_any'    THEN n_patients ELSE 0 END) AS n_dx_any
     SUM(CASE WHEN stage = 'dx_in_obs' THEN n_patients ELSE 0 END) AS n_dx_in_obs,
     SUM(CASE WHEN stage = 'dx_any'    THEN n_patients ELSE 0 END)
     - SUM(CASE WHEN stage = 'dx_in_obs' THEN n_patients ELSE 0 END)  AS n_excluded_no_obs_dx
-FROM a9of9doxcohort_attrition
+FROM vcbo5u4zcohort_attrition
  ;
 -- 1) Population prevalence
 WITH base AS (SELECT CASE
@@ -2723,7 +2808,7 @@ WITH base AS (SELECT CASE
         SUM(CASE WHEN first_gen_cancer_date IS NOT NULL THEN 1 ELSE 0 END) AS n_with_gen_cancer_dx,
         SUM(CASE WHEN first_met_date IS NOT NULL THEN 1 ELSE 0 END) AS n_with_met,
         SUM(CASE WHEN first_l01_date IS NOT NULL THEN 1 ELSE 0 END) AS n_with_l01
-    FROM a9of9doxpatient_char
+    FROM vcbo5u4zpatient_char
     GROUP BY GROUPING SETS (
         (),
         (EXTRACT(YEAR FROM index_date))
@@ -2774,22 +2859,22 @@ SELECT x.time_window,
     CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE COALESCE(ts.lq_days_first,       tba.lq_days_first)       END AS lq_days,
     CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE COALESCE(ts.median_days_first,   tba.median_days_first)   END AS median_days,
     CASE WHEN x.n_patients <= @min_cell_count THEN NULL ELSE COALESCE(ts.uq_days_first,       tba.uq_days_first)       END AS uq_days
-FROM (SELECT 'all'    AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM a9of9doxevent_code_counts
+FROM (SELECT 'all'    AS time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM vcbo5u4zevent_code_counts
       UNION ALL
-    SELECT 'before'  time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM a9of9doxevent_code_counts_before_after                WHERE time_relative = 'BEFORE'
+    SELECT 'before'  time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM vcbo5u4zevent_code_counts_before_after                WHERE time_relative = 'BEFORE'
         UNION ALL
-    SELECT 'after'   time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM a9of9doxevent_code_counts_before_after            WHERE time_relative = 'AFTER'
+    SELECT 'after'   time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM vcbo5u4zevent_code_counts_before_after            WHERE time_relative = 'AFTER'
        UNION ALL
-    SELECT 'before'  time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM a9of9doxevent_code_counts_before_after_first_met    WHERE time_relative = 'BEFORE'
+    SELECT 'before'  time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM vcbo5u4zevent_code_counts_before_after_first_met    WHERE time_relative = 'BEFORE'
        UNION ALL
-    SELECT 'after'   time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM a9of9doxevent_code_counts_before_after_first_met  WHERE time_relative = 'AFTER'
+    SELECT 'after'   time_window, anchor_event, event_family, concept_id, n_records, n_patients FROM vcbo5u4zevent_code_counts_before_after_first_met  WHERE time_relative = 'AFTER'
  ) x
-LEFT JOIN a9of9doxevent_code_timing_summary ts
+LEFT JOIN vcbo5u4zevent_code_timing_summary ts
   ON x.time_window = 'all'
  AND x.anchor_event = ts.anchor_event
  AND x.event_family = ts.event_family
  AND x.concept_id   = ts.concept_id
-LEFT JOIN a9of9doxevent_code_timing_before_after_summary tba
+LEFT JOIN vcbo5u4zevent_code_timing_before_after_summary tba
   ON x.time_window != 'all'
  AND x.anchor_event = tba.anchor_event
  AND x.event_family = tba.event_family
@@ -2828,7 +2913,7 @@ WITH dx_met_base AS (SELECT EXTRACT(YEAR FROM index_date) AS index_year_int,
             WHEN days_dx_to_met <= 365   THEN 'AFTER_91_365'
             ELSE 'AFTER_GT365'
         END AS direction
-    FROM a9of9doxpatient_char
+    FROM vcbo5u4zpatient_char
  ),
 dx_l01_base AS (SELECT EXTRACT(YEAR FROM index_date) AS index_year_int,
         CASE
@@ -2841,7 +2926,7 @@ dx_l01_base AS (SELECT EXTRACT(YEAR FROM index_date) AS index_year_int,
             WHEN days_dx_to_l01 <= 365   THEN 'AFTER_91_365'
             ELSE 'AFTER_GT365'
         END AS direction
-    FROM a9of9doxpatient_char
+    FROM vcbo5u4zpatient_char
  ),
 met_l01_base AS (SELECT EXTRACT(YEAR FROM first_met_date) AS index_year_int,
         CASE
@@ -2854,7 +2939,7 @@ met_l01_base AS (SELECT EXTRACT(YEAR FROM first_met_date) AS index_year_int,
             WHEN days_met_to_l01 <= 365  THEN 'AFTER_91_365'
             ELSE 'AFTER_GT365'
         END AS direction
-    FROM a9of9doxpatient_char
+    FROM vcbo5u4zpatient_char
       WHERE first_met_date IS NOT NULL
  )
 SELECT x.pair,
@@ -2925,13 +3010,13 @@ SELECT x.timing_type,
     CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p80_days END AS p80_days,
     CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p90_days END AS p90_days,
     CASE WHEN x.n_patients_with_pair <= @min_cell_count THEN NULL ELSE x.p95_days END AS p95_days
-FROM (SELECT 'first_to_first'          AS timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM a9of9doxtiming_pair_summary
+FROM (SELECT 'first_to_first'          AS timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM vcbo5u4ztiming_pair_summary
       UNION ALL
-    SELECT 'first_to_closest'         timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM a9of9doxtiming_pair_summary_first_to_closest
+    SELECT 'first_to_closest'         timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM vcbo5u4ztiming_pair_summary_first_to_closest
       UNION ALL
-    SELECT 'first_to_closest_before'  timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM a9of9doxtiming_pair_summary_first_to_closest_before
+    SELECT 'first_to_closest_before'  timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM vcbo5u4ztiming_pair_summary_first_to_closest_before
       UNION ALL
-    SELECT 'first_to_closest_after'   timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM a9of9doxtiming_pair_summary_first_to_closest_after
+    SELECT 'first_to_closest_after'   timing_type, from_event, to_event, n_patients_with_pair, p05_days, p10_days, p20_days, p25_days, p30_days, p40_days, p50_days, p60_days, p70_days, p75_days, p80_days, p90_days, p95_days FROM vcbo5u4ztiming_pair_summary_first_to_closest_after
  ) x
 ORDER BY x.timing_type, x.from_event, x.to_event
  ;
@@ -2939,7 +3024,7 @@ ORDER BY x.timing_type, x.from_event, x.to_event
 --    Same structure as chunk 04 (final_timing_pairwise.csv) but grouped by year.
 --    Year is anchored on the from_event: DX-anchored pairs use YEAR(index_date),
 --    MET-anchored pairs use YEAR(first_met_date).
---    Used for year-over-year plots and for the per-year columns in the §06 stability matrix.
+--    Used for year-over-year plots and for the per-year columns in the <U+00A7>06 stability matrix.
 --    Small-cell suppression applied.
 SELECT x.timing_type,
     x.index_year,
@@ -2961,9 +3046,9 @@ FROM (SELECT 'first_to_first' AS timing_type,
             CASE WHEN p.from_event = 'MET' THEN EXTRACT(YEAR FROM ms.first_met_date) ELSE EXTRACT(YEAR FROM pc.index_date) END AS index_year_int,
             ROW_NUMBER() OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN EXTRACT(YEAR FROM ms.first_met_date) ELSE EXTRACT(YEAR FROM pc.index_date) END, p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
             COUNT(*)     OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN EXTRACT(YEAR FROM ms.first_met_date) ELSE EXTRACT(YEAR FROM pc.index_date) END, p.from_event, p.to_event)                    AS cnt
-        FROM a9of9doxpatient_timing_pairs p
-        JOIN a9of9doxpatient_char pc    ON p.person_id = pc.person_id
-        LEFT JOIN a9of9doxmet_summary ms ON p.person_id = ms.person_id
+        FROM vcbo5u4zpatient_timing_pairs p
+        JOIN vcbo5u4zpatient_char pc    ON p.person_id = pc.person_id
+        LEFT JOIN vcbo5u4zmet_summary ms ON p.person_id = ms.person_id
      ) y
     GROUP BY index_year_int, from_event, to_event
       UNION ALL
@@ -2981,9 +3066,9 @@ FROM (SELECT 'first_to_first' AS timing_type,
             CASE WHEN p.from_event = 'MET' THEN EXTRACT(YEAR FROM ms.first_met_date) ELSE EXTRACT(YEAR FROM pc.index_date) END AS index_year_int,
             ROW_NUMBER() OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN EXTRACT(YEAR FROM ms.first_met_date) ELSE EXTRACT(YEAR FROM pc.index_date) END, p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
             COUNT(*)     OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN EXTRACT(YEAR FROM ms.first_met_date) ELSE EXTRACT(YEAR FROM pc.index_date) END, p.from_event, p.to_event)                    AS cnt
-        FROM a9of9doxpatient_timing_pairs_first_to_closest_after p
-        JOIN a9of9doxpatient_char pc    ON p.person_id = pc.person_id
-        LEFT JOIN a9of9doxmet_summary ms ON p.person_id = ms.person_id
+        FROM vcbo5u4zpatient_timing_pairs_first_to_closest_after p
+        JOIN vcbo5u4zpatient_char pc    ON p.person_id = pc.person_id
+        LEFT JOIN vcbo5u4zmet_summary ms ON p.person_id = ms.person_id
      ) y
     GROUP BY index_year_int, from_event, to_event
  ) x
@@ -2993,93 +3078,305 @@ ORDER BY
     x.to_event,
     CAST(x.index_year AS INT)
  ;
--- 6) Windowed ODX (and GDX) concept prevalence relative to anchor date
---    For each anchor / event family / concept, counts distinct patients with
---    at least one event in each time window around the anchor date.
+-- 6b) Directional ODX / GDX prevalence expressed CUMULATIVELY (CDF-style), so an
+--     exclusion look-back (before) or follow-up (after) cutoff can be read off
+--     directly. Cumulative companion to the disjoint bands in chunk 06; same
+--     population, same closest-event-per-side construction, same two anchors.
 --
---    Anchors:
---      INDEX     : DX index_date (all DX cohort)
---      FIRST_MET : first_met_date (MET subgroup only)
+--     For each anchor / event family / concept, the number of DISTINCT PATIENTS
+--     whose closest event on a side sits WITHIN each day threshold of the anchor.
+--     Because a patient counts as "within X" whenever ANY event on that side is
+--     within X days of the anchor, n_within_Xd_before is exactly the number of
+--     patients an X-day look-back exclusion would capture for this concept.
+--     Counts are cumulative and monotonically non-decreasing across thresholds.
 --
---    Windows (days = event_date - anchor_date):
---      pm30d      : -30 <= days <= 30
---      pm90d      : -90 <= days <= 90
---      pm180d     : -180 <= days <= 180
---      pm1yr      : -365 <= days <= 365
---      ever_before: days < 0
---      ever_after : days >= 0
---      ever       : any time
+--     Anchors (both surfaced): INDEX (DX index_date, full DX cohort) and
+--     FIRST_MET (first_met_date, MET subgroup only).
+--     Families: ODX (other specific cancer dx), GDX (general / non-specific).
+--     days = DATEDIFF(DAY, anchor_date, event_date); before = days <= -1,
+--     after = days >= 1, day 0 its own category (never folded into a side).
 --
---    Covers ODX and GDX families (clinically relevant exclusion criteria).
---    Restricted to top concepts by overall patient count; report builder
---    will further limit to top N.
+--     Columns:
+--       n_ever            : distinct patients with any event of the concept, any time.
+--       n_before_ever     : distinct patients with any event before the anchor
+--                           (the denominator for the before CDF; the tail beyond
+--                           2 yr is n_before_ever - n_within_730d_before).
+--       n_within_30d_before ... n_within_730d_before : cumulative before counts
+--                           (patients with a before event within 30/90/180/365/730 days).
+--       median_days_before: median of days-before over patients with any before
+--                           event, days-before = distance of the closest-before
+--                           event; framework ordered-set median convention
+--                           (lower-middle for even n, as in chunks 16-17, 23, 27-28).
+--       n_day0            : distinct patients with an event on the anchor day.
+--       n_after_ever, n_within_30d_after ... n_within_730d_after, median_days_after:
+--                           mirror of the before columns on the after side.
 --
---    Small-cell suppression: each count <= @min_cell_count suppressed to -@min_cell_count.
-WITH index_events AS (SELECT 'INDEX' AS anchor_event, 'ODX' AS event_family, e.concept_id, e.person_id,
+--     Covers ODX and GDX. All concepts reported; report builder limits to top N.
+--
+--     Small-cell suppression: each count in (0, @min_cell_count] set to
+--     -@min_cell_count; a side median set to NULL when that side's denominator
+--     (n_before_ever / n_after_ever) is <= @min_cell_count.
+WITH events AS (SELECT 'INDEX' AS anchor_event, 'ODX' AS event_family, e.person_id, e.concept_id,
         CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)) AS days_from_anchor
-    FROM a9of9doxother_dx_events e
-    JOIN a9of9doxcohort c ON e.person_id = c.person_id
+    FROM vcbo5u4zother_dx_events e
+    JOIN vcbo5u4zcohort c ON e.person_id = c.person_id
       UNION ALL
-    SELECT 'INDEX'  anchor_event, 'GDX'  event_family, e.concept_id, e.person_id,
-        CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)) AS days_from_anchor
-    FROM a9of9doxgen_cancer_events e
-    JOIN a9of9doxcohort c  ON e.person_id = c.person_id
- ),
-met_events AS (SELECT 'FIRST_MET' AS anchor_event, 'ODX' AS event_family, e.concept_id, e.person_id,
-        CEIL(CAST(e.event_date AS DATE) - CAST(ms.first_met_date AS DATE)) AS days_from_anchor
-    FROM a9of9doxother_dx_events e
-    JOIN a9of9doxcohort c ON e.person_id = c.person_id
-    JOIN a9of9doxmet_summary ms ON ms.person_id = c.person_id
-        WHERE ms.first_met_date IS NOT NULL
-       UNION ALL
-    SELECT 'FIRST_MET'  anchor_event, 'GDX'  event_family, e.concept_id, e.person_id,
+    SELECT 'INDEX'  anchor_event, 'GDX'  event_family, e.person_id, e.concept_id,
+        CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE))  days_from_anchor
+    FROM vcbo5u4zgen_cancer_events e
+    JOIN vcbo5u4zcohort c  ON e.person_id = c.person_id
+      UNION ALL
+    SELECT 'FIRST_MET'  anchor_event, 'ODX'  event_family, e.person_id, e.concept_id,
         CEIL(CAST(e.event_date AS DATE) - CAST(ms.first_met_date AS DATE))  days_from_anchor
-    FROM a9of9doxgen_cancer_events e
-    JOIN a9of9doxcohort c  ON e.person_id = c.person_id
-    JOIN a9of9doxmet_summary ms ON ms.person_id = c.person_id
+    FROM vcbo5u4zother_dx_events e
+    JOIN vcbo5u4zcohort c  ON e.person_id = c.person_id
+    JOIN vcbo5u4zmet_summary ms ON ms.person_id = c.person_id
+              WHERE ms.first_met_date IS NOT NULL
+         UNION ALL
+    SELECT 'FIRST_MET'  anchor_event, 'GDX'  event_family, e.person_id, e.concept_id,
+        CEIL(CAST(e.event_date AS DATE) - CAST(ms.first_met_date AS DATE))  days_from_anchor
+    FROM vcbo5u4zgen_cancer_events e
+    JOIN vcbo5u4zcohort c  ON e.person_id = c.person_id
+    JOIN vcbo5u4zmet_summary ms ON ms.person_id = c.person_id
      WHERE ms.first_met_date IS NOT NULL
  ),
-all_events AS (SELECT * FROM index_events
-      UNION ALL
-    SELECT * FROM met_events
- ),
-windowed AS (SELECT anchor_event,
+per_person AS (SELECT anchor_event,
         event_family,
         concept_id,
         person_id,
-        MAX(CASE WHEN days_from_anchor >= -30  AND days_from_anchor <= 30  THEN 1 ELSE 0 END) AS in_pm30d,
-        MAX(CASE WHEN days_from_anchor >= -90  AND days_from_anchor <= 90  THEN 1 ELSE 0 END) AS in_pm90d,
-        MAX(CASE WHEN days_from_anchor >= -180 AND days_from_anchor <= 180 THEN 1 ELSE 0 END) AS in_pm180d,
-        MAX(CASE WHEN days_from_anchor >= -365 AND days_from_anchor <= 365 THEN 1 ELSE 0 END) AS in_pm1yr,
-        MAX(CASE WHEN days_from_anchor < 0                                 THEN 1 ELSE 0 END) AS in_ever_before,
-        MAX(CASE WHEN days_from_anchor >= 0                                THEN 1 ELSE 0 END) AS in_ever_after,
-        1 AS in_ever
-    FROM all_events
+        MAX(CASE WHEN days_from_anchor = 0 THEN 1 ELSE 0 END)      AS has_day0,
+        MAX(CASE WHEN days_from_anchor < 0 THEN days_from_anchor END) AS closest_before_days,
+        MIN(CASE WHEN days_from_anchor > 0 THEN days_from_anchor END) AS closest_after_days
+    FROM events
     GROUP BY anchor_event, event_family, concept_id, person_id
+ ),
+dir AS (SELECT anchor_event,
+        event_family,
+        concept_id,
+        person_id,
+        has_day0,
+        CASE WHEN closest_before_days IS NULL THEN NULL ELSE -closest_before_days END AS days_before,
+        closest_after_days AS days_after
+    FROM per_person
+ ),
+med_before AS (SELECT anchor_event,
+        event_family,
+        concept_id,
+        MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_before AS FLOAT) END) AS median_days_before
+    FROM (SELECT anchor_event,
+            event_family,
+            concept_id,
+            days_before,
+            ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, concept_id ORDER BY days_before) AS rn,
+            COUNT(*)     OVER (PARTITION BY anchor_event, event_family, concept_id)                      AS cnt
+        FROM dir
+          WHERE days_before IS NOT NULL
+     ) x
+    GROUP BY anchor_event, event_family, concept_id
+ ),
+med_after AS (SELECT anchor_event,
+        event_family,
+        concept_id,
+        MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_after AS FLOAT) END) AS median_days_after
+    FROM (SELECT anchor_event,
+            event_family,
+            concept_id,
+            days_after,
+            ROW_NUMBER() OVER (PARTITION BY anchor_event, event_family, concept_id ORDER BY days_after) AS rn,
+            COUNT(*)     OVER (PARTITION BY anchor_event, event_family, concept_id)                     AS cnt
+        FROM dir
+          WHERE days_after IS NOT NULL
+     ) x
+    GROUP BY anchor_event, event_family, concept_id
  ),
 agg AS (SELECT anchor_event,
         event_family,
         concept_id,
-        COUNT(*)            AS n_ever,
-        SUM(in_pm30d)       AS n_pm30d,
-        SUM(in_pm90d)       AS n_pm90d,
-        SUM(in_pm180d)      AS n_pm180d,
-        SUM(in_pm1yr)       AS n_pm1yr,
-        SUM(in_ever_before) AS n_ever_before,
-        SUM(in_ever_after)  AS n_ever_after
-    FROM windowed
+        COUNT(*)                                                       AS n_ever,
+        SUM(CASE WHEN days_before IS NOT NULL THEN 1 ELSE 0 END)       AS n_before_ever,
+        SUM(CASE WHEN days_before <= 30  THEN 1 ELSE 0 END)            AS n_before_30,
+        SUM(CASE WHEN days_before <= 90  THEN 1 ELSE 0 END)            AS n_before_90,
+        SUM(CASE WHEN days_before <= 180 THEN 1 ELSE 0 END)            AS n_before_180,
+        SUM(CASE WHEN days_before <= 365 THEN 1 ELSE 0 END)            AS n_before_365,
+        SUM(CASE WHEN days_before <= 730 THEN 1 ELSE 0 END)            AS n_before_730,
+        SUM(has_day0)                                                  AS n_day0,
+        SUM(CASE WHEN days_after IS NOT NULL THEN 1 ELSE 0 END)        AS n_after_ever,
+        SUM(CASE WHEN days_after <= 30  THEN 1 ELSE 0 END)             AS n_after_30,
+        SUM(CASE WHEN days_after <= 90  THEN 1 ELSE 0 END)             AS n_after_90,
+        SUM(CASE WHEN days_after <= 180 THEN 1 ELSE 0 END)             AS n_after_180,
+        SUM(CASE WHEN days_after <= 365 THEN 1 ELSE 0 END)             AS n_after_365,
+        SUM(CASE WHEN days_after <= 730 THEN 1 ELSE 0 END)             AS n_after_730
+    FROM dir
     GROUP BY anchor_event, event_family, concept_id
  )
 SELECT a.anchor_event,
     a.event_family,
     a.concept_id,
     CASE WHEN a.n_ever        > 0 AND a.n_ever        <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever        END AS n_ever,
-    CASE WHEN a.n_pm30d       > 0 AND a.n_pm30d       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm30d       END AS n_pm30d,
-    CASE WHEN a.n_pm90d       > 0 AND a.n_pm90d       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm90d       END AS n_pm90d,
-    CASE WHEN a.n_pm180d      > 0 AND a.n_pm180d      <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm180d      END AS n_pm180d,
-    CASE WHEN a.n_pm1yr       > 0 AND a.n_pm1yr       <= @min_cell_count THEN -@min_cell_count ELSE a.n_pm1yr       END AS n_pm1yr,
-    CASE WHEN a.n_ever_before > 0 AND a.n_ever_before <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_before END AS n_ever_before,
-    CASE WHEN a.n_ever_after  > 0 AND a.n_ever_after  <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_after  END AS n_ever_after
+    CASE WHEN a.n_before_ever > 0 AND a.n_before_ever <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_ever END AS n_before_ever,
+    CASE WHEN a.n_before_30   > 0 AND a.n_before_30   <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_30   END AS n_within_30d_before,
+    CASE WHEN a.n_before_90   > 0 AND a.n_before_90   <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_90   END AS n_within_90d_before,
+    CASE WHEN a.n_before_180  > 0 AND a.n_before_180  <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_180  END AS n_within_180d_before,
+    CASE WHEN a.n_before_365  > 0 AND a.n_before_365  <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_365  END AS n_within_365d_before,
+    CASE WHEN a.n_before_730  > 0 AND a.n_before_730  <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_730  END AS n_within_730d_before,
+    CASE WHEN a.n_before_ever <= @min_cell_count THEN NULL ELSE mb.median_days_before END AS median_days_before,
+    CASE WHEN a.n_day0        > 0 AND a.n_day0        <= @min_cell_count THEN -@min_cell_count ELSE a.n_day0        END AS n_day0,
+    CASE WHEN a.n_after_ever  > 0 AND a.n_after_ever  <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_ever  END AS n_after_ever,
+    CASE WHEN a.n_after_30    > 0 AND a.n_after_30    <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_30    END AS n_within_30d_after,
+    CASE WHEN a.n_after_90    > 0 AND a.n_after_90    <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_90    END AS n_within_90d_after,
+    CASE WHEN a.n_after_180   > 0 AND a.n_after_180   <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_180   END AS n_within_180d_after,
+    CASE WHEN a.n_after_365   > 0 AND a.n_after_365   <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_365   END AS n_within_365d_after,
+    CASE WHEN a.n_after_730   > 0 AND a.n_after_730   <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_730   END AS n_within_730d_after,
+    CASE WHEN a.n_after_ever  <= @min_cell_count THEN NULL ELSE ma.median_days_after END AS median_days_after
+FROM agg a
+LEFT JOIN med_before mb
+  ON  mb.anchor_event = a.anchor_event
+  AND mb.event_family = a.event_family
+  AND mb.concept_id   = a.concept_id
+LEFT JOIN med_after ma
+  ON  ma.anchor_event = a.anchor_event
+  AND ma.event_family = a.event_family
+  AND ma.concept_id   = a.concept_id
+ORDER BY
+    CASE WHEN a.anchor_event = 'INDEX' THEN 0 ELSE 1 END,
+    a.event_family,
+    a.n_ever DESC,
+    a.concept_id
+ ;
+-- 6) Directional ODX / GDX concept prevalence relative to the anchor date, at
+--    fixed clinical time points, with before and after kept strictly separate and
+--    day 0 as its own category. Replaces the earlier symmetric (+/-) windowed
+--    output (the +/- windows conflated pre- and post-anchor coding, which have
+--    different clinical meaning for exclusion-criteria design).
+--
+--    For each anchor / event family / concept this counts DISTINCT PATIENTS by
+--    where the code sits in time relative to the anchor. Before and after are
+--    never combined into a symmetric window. The event closest to the anchor on
+--    each side places the patient into exactly one before band and/or one after
+--    band, so within a side the bands partition that side's patients. This is the
+--    disjoint-band "quick scan" companion to the cumulative CDF in chunk 06b.
+--
+--    Anchors (framework two-anchor convention, both surfaced):
+--      INDEX     : DX index_date (full DX cohort, #cohort)
+--      FIRST_MET : first_met_date (MET subgroup only; patients with a first MET)
+--
+--    Event families:
+--      ODX : other specific cancer diagnoses (competing-cancer exclusion codes)
+--      GDX : general / non-specific cancer diagnoses (broad ancestor codes)
+--
+--    days = DATEDIFF(DAY, anchor_date, event_date). Bands are placed on the event
+--    CLOSEST to the anchor on each side (nearest-before for the before bands,
+--    nearest-after for the after bands):
+--      before side (days <= -1), by days-before = -days of the closest-before event:
+--        n_before_gt730   : > 730 days before  (more than 2 yr)
+--        n_before_366_730 : 366-730 days before (1-2 yr)
+--        n_before_181_365 : 181-365 days before
+--        n_before_91_180  : 91-180 days before
+--        n_before_31_90   : 31-90 days before
+--        n_before_1_30    : 1-30 days before
+--      day 0 (its own category, never folded into before or after):
+--        n_day0           : an event on the anchor day (days = 0)
+--      after side (days >= 1), by days-after of the closest-after event:
+--        n_after_1_30 ... n_after_gt730 : mirror of the before bands, forward
+--    Side totals (each = the sum of that side's bands = any event on that side):
+--        n_before_ever, n_after_ever
+--    Overall:
+--        n_ever : distinct patients with any event of the concept at any time.
+--
+--    n_ever is NOT the sum of the columns: one patient may have events before,
+--    on, and after the anchor and so appear in a before band, in n_day0, and in
+--    an after band. Within a single side the bands ARE a clean partition
+--    (n_before_ever = sum of before bands; n_after_ever = sum of after bands).
+--
+--    Covers ODX and GDX. All concepts are reported; the report builder limits to
+--    top N by n_ever.
+--
+--    Small-cell suppression: each count in (0, @min_cell_count] set to
+--    -@min_cell_count.
+WITH events AS (SELECT 'INDEX' AS anchor_event, 'ODX' AS event_family, e.person_id, e.concept_id,
+        CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE)) AS days_from_anchor
+    FROM vcbo5u4zother_dx_events e
+    JOIN vcbo5u4zcohort c ON e.person_id = c.person_id
+      UNION ALL
+    SELECT 'INDEX'  anchor_event, 'GDX'  event_family, e.person_id, e.concept_id,
+        CEIL(CAST(e.event_date AS DATE) - CAST(c.index_date AS DATE))  days_from_anchor
+    FROM vcbo5u4zgen_cancer_events e
+    JOIN vcbo5u4zcohort c  ON e.person_id = c.person_id
+      UNION ALL
+    SELECT 'FIRST_MET'  anchor_event, 'ODX'  event_family, e.person_id, e.concept_id,
+        CEIL(CAST(e.event_date AS DATE) - CAST(ms.first_met_date AS DATE))  days_from_anchor
+    FROM vcbo5u4zother_dx_events e
+    JOIN vcbo5u4zcohort c  ON e.person_id = c.person_id
+    JOIN vcbo5u4zmet_summary ms ON ms.person_id = c.person_id
+              WHERE ms.first_met_date IS NOT NULL
+         UNION ALL
+    SELECT 'FIRST_MET'  anchor_event, 'GDX'  event_family, e.person_id, e.concept_id,
+        CEIL(CAST(e.event_date AS DATE) - CAST(ms.first_met_date AS DATE))  days_from_anchor
+    FROM vcbo5u4zgen_cancer_events e
+    JOIN vcbo5u4zcohort c  ON e.person_id = c.person_id
+    JOIN vcbo5u4zmet_summary ms ON ms.person_id = c.person_id
+     WHERE ms.first_met_date IS NOT NULL
+ ),
+per_person AS (SELECT anchor_event,
+        event_family,
+        concept_id,
+        person_id,
+        MAX(CASE WHEN days_from_anchor = 0 THEN 1 ELSE 0 END)      AS has_day0,
+        MAX(CASE WHEN days_from_anchor < 0 THEN days_from_anchor END) AS closest_before_days,
+        MIN(CASE WHEN days_from_anchor > 0 THEN days_from_anchor END) AS closest_after_days
+    FROM events
+    GROUP BY anchor_event, event_family, concept_id, person_id
+ ),
+dir AS (SELECT anchor_event,
+        event_family,
+        concept_id,
+        person_id,
+        has_day0,
+        CASE WHEN closest_before_days IS NULL THEN NULL ELSE -closest_before_days END AS days_before,
+        closest_after_days AS days_after
+    FROM per_person
+ ),
+agg AS (SELECT anchor_event,
+        event_family,
+        concept_id,
+        COUNT(*)                                                       AS n_ever,
+        SUM(CASE WHEN days_before IS NOT NULL       THEN 1 ELSE 0 END) AS n_before_ever,
+        SUM(CASE WHEN days_before > 730             THEN 1 ELSE 0 END) AS n_before_gt730,
+        SUM(CASE WHEN days_before BETWEEN 366 AND 730 THEN 1 ELSE 0 END) AS n_before_366_730,
+        SUM(CASE WHEN days_before BETWEEN 181 AND 365 THEN 1 ELSE 0 END) AS n_before_181_365,
+        SUM(CASE WHEN days_before BETWEEN 91  AND 180 THEN 1 ELSE 0 END) AS n_before_91_180,
+        SUM(CASE WHEN days_before BETWEEN 31  AND 90  THEN 1 ELSE 0 END) AS n_before_31_90,
+        SUM(CASE WHEN days_before BETWEEN 1   AND 30  THEN 1 ELSE 0 END) AS n_before_1_30,
+        SUM(has_day0)                                                  AS n_day0,
+        SUM(CASE WHEN days_after BETWEEN 1   AND 30  THEN 1 ELSE 0 END) AS n_after_1_30,
+        SUM(CASE WHEN days_after BETWEEN 31  AND 90  THEN 1 ELSE 0 END) AS n_after_31_90,
+        SUM(CASE WHEN days_after BETWEEN 91  AND 180 THEN 1 ELSE 0 END) AS n_after_91_180,
+        SUM(CASE WHEN days_after BETWEEN 181 AND 365 THEN 1 ELSE 0 END) AS n_after_181_365,
+        SUM(CASE WHEN days_after BETWEEN 366 AND 730 THEN 1 ELSE 0 END) AS n_after_366_730,
+        SUM(CASE WHEN days_after > 730              THEN 1 ELSE 0 END) AS n_after_gt730,
+        SUM(CASE WHEN days_after IS NOT NULL        THEN 1 ELSE 0 END) AS n_after_ever
+    FROM dir
+    GROUP BY anchor_event, event_family, concept_id
+ )
+SELECT a.anchor_event,
+    a.event_family,
+    a.concept_id,
+    CASE WHEN a.n_ever           > 0 AND a.n_ever           <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever           END AS n_ever,
+    CASE WHEN a.n_before_ever    > 0 AND a.n_before_ever    <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_ever    END AS n_before_ever,
+    CASE WHEN a.n_before_gt730   > 0 AND a.n_before_gt730   <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_gt730   END AS n_before_gt730,
+    CASE WHEN a.n_before_366_730 > 0 AND a.n_before_366_730 <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_366_730 END AS n_before_366_730,
+    CASE WHEN a.n_before_181_365 > 0 AND a.n_before_181_365 <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_181_365 END AS n_before_181_365,
+    CASE WHEN a.n_before_91_180  > 0 AND a.n_before_91_180  <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_91_180  END AS n_before_91_180,
+    CASE WHEN a.n_before_31_90   > 0 AND a.n_before_31_90   <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_31_90   END AS n_before_31_90,
+    CASE WHEN a.n_before_1_30    > 0 AND a.n_before_1_30    <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_1_30    END AS n_before_1_30,
+    CASE WHEN a.n_day0           > 0 AND a.n_day0           <= @min_cell_count THEN -@min_cell_count ELSE a.n_day0           END AS n_day0,
+    CASE WHEN a.n_after_1_30     > 0 AND a.n_after_1_30     <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_1_30     END AS n_after_1_30,
+    CASE WHEN a.n_after_31_90    > 0 AND a.n_after_31_90    <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_31_90    END AS n_after_31_90,
+    CASE WHEN a.n_after_91_180   > 0 AND a.n_after_91_180   <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_91_180   END AS n_after_91_180,
+    CASE WHEN a.n_after_181_365  > 0 AND a.n_after_181_365  <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_181_365  END AS n_after_181_365,
+    CASE WHEN a.n_after_366_730  > 0 AND a.n_after_366_730  <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_366_730  END AS n_after_366_730,
+    CASE WHEN a.n_after_gt730    > 0 AND a.n_after_gt730    <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_gt730    END AS n_after_gt730,
+    CASE WHEN a.n_after_ever     > 0 AND a.n_after_ever     <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_ever     END AS n_after_ever
 FROM agg a
 ORDER BY
     CASE WHEN a.anchor_event = 'INDEX' THEN 0 ELSE 1 END,
@@ -3110,7 +3407,7 @@ WITH window_bounds AS (SELECT 'INDEX' AS anchor_event,
         c.person_id,
         c.index_date AS anchor_date,
         w.window_index
-    FROM a9of9doxcohort c
+    FROM vcbo5u4zcohort c
     CROSS JOIN (SELECT -12 AS window_index  FROM DUAL  UNION ALL SELECT -11   FROM DUAL  UNION ALL SELECT -10
           FROM DUAL  UNION ALL SELECT -9    FROM DUAL  UNION ALL SELECT -8    FROM DUAL  UNION ALL SELECT -7
           FROM DUAL  UNION ALL SELECT -6    FROM DUAL  UNION ALL SELECT -5    FROM DUAL  UNION ALL SELECT -4
@@ -3138,7 +3435,7 @@ WITH window_bounds AS (SELECT 'INDEX' AS anchor_event,
         ms.person_id,
         ms.first_met_date  anchor_date,
         w.window_index
-    FROM a9of9doxmet_summary ms
+    FROM vcbo5u4zmet_summary ms
     CROSS JOIN (SELECT -6  AS window_index  FROM DUAL  UNION ALL SELECT -5    FROM DUAL  UNION ALL SELECT -4
           FROM DUAL  UNION ALL SELECT -3    FROM DUAL  UNION ALL SELECT -2    FROM DUAL  UNION ALL SELECT -1
           FROM DUAL  UNION ALL SELECT 0    FROM DUAL  UNION ALL SELECT 1    FROM DUAL  UNION ALL SELECT 2
@@ -3165,7 +3462,7 @@ window_l01 AS (SELECT wb.anchor_event,
             END
         ) AS has_l01_in_window
     FROM window_bounds wb
-    LEFT JOIN a9of9doxl01_events le
+    LEFT JOIN vcbo5u4zl01_events le
       ON wb.person_id = le.person_id
     GROUP BY wb.anchor_event, wb.person_id, wb.window_index, wb.anchor_date
  ),
@@ -3224,11 +3521,11 @@ SELECT s.prevalence_year,
     CASE WHEN s.n_patients <= @min_cell_count THEN NULL ELSE f.lq_followup_days END AS lq_followup_days,
     CASE WHEN s.n_patients <= @min_cell_count THEN NULL ELSE f.median_followup_days END AS median_followup_days,
     CASE WHEN s.n_patients <= @min_cell_count THEN NULL ELSE f.uq_followup_days END AS uq_followup_days
-FROM a9of9doxdeath_stratum_counts s
-LEFT JOIN a9of9doxdeath_timing_quantiles q
+FROM vcbo5u4zdeath_stratum_counts s
+LEFT JOIN vcbo5u4zdeath_timing_quantiles q
   ON s.prevalence_year = q.prevalence_year
  AND s.anchor_event = q.anchor_event
-LEFT JOIN a9of9doxfollowup_quantiles f
+LEFT JOIN vcbo5u4zfollowup_quantiles f
   ON s.prevalence_year = f.prevalence_year
  AND s.anchor_event = f.anchor_event
 ORDER BY
@@ -3241,14 +3538,14 @@ ORDER BY
 WITH anchor_persons AS (SELECT 'INDEX' AS anchor_event,
         c.person_id,
         c.index_date AS anchor_date
-    FROM a9of9doxpatient_char c
+    FROM vcbo5u4zpatient_char c
         WHERE c.index_date IS NOT NULL
        UNION ALL
     SELECT
         'FIRST_MET'  anchor_event,
         c.person_id,
         c.first_met_date  anchor_date
-    FROM a9of9doxpatient_char c
+    FROM vcbo5u4zpatient_char c
      WHERE c.first_met_date IS NOT NULL
  ),
 base AS (SELECT a.anchor_event,
@@ -3313,7 +3610,7 @@ WITH dx_days AS (SELECT DISTINCT
         person_id,
         event_date,
         concept_id
-    FROM a9of9doxdx_events
+    FROM vcbo5u4zdx_events
  )
 SELECT s.concept_id,
     CASE WHEN s.n_distinct_patients <= @min_cell_count THEN -@min_cell_count ELSE s.n_distinct_patients END AS n_distinct_patients,
@@ -3326,7 +3623,7 @@ FROM (SELECT concept_id,
  ) s
 ORDER BY s.n_distinct_patients DESC, s.concept_id
  ;
--- 11) L01 consecutive record gap distribution — decile summary
+-- 11) L01 consecutive record gap distribution <U+2014> decile summary
 --     Intermediate tables #l01_event_days and #l01_consecutive_gaps are
 --     built in 00_setup.sql (section L).
 --
@@ -3348,12 +3645,12 @@ SELECT subgroup,
 FROM (SELECT subgroup, person_id, gap_days,
         ROW_NUMBER() OVER (PARTITION BY subgroup ORDER BY gap_days) AS rn,
         COUNT(*)     OVER (PARTITION BY subgroup)                   AS cnt
-    FROM a9of9doxl01_consecutive_gaps
+    FROM vcbo5u4zl01_consecutive_gaps
  ) x
 GROUP BY subgroup
 ORDER BY subgroup
   ;
--- 12) L01 consecutive record gap distribution — bucketed histogram
+-- 12) L01 consecutive record gap distribution <U+2014> bucketed histogram
 --     Intermediate table #l01_consecutive_gaps is built in 00_setup.sql
 --     (section L).  Same subgroups as chunk 11 (ALL_L01, MET_L01).
 --
@@ -3368,7 +3665,7 @@ SELECT subgroup,
         ELSE 'ge365d'
     END AS gap_bucket,
     CASE WHEN  COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*)  END AS n_gaps
-FROM a9of9doxl01_consecutive_gaps
+FROM vcbo5u4zl01_consecutive_gaps
 GROUP BY subgroup,
     CASE
         WHEN gap_days <  30  THEN 'lt30d'
@@ -3389,10 +3686,10 @@ ORDER BY
         ELSE 6
     END)
   ;
--- 13) Death date vs observation period alignment — summary counts
+-- 13) Death date vs observation period alignment <U+2014> summary counts
 --     For patients in the DX cohort (and the FIRST_MET subgroup), reports:
 --       - n_death_before_obs : death_date < first observation_period_start
---                              (data quality error — rare but important)
+--                              (data quality error <U+2014> rare but important)
 --       - n_death_after_obs  : death_date > last  observation_period_end
 --                              (gap distribution summarized in chunk 14)
 --       - lq/median/uq/p90 percentiles of the post-obs gap (days).
@@ -3404,7 +3701,7 @@ WITH patient_obs AS (SELECT person_id,
         MIN(observation_period_start_date) AS first_obs_start,
         MAX(observation_period_end_date)   AS last_obs_end
     FROM @cdm_database_schema.observation_period
-      WHERE person_id IN (SELECT person_id FROM a9of9doxcohort )
+      WHERE person_id IN (SELECT person_id FROM vcbo5u4zcohort )
     GROUP BY person_id
  ),
 death_obs_gaps AS (SELECT c.person_id,
@@ -3423,9 +3720,9 @@ death_obs_gaps AS (SELECT c.person_id,
                 THEN 1
             ELSE 0
         END AS death_before_obs
-    FROM a9of9doxcohort c
-    INNER JOIN a9of9doxdeath_obs_status dos ON dos.person_id = c.person_id
-    LEFT JOIN a9of9doxmet_summary ms ON ms.person_id = c.person_id
+    FROM vcbo5u4zcohort c
+    INNER JOIN vcbo5u4zdeath_obs_status dos ON dos.person_id = c.person_id
+    LEFT JOIN vcbo5u4zmet_summary ms ON ms.person_id = c.person_id
     LEFT JOIN patient_obs po  ON po.person_id  = c.person_id
  )
 SELECT anchor_event,
@@ -3466,7 +3763,7 @@ FROM (SELECT 'INDEX' AS anchor_event,
      ) x
  ) agg
  ;
--- 14) Death date vs observation period — bucketed gap histogram
+-- 14) Death date vs observation period <U+2014> bucketed gap histogram
 --     Restricted to patients where death_date > obs_period_end_date.
 --     Exported for both INDEX (all DX cohort) and FIRST_MET (MET subgroup)
 --     so that each can be shown as a separate figure in the report.
@@ -3474,7 +3771,7 @@ WITH patient_obs AS (SELECT person_id,
         MIN(observation_period_start_date) AS first_obs_start,
         MAX(observation_period_end_date)   AS last_obs_end
     FROM @cdm_database_schema.observation_period
-      WHERE person_id IN (SELECT person_id FROM a9of9doxcohort )
+      WHERE person_id IN (SELECT person_id FROM vcbo5u4zcohort )
     GROUP BY person_id
  ),
 death_obs_gaps AS (SELECT c.person_id,
@@ -3484,9 +3781,9 @@ death_obs_gaps AS (SELECT c.person_id,
                 THEN CEIL(CAST(dos.death_date AS DATE) - CAST(po.last_obs_end AS DATE))
             ELSE NULL
         END AS gap_death_after_obs
-    FROM a9of9doxcohort c
-    INNER JOIN a9of9doxdeath_obs_status dos ON dos.person_id = c.person_id
-    LEFT JOIN a9of9doxmet_summary ms        ON ms.person_id  = c.person_id
+    FROM vcbo5u4zcohort c
+    INNER JOIN vcbo5u4zdeath_obs_status dos ON dos.person_id = c.person_id
+    LEFT JOIN vcbo5u4zmet_summary ms        ON ms.person_id  = c.person_id
     LEFT JOIN patient_obs po         ON po.person_id  = c.person_id
  ),
 bucketed AS (SELECT person_id,
@@ -3547,12 +3844,12 @@ SELECT subgroup,
     END AS days_bucket,
     CASE WHEN  COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*)  END AS n_patients
 FROM (SELECT e.person_id, COUNT(*) AS n_days, 'ALL_L01' AS subgroup
-    FROM a9of9doxl01_event_days e
+    FROM vcbo5u4zl01_event_days e
     GROUP BY e.person_id
       UNION ALL
     SELECT e.person_id, COUNT(*)  n_days, 'MET_L01' AS subgroup
-    FROM a9of9doxl01_event_days e
-    JOIN a9of9doxmet_summary ms ON e.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
+    FROM vcbo5u4zl01_event_days e
+    JOIN vcbo5u4zmet_summary ms ON e.person_id = ms.person_id AND ms.first_met_date IS NOT NULL
     GROUP BY e.person_id
  ) x
 GROUP BY subgroup,
@@ -3566,4 +3863,1947 @@ ORDER BY
     subgroup,
     MIN(n_days)
   ;
+-- 16) E. Observation-period characterization <U+2014> observability around the index
+--     How much observable time each patient has BEFORE the index (look-back) and
+--     AFTER the index (follow-up), reported as cumulative day-threshold counts:
+--     the number of patients with fewer than 30 / 90 / 180 / 365 days of
+--     observation on each side of the index. Look-back and follow-up are kept
+--     strictly separate (one row per side); day 0 sits on the follow-up side
+--     (follow-up = days from the index to the observation-period end, >= 0).
+--
+--     Observable time is measured inside the single observation period that
+--     CONTAINS the anchor date, so both sides are contiguous observable time:
+--       look-back_days = index_date - observation_period_start_date
+--       follow-up_days = observation_period_end_date - index_date
+--     A patient contributes only if the anchor date falls within one of their
+--     observation periods. For INDEX this holds for every cohort patient by
+--     construction (see #cohort in 00_setup.sql); for FIRST_MET it holds only
+--     for patients whose first metastasis date is inside an observation period.
+--
+--     Two anchors: INDEX (first qualifying DX = cohort index date) and FIRST_MET
+--     (first metastasis date). Source: #cohort, #met_summary (00_setup.sql) and
+--     @cdm_database_schema.observation_period.
+--     Small-cell suppression: threshold counts in (0, @min_cell_count] are set to
+--     -@min_cell_count; median set to NULL when the group denominator is suppressed.
+--     n_patients is an aggregate cohort denominator and is not suppressed, matching
+--     the existing death/prevalence chunks.
+WITH obs_around_anchor AS (SELECT 'INDEX' AS anchor_event,
+        c.person_id,
+        CEIL(CAST(c.index_date AS DATE) - CAST(op.observation_period_start_date AS DATE)) AS lookback_days,
+        CEIL(CAST(op.observation_period_end_date AS DATE) - CAST(c.index_date AS DATE))   AS followup_days
+    FROM vcbo5u4zcohort c
+    INNER JOIN @cdm_database_schema.observation_period op
+        ON  op.person_id = c.person_id
+        AND c.index_date BETWEEN op.observation_period_start_date
+                             AND op.observation_period_end_date
+      UNION ALL
+    -- FIRST_MET anchor: only patients whose first metastasis date is inside a period.
+    SELECT
+        'FIRST_MET'  anchor_event,
+        c.person_id,
+        CEIL(CAST(ms.first_met_date AS DATE) - CAST(op.observation_period_start_date AS DATE))  lookback_days,
+        CEIL(CAST(op.observation_period_end_date AS DATE) - CAST(ms.first_met_date AS DATE))   AS followup_days
+    FROM vcbo5u4zcohort c
+    INNER JOIN vcbo5u4zmet_summary ms
+         ON ms.person_id = c.person_id AND ms.first_met_date IS NOT NULL
+    INNER JOIN @cdm_database_schema.observation_period op
+        ON  op.person_id = c.person_id
+        AND ms.first_met_date BETWEEN op.observation_period_start_date
+                                  AND op.observation_period_end_date
+ ),
+obs_sided AS (SELECT anchor_event, person_id, 'LOOKBACK_BEFORE_ANCHOR' AS observation_side, lookback_days AS obs_days
+    FROM obs_around_anchor
+      UNION ALL
+    SELECT anchor_event, person_id, 'FOLLOWUP_AFTER_ANCHOR'   observation_side, followup_days AS obs_days
+    FROM obs_around_anchor
+ ),
+ranked AS (SELECT anchor_event,
+        observation_side,
+        obs_days,
+        ROW_NUMBER() OVER (PARTITION BY anchor_event, observation_side ORDER BY obs_days) AS rn,
+        COUNT(*)     OVER (PARTITION BY anchor_event, observation_side)                    AS cnt
+    FROM obs_sided
+ ),
+agg AS (SELECT anchor_event,
+        observation_side,
+        COUNT(*) AS n_patients,
+        SUM(CASE WHEN obs_days < 30  THEN 1 ELSE 0 END) AS n_lt_30d,
+        SUM(CASE WHEN obs_days < 90  THEN 1 ELSE 0 END) AS n_lt_90d,
+        SUM(CASE WHEN obs_days < 180 THEN 1 ELSE 0 END) AS n_lt_180d,
+        SUM(CASE WHEN obs_days < 365 THEN 1 ELSE 0 END) AS n_lt_365d,
+        MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(obs_days AS FLOAT) END) AS median_days
+    FROM ranked
+    GROUP BY anchor_event, observation_side
+ )
+SELECT anchor_event,
+    observation_side,
+    n_patients,
+    CASE WHEN n_lt_30d  > 0 AND n_lt_30d  <= @min_cell_count THEN -@min_cell_count ELSE n_lt_30d  END AS n_lt_30d,
+    CASE WHEN n_lt_90d  > 0 AND n_lt_90d  <= @min_cell_count THEN -@min_cell_count ELSE n_lt_90d  END AS n_lt_90d,
+    CASE WHEN n_lt_180d > 0 AND n_lt_180d <= @min_cell_count THEN -@min_cell_count ELSE n_lt_180d END AS n_lt_180d,
+    CASE WHEN n_lt_365d > 0 AND n_lt_365d <= @min_cell_count THEN -@min_cell_count ELSE n_lt_365d END AS n_lt_365d,
+    CASE WHEN n_patients <= @min_cell_count THEN NULL ELSE median_days END AS median_days
+FROM agg
+ORDER BY
+    CASE anchor_event WHEN 'INDEX' THEN 0 ELSE 1 END,
+    CASE observation_side WHEN 'LOOKBACK_BEFORE_ANCHOR' THEN 0 ELSE 1 END
+ ;
+-- 17) E. Observation-period characterization <U+2014> integrity checks
+--     Whether the observation period behaves the way a phenotype would assume.
+--     Long format: one row per (anchor_event, metric, stratum). Metrics:
+--
+--       PERIOD_TYPE_CONCEPT              (anchor_event = 'ALL')
+--           How the period is defined at this site. One row per distinct
+--           observation_period.period_type_concept_id among cohort patients.
+--           n_numerator   = distinct cohort patients with a period of this type
+--           n_denominator = distinct cohort patients with any period
+--           (states the definition/source: claims-enrollment vs EHR-estimated
+--            period types resolve to different concept ids; label upstream).
+--
+--       PATIENTS_WITH_MULTIPLE_OBS_PERIODS   (per anchor)
+--           n_numerator   = patients with more than one observation period (a gap)
+--           n_denominator = patients in this anchor's cohort
+--
+--       DEATHS_OUTSIDE_OBS_PERIOD            (per anchor)
+--           n_numerator   = deaths on/after the anchor recorded outside any period
+--           n_denominator = deaths on/after the anchor
+--           (read straight from #death_stratum_counts OVERALL rows.)
+--
+--       DECEDENTS_PERIOD_ENDS_AFTER_DEATH    (per anchor)
+--           n_numerator   = decedents whose last observation_period_end_date is
+--                           AFTER the death date (period runs past death)
+--           n_denominator = decedents (deaths on/after the anchor)
+--
+--       MEDIAN_DAYS_PERIOD_ENDS_PAST_DEATH   (per anchor)
+--           median_days   = median (last_obs_end - death_date) among the decedents
+--                           counted in DECEDENTS_PERIOD_ENDS_AFTER_DEATH
+--           n_denominator = count of those decedents
+--
+--     Anchors: INDEX (cohort index date) and FIRST_MET (first metastasis date).
+--     Sources: #cohort, #met_summary, #death_obs_status, #death_stratum_counts
+--     (00_setup.sql) and @cdm_database_schema.observation_period.
+--     Small-cell suppression: n_numerator in (0, @min_cell_count] set to
+--     -@min_cell_count; median set to NULL when its decedent denominator is
+--     suppressed. Aggregate cohort/death denominators are not suppressed.
+WITH patient_obs AS (SELECT person_id,
+        MAX(observation_period_end_date) AS last_obs_end,
+        COUNT(*)                         AS n_periods
+    FROM @cdm_database_schema.observation_period
+      WHERE person_id IN (SELECT person_id FROM vcbo5u4zcohort )
+    GROUP BY person_id
+ ),
+period_type_patients AS (SELECT op.period_type_concept_id,
+        COUNT(DISTINCT op.person_id) AS n_patients
+    FROM @cdm_database_schema.observation_period op
+      WHERE op.person_id IN (SELECT person_id FROM vcbo5u4zcohort )
+    GROUP BY op.period_type_concept_id
+ ),
+period_type_total AS (SELECT COUNT(DISTINCT person_id) AS n_patients_any_period
+    FROM @cdm_database_schema.observation_period
+      WHERE person_id IN (SELECT person_id FROM vcbo5u4zcohort )
+ ),
+-- Anchor cohorts: INDEX = full DX cohort; FIRST_MET = cohort with a metastasis.
+anchor_cohort AS (SELECT 'INDEX' AS anchor_event, c.person_id, po.n_periods
+    FROM vcbo5u4zcohort c
+    LEFT JOIN patient_obs po ON po.person_id = c.person_id
+      UNION ALL
+    SELECT 'FIRST_MET'  anchor_event, c.person_id, po.n_periods
+    FROM vcbo5u4zcohort c
+    INNER JOIN vcbo5u4zmet_summary ms ON ms.person_id = c.person_id AND ms.first_met_date IS NOT NULL
+    LEFT JOIN patient_obs po ON po.person_id = c.person_id
+ ),
+-- Decedents relative to each anchor, with whether the period runs past death.
+decedent_anchor AS (SELECT 'INDEX' AS anchor_event,
+        dos.death_date,
+        CASE WHEN po.last_obs_end > dos.death_date THEN 1 ELSE 0 END AS period_ends_after_death,
+        CASE WHEN po.last_obs_end > dos.death_date
+             THEN CEIL(CAST(po.last_obs_end AS DATE) - CAST(dos.death_date AS DATE)) END  AS days_past_death
+    FROM vcbo5u4zcohort c
+    INNER JOIN vcbo5u4zdeath_obs_status dos ON dos.person_id = c.person_id
+    LEFT JOIN patient_obs po ON po.person_id = c.person_id
+        WHERE dos.death_date >= c.index_date
+       UNION ALL
+    SELECT
+        'FIRST_MET'  anchor_event,
+        dos.death_date,
+        CASE WHEN po.last_obs_end > dos.death_date THEN 1 ELSE 0 END,
+        CASE WHEN po.last_obs_end > dos.death_date
+             THEN CEIL(CAST(po.last_obs_end AS DATE) - CAST(dos.death_date AS DATE)) END
+    FROM vcbo5u4zcohort c
+    INNER JOIN vcbo5u4zmet_summary ms ON ms.person_id = c.person_id AND ms.first_met_date IS NOT NULL
+    INNER JOIN vcbo5u4zdeath_obs_status dos ON dos.person_id = c.person_id
+    LEFT JOIN patient_obs po ON po.person_id = c.person_id
+     WHERE dos.death_date >= ms.first_met_date
+ ),
+decedent_days_ranked AS (SELECT anchor_event,
+        days_past_death,
+        ROW_NUMBER() OVER (PARTITION BY anchor_event ORDER BY days_past_death) AS rn,
+        COUNT(*)     OVER (PARTITION BY anchor_event)                          AS non_null_cnt
+    FROM decedent_anchor
+      WHERE days_past_death IS NOT NULL
+ ),
+metrics AS (SELECT 'ALL' AS anchor_event,
+        'PERIOD_TYPE_CONCEPT' AS metric,
+        CAST(ptp.period_type_concept_id AS VARCHAR(20)) AS stratum,
+        ptp.n_patients AS n_numerator,
+        ptt.n_patients_any_period AS n_denominator,
+        CAST(NULL AS FLOAT) AS median_days
+    FROM period_type_patients ptp
+    CROSS JOIN period_type_total ptt
+      UNION ALL
+    -- (2) patients with more than one observation period (a gap)
+    SELECT anchor_event,
+        'PATIENTS_WITH_MULTIPLE_OBS_PERIODS',
+        '',
+        SUM(CASE WHEN n_periods > 1 THEN 1 ELSE 0 END),
+        COUNT(*),
+        CAST(NULL AS FLOAT)
+    FROM anchor_cohort
+    GROUP BY anchor_event
+      UNION ALL
+    -- (3) deaths recorded outside any observation period
+    SELECT anchor_event,
+        'DEATHS_OUTSIDE_OBS_PERIOD',
+        '',
+        n_deaths_out_obs,
+        n_deaths,
+        CAST(NULL AS FLOAT)
+    FROM vcbo5u4zdeath_stratum_counts
+            WHERE prevalence_year = 'OVERALL'
+         UNION ALL
+    -- (4) decedents whose observation period ends after the death date
+    SELECT anchor_event,
+        'DECEDENTS_PERIOD_ENDS_AFTER_DEATH',
+        '',
+        SUM(period_ends_after_death),
+        COUNT(*),
+        CAST(NULL AS FLOAT)
+    FROM decedent_anchor
+    GROUP BY anchor_event
+      UNION ALL
+    -- (5) median days the period runs past death, among those decedents
+    SELECT
+        anchor_event,
+        'MEDIAN_DAYS_PERIOD_ENDS_PAST_DEATH',
+        '',
+        CAST(NULL AS INT),
+        MAX(non_null_cnt),
+        MIN(CASE WHEN 2.0 * rn >= non_null_cnt
+                 THEN CAST(days_past_death AS FLOAT) END)
+    FROM decedent_days_ranked
+    GROUP BY anchor_event
+ )
+SELECT anchor_event,
+    metric,
+    stratum,
+    CASE WHEN n_numerator IS NOT NULL AND n_numerator > 0 AND n_numerator <= @min_cell_count
+         THEN -@min_cell_count ELSE n_numerator END AS n_numerator,
+    n_denominator,
+    CASE WHEN median_days IS NOT NULL AND n_denominator IS NOT NULL AND n_denominator <= @min_cell_count
+         THEN NULL ELSE median_days END AS median_days
+FROM metrics
+ORDER BY
+    CASE metric
+        WHEN 'PERIOD_TYPE_CONCEPT'                 THEN 0
+        WHEN 'PATIENTS_WITH_MULTIPLE_OBS_PERIODS'  THEN 1
+        WHEN 'DEATHS_OUTSIDE_OBS_PERIOD'           THEN 2
+        WHEN 'DECEDENTS_PERIOD_ENDS_AFTER_DEATH'   THEN 3
+        WHEN 'MEDIAN_DAYS_PERIOD_ENDS_PAST_DEATH'  THEN 4
+        ELSE 9
+    END,
+    CASE anchor_event WHEN 'ALL' THEN 0 WHEN 'INDEX' THEN 1 ELSE 2 END,
+    stratum
+ ;
+-- 18) F. Index event record counts (part 1) <U+2014> how often the code repeats
+--     Distribution of the number of records per patient, for the anchor
+--     Diagnosis and the anchor Metastasis. This counts RECORDS (rows in the
+--     source table), not distinct days <U+2014> a heavily repeated code shows up here.
+--     (Part 2, chunk 19, measures the timescale between distinct Diagnosis days.)
+--
+--       DX  buckets: exactly 1 / 2 to 5 / 6 or more records per patient
+--       MET buckets: exactly 1 / 2 or more records per patient
+--
+--     Denominators (n_patients_total, repeated on each row of the family):
+--       DX  = cohort patients carrying the anchor Diagnosis (all of #dx_summary,
+--             one row per cohort patient, every cohort patient has >= 1 DX record)
+--       MET = cohort patients carrying an anchor Metastasis (all of #met_summary)
+--     A patient falls in exactly one bucket per family.
+--     Source: #dx_summary.n_dx_records, #met_summary.n_met_records (00_setup.sql).
+--     Small-cell suppression: n_patients in (0, @min_cell_count] set to
+--     -@min_cell_count. n_patients_total is an aggregate denominator, not suppressed.
+WITH family_counts AS (SELECT 'DX'  AS event_family, person_id, n_dx_records  AS n_records FROM vcbo5u4zdx_summary
+      UNION ALL
+    SELECT 'MET'  event_family, person_id, n_met_records AS n_records FROM vcbo5u4zmet_summary
+ ),
+bucketed AS (SELECT event_family,
+        person_id,
+        CASE
+            WHEN event_family = 'DX'  AND n_records = 1  THEN '1'
+            WHEN event_family = 'DX'  AND n_records <= 5 THEN '2_5'
+            WHEN event_family = 'DX'                     THEN '6plus'
+            WHEN event_family = 'MET' AND n_records = 1  THEN '1'
+            ELSE '2plus'
+        END AS record_count_bucket,
+        CASE
+            WHEN event_family = 'DX'  AND n_records = 1  THEN 1
+            WHEN event_family = 'DX'  AND n_records <= 5 THEN 2
+            WHEN event_family = 'DX'                     THEN 3
+            WHEN event_family = 'MET' AND n_records = 1  THEN 1
+            ELSE 2
+        END AS bucket_order
+    FROM family_counts
+ ),
+totals AS (SELECT event_family, COUNT(*) AS n_patients_total
+    FROM bucketed
+    GROUP BY event_family
+ )
+SELECT b.event_family,
+    b.record_count_bucket,
+     CASE WHEN  COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*)  END AS n_patients,
+    t.n_patients_total
+FROM bucketed b
+JOIN totals t ON t.event_family = b.event_family
+GROUP BY b.event_family, b.record_count_bucket, t.n_patients_total
+ORDER BY
+    CASE b.event_family WHEN 'DX' THEN 0 ELSE 1 END,
+    MIN(b.bucket_order)
+  ;
+-- 19) F. Index event record counts (part 2) <U+2014> on what timescale the code repeats
+--     For patients with more than one Diagnosis code, the time between
+--     consecutive Diagnosis codes, for the first two transitions only:
+--       DX_1_TO_2 : first Diagnosis day  -> second Diagnosis day
+--       DX_2_TO_3 : second Diagnosis day -> third  Diagnosis day
+--     bucketed by timeframe: within 30 days / 31 to 90 / 91 to 365 / more than a year.
+--
+--     JUDGMENT CALL (flag for review): "consecutive codes" is measured between
+--     DISTINCT Diagnosis DAYS, not raw records. Same-day duplicate records are
+--     collapsed first (SELECT DISTINCT person_id, event_date), mirroring the L01
+--     gap methodology (#l01_event_days in 00_setup.sql). Counting raw records
+--     instead would make almost every first-to-second gap 0 days (same-day
+--     administrative duplicates) and hide the coding timescale. Consequently
+--     every gap is >= 1 day and the "within 30 days" bucket is 1-30 days.
+--     Part 1 (chunk 18) counts records; this part measures timing between days.
+--
+--     Denominators (n_transitions_total, per transition = patients, since each
+--     patient contributes at most one gap per transition):
+--       DX_1_TO_2 = patients with >= 2 distinct Diagnosis days
+--       DX_2_TO_3 = patients with >= 3 distinct Diagnosis days
+--     Source: #dx_events restricted to #cohort (00_setup.sql).
+--     Small-cell suppression: n_transitions in (0, @min_cell_count] set to
+--     -@min_cell_count. n_transitions_total is an aggregate denominator, not suppressed.
+WITH dx_days AS (SELECT DISTINCT e.person_id, e.event_date AS event_day
+    FROM vcbo5u4zdx_events e
+    JOIN vcbo5u4zcohort c ON e.person_id = c.person_id
+ ),
+ranked AS (SELECT person_id,
+        event_day,
+        ROW_NUMBER() OVER (PARTITION BY person_id ORDER BY event_day)      AS day_rank,
+        LEAD(event_day) OVER (PARTITION BY person_id ORDER BY event_day)   AS next_day
+    FROM dx_days
+ ),
+transitions AS (SELECT CASE day_rank WHEN 1 THEN 'DX_1_TO_2' WHEN 2 THEN 'DX_2_TO_3' END AS transition,
+        CEIL(CAST(next_day AS DATE) - CAST(event_day AS DATE)) AS gap_days
+    FROM ranked
+      WHERE day_rank IN (1, 2)
+      AND next_day IS NOT NULL
+ ),
+bucketed AS (SELECT transition,
+        CASE
+            WHEN gap_days <= 30  THEN 'lte30d'
+            WHEN gap_days <= 90  THEN '31_90d'
+            WHEN gap_days <= 365 THEN '91_365d'
+            ELSE 'gt365d'
+        END AS gap_bucket,
+        CASE
+            WHEN gap_days <= 30  THEN 1
+            WHEN gap_days <= 90  THEN 2
+            WHEN gap_days <= 365 THEN 3
+            ELSE 4
+        END AS bucket_order
+    FROM transitions
+ ),
+totals AS (SELECT transition, COUNT(*) AS n_transitions_total
+    FROM bucketed
+    GROUP BY transition
+ )
+SELECT b.transition,
+    b.gap_bucket,
+     CASE WHEN  COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count ELSE COUNT(*)  END AS n_transitions,
+    t.n_transitions_total
+FROM bucketed b
+JOIN totals t ON t.transition = b.transition
+GROUP BY b.transition, b.gap_bucket, t.n_transitions_total
+ORDER BY b.transition, MIN(b.bucket_order)
+  ;
+-- 20) D. MET-first subgroup, part 1. Ordering of the first Metastasis and the
+--     first specific Diagnosis, among patients who carry a Metastasis code within
+--     the DX-anchored cohort.
+--     Every patient in this framework carries an anchor Diagnosis (DX) code by
+--     construction. The cohort is DX-anchored: a Diagnosis code from the anchor
+--     concept set is the entry point, and Metastasis is observed WITHIN that cohort,
+--     never as a separate way to enter it. Each patient who carries an anchor
+--     Metastasis (MET) measurement code (and therefore also an anchor DX code) is
+--     placed in exactly one category by which of two events is recorded first: the
+--     first MET and the first specific (anchor) DX. Same-day is its own category,
+--     never folded into either side.
+--
+--       DX_FIRST            first specific DX date < first MET date
+--       SAME_DAY            first specific DX date = first MET date
+--       MET_FIRST_THEN_DX   first MET date < first specific DX date
+--                           (the MET code predates the existing DX code; the DX code
+--                            always exists, it simply arrives later)
+--
+--     There is NO "Metastasis-only, never Diagnosis" category. A patient with a
+--     generic Metastasis code but no anchor DX code is not in this cohort at all.
+--     The MET concept set (AJCC/UICC stage 4, M1, Metastasis) is generic across
+--     cancer types, so a MET code without an anchor DX gives no evidence the patient
+--     has the cancer of interest. Only MET_FIRST_THEN_DX (is_met_first_subgroup = 1)
+--     is carried into parts 2 and 3.
+--
+--     Denominator (n_patients_met_total, repeated on each row):
+--       all patients with >= 1 anchor MET measurement code AND >= 1 anchor DX code
+--       at this site (the three categories sum to this total).
+--
+--     POPULATION. Built from #met_events (00_setup.sql, section F), which is
+--     @cdm_database_schema.measurement JOIN #met_concepts JOIN #anchor_person, so
+--     every person already carries an anchor DX code. #anchor_person is the
+--     DX-anchored cohort WITHOUT the observation-period-at-index gate that #cohort
+--     adds, so this count sits at or above Analysis F's #met_summary count (DX plus
+--     observation period at the index DX) and at or below a count of all MET carriers
+--     regardless of DX. The first specific DX per patient comes from #dx_events (all
+--     anchor-DX events, no observation-period gate), consistent with anchoring on
+--     #anchor_person. Because every #met_events person is in #anchor_person and hence
+--     in #dx_events, the DX join below matches every patient (no null-DX branch).
+--
+--     JUDGMENT CALL / FLAG (observation period). The population is anchored on
+--     "has an anchor DX code" (#anchor_person), NOT on "has an anchor DX code inside
+--     an observation period" (#cohort). Observation-period coverage is a separate,
+--     still-open decision, characterized on its own in Analysis E (chunks 16-17); it
+--     is deliberately not imposed here. See the accompanying report for the reasoned
+--     recommendation.
+--
+--     JUDGMENT CALL / FLAG (same-day). SAME_DAY = the first specific DX and the
+--     first MET fall on the identical calendar date; neither precedes the other.
+--
+--     Small-cell suppression: n_patients in (0, @min_cell_count] set to
+--     -@min_cell_count. n_patients_met_total is an aggregate denominator, not
+--     suppressed. A category with zero patients is absent (as in chunks 18-19).
+WITH met_all AS (SELECT person_id,
+        MIN(event_date) AS first_met_date
+    FROM vcbo5u4zmet_events
+    GROUP BY person_id
+ ),
+dx_all AS (SELECT person_id,
+        MIN(event_date) AS first_dx_date
+    FROM vcbo5u4zdx_events
+    GROUP BY person_id
+ ),
+classified AS (SELECT ma.person_id,
+        CASE
+            WHEN dx.first_dx_date < ma.first_met_date THEN 'DX_FIRST'
+            WHEN dx.first_dx_date = ma.first_met_date THEN 'SAME_DAY'
+            ELSE                                           'MET_FIRST_THEN_DX'
+        END AS ordering_category
+    FROM met_all ma
+    JOIN dx_all dx
+      ON dx.person_id = ma.person_id
+ ),
+totals AS (SELECT COUNT(*) AS n_patients_met_total FROM classified
+ )
+SELECT c.ordering_category,
+     CASE WHEN c.ordering_category = 'MET_FIRST_THEN_DX'
+         THEN 1 ELSE 0 END AS is_met_first_subgroup,
+    CASE WHEN  COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count
+         ELSE COUNT(*)  END AS n_patients,
+    t.n_patients_met_total
+FROM classified c
+CROSS JOIN totals t
+GROUP BY c.ordering_category, t.n_patients_met_total
+ORDER BY
+    CASE c.ordering_category
+        WHEN 'DX_FIRST'          THEN 0
+        WHEN 'SAME_DAY'          THEN 1
+        WHEN 'MET_FIRST_THEN_DX' THEN 2
+        ELSE 9
+    END
+  ;
+-- 21) D. MET-first subgroup, part 2. Whether, and how well supported, the specific
+--     Diagnosis anchor is within the MET-first subgroup.
+--     For the MET-first patients (first MET strictly before the first specific DX,
+--     the MET_FIRST_THEN_DX group of chunk 20), a phenotype would still have to
+--     anchor on their specific Diagnosis once it arrives. This part places each such
+--     patient in exactly one bucket by how their specific-Diagnosis coding is
+--     supported:
+--
+--       SPECIFIC_DX_SINGLE_DAY   specific DX on exactly one distinct day (unconfirmed anchor)
+--       SPECIFIC_DX_2PLUS_DAYS   specific DX on 2 or more distinct days (repeated anchor)
+--
+--     There is NO "no specific DX ever" bucket. Under the corrected DX-anchored
+--     population every patient carries an anchor DX code by construction (see chunk
+--     20), so the reliability question here is single (unconfirmed) versus repeated
+--     anchor, not present versus absent. The two buckets together are the
+--     MET_FIRST_THEN_DX group of chunk 20.
+--
+--     Denominator (n_patients_subgroup_total, repeated on each row):
+--       the MET-first subgroup = patients with a MET code whose first MET precedes
+--       their first specific DX (the shaded row of chunk 20).
+--
+--     JUDGMENT CALL / FLAG (records vs distinct days). The reliability question is a
+--     rule-of-two (two codes on two separate encounters), so this chunk measures
+--     DISTINCT specific-DX DAYS, not raw records: two same-day administrative
+--     duplicates should not count as a confirmed repeated anchor. This matches the
+--     distinct-day treatment in chunk 19. To count raw records instead, change
+--     COUNT(DISTINCT event_date) to COUNT(*) in dx_all; that would move some
+--     same-day-duplicate patients from SPECIFIC_DX_SINGLE_DAY into
+--     SPECIFIC_DX_2PLUS_DAYS.
+--
+--     Population and observation-period notes: same as chunk 20 (DX-anchored MET
+--     population from #met_events, first specific DX from #dx_events, anchored on
+--     #anchor_person, no observation-period gate).
+--
+--     Small-cell suppression: n_patients in (0, @min_cell_count] set to
+--     -@min_cell_count. n_patients_subgroup_total is an aggregate denominator,
+--     not suppressed. A bucket with zero patients is absent (as in chunks 18-19).
+WITH met_all AS (SELECT person_id,
+        MIN(event_date) AS first_met_date
+    FROM vcbo5u4zmet_events
+    GROUP BY person_id
+ ),
+dx_all AS (SELECT person_id,
+        MIN(event_date)            AS first_dx_date,
+        COUNT(DISTINCT event_date) AS n_dx_days
+    FROM vcbo5u4zdx_events
+    GROUP BY person_id
+ ),
+subgroup AS (SELECT ma.person_id,
+        dx.n_dx_days
+    FROM met_all ma
+    JOIN dx_all dx
+      ON dx.person_id = ma.person_id
+      WHERE ma.first_met_date < dx.first_dx_date
+ ),
+bucketed AS (SELECT person_id,
+        CASE
+            WHEN n_dx_days = 1 THEN 'SPECIFIC_DX_SINGLE_DAY'
+            ELSE                    'SPECIFIC_DX_2PLUS_DAYS'
+        END AS dx_support_bucket
+    FROM subgroup
+ ),
+totals AS (SELECT COUNT(*) AS n_patients_subgroup_total FROM bucketed
+ )
+SELECT b.dx_support_bucket,
+     CASE WHEN  COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count
+         ELSE COUNT(*)  END AS n_patients,
+    t.n_patients_subgroup_total
+FROM bucketed b
+CROSS JOIN totals t
+GROUP BY b.dx_support_bucket, t.n_patients_subgroup_total
+ORDER BY
+    CASE b.dx_support_bucket
+        WHEN 'SPECIFIC_DX_SINGLE_DAY' THEN 1
+        WHEN 'SPECIFIC_DX_2PLUS_DAYS' THEN 2
+        ELSE 9
+    END
+  ;
+-- 22) D. MET-first subgroup, part 3a. Time from the first Metastasis to the first
+--     specific Diagnosis, bucketed, for the MET-first patients.
+--     For the MET_FIRST_THEN_DX group of chunk 20, the gap in days from the first
+--     MET to the first specific DX, placed in one bucket:
+--
+--       LTE30D    1 to 30 days      D91_180   91 to 180 days
+--       D31_60    31 to 60 days     D181_365  181 to 365 days
+--       D61_90    61 to 90 days     GT365D    366 days or more
+--
+--     All of this time is AFTER the first MET by construction (MET-first subgroup),
+--     so the gap is >= 1 day and the first bucket contains 1-30 days. Day 0 cannot
+--     occur: those patients are the SAME_DAY category of chunk 20, excluded here.
+--
+--     Denominator (n_patients_reaching_dx_total, repeated on each row):
+--       MET-first patients who reach a specific DX = the MET_FIRST_THEN_DX group of
+--       chunk 20 (the two SPECIFIC_DX_* buckets of chunk 21). Under the corrected
+--       DX-anchored population every MET-first patient reaches a specific DX, so this
+--       denominator equals the full MET-first subgroup.
+--
+--     Population and observation-period notes: same as chunk 20 (DX-anchored MET
+--     population from #met_events, first specific DX from #dx_events, anchored on
+--     #anchor_person, no observation-period gate).
+--
+--     Small-cell suppression: n_patients in (0, @min_cell_count] set to
+--     -@min_cell_count. n_patients_reaching_dx_total is an aggregate denominator,
+--     not suppressed. A bucket with zero patients is absent (as in chunks 18-19).
+WITH met_all AS (SELECT person_id,
+        MIN(event_date) AS first_met_date
+    FROM vcbo5u4zmet_events
+    GROUP BY person_id
+ ),
+dx_all AS (SELECT person_id,
+        MIN(event_date) AS first_dx_date
+    FROM vcbo5u4zdx_events
+    GROUP BY person_id
+ ),
+gap AS (SELECT ma.person_id,
+        CEIL(CAST(dx.first_dx_date AS DATE) - CAST(ma.first_met_date AS DATE)) AS gap_days
+    FROM met_all ma
+    JOIN dx_all dx
+      ON dx.person_id = ma.person_id
+      WHERE ma.first_met_date < dx.first_dx_date
+ ),
+bucketed AS (SELECT person_id,
+        CASE
+            WHEN gap_days <= 30  THEN 'LTE30D'
+            WHEN gap_days <= 60  THEN 'D31_60'
+            WHEN gap_days <= 90  THEN 'D61_90'
+            WHEN gap_days <= 180 THEN 'D91_180'
+            WHEN gap_days <= 365 THEN 'D181_365'
+            ELSE                      'GT365D'
+        END AS timing_bucket,
+        CASE
+            WHEN gap_days <= 30  THEN 1
+            WHEN gap_days <= 60  THEN 2
+            WHEN gap_days <= 90  THEN 3
+            WHEN gap_days <= 180 THEN 4
+            WHEN gap_days <= 365 THEN 5
+            ELSE                      6
+        END AS bucket_order
+    FROM gap
+ ),
+totals AS (SELECT COUNT(*) AS n_patients_reaching_dx_total FROM bucketed
+ )
+SELECT b.timing_bucket,
+     CASE WHEN  COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count
+         ELSE COUNT(*)  END AS n_patients,
+    t.n_patients_reaching_dx_total
+FROM bucketed b
+CROSS JOIN totals t
+GROUP BY b.timing_bucket, t.n_patients_reaching_dx_total
+ORDER BY MIN(b.bucket_order)
+  ;
+-- 23) D. MET-first subgroup, part 3b. The same MET-to-first-specific-DX gap as
+--     chunk 22, expressed cumulatively (CDF) so a linking cutoff can be read off
+--     directly, plus the median gap.
+--     For the MET_FIRST_THEN_DX group of chunk 20, the number of patients whose
+--     first specific DX has ARRIVED BY each day threshold after the first MET.
+--     Cumulative and monotonically non-decreasing across thresholds:
+--
+--       n_arrived_by_30d, _45d, _60d, _90d, _180d, _365d
+--
+--     Thresholds 30/45/60/90 are the candidate cutoffs; 180/365 give the longer
+--     shape. All time is AFTER the first MET by construction, so there is no before
+--     side and no day-0 mass. Patients whose specific DX arrives after 365 days are
+--     the >1-year tail, derivable as n_patients_reaching_dx_total - n_arrived_by_365d.
+--
+--     median_days_met_to_dx: median gap (days) among the same patients, using the
+--     framework's ordered-set median convention (lower-middle value for even n, as
+--     in chunks 16-17 and 00_setup.sql).
+--
+--     Denominator (n_patients_reaching_dx_total):
+--       MET-first patients who reach a specific DX (same as chunk 22). Under the
+--       corrected DX-anchored population every MET-first patient reaches a specific
+--       DX, so this equals the full MET-first subgroup.
+--
+--     Population and observation-period notes: same as chunk 20 (DX-anchored MET
+--     population from #met_events, first specific DX from #dx_events, anchored on
+--     #anchor_person, no observation-period gate).
+--
+--     Small-cell suppression: each cumulative count in (0, @min_cell_count] set to
+--     -@min_cell_count; median set to NULL when its denominator is suppressed.
+--     n_patients_reaching_dx_total is an aggregate denominator, not suppressed.
+WITH met_all AS (SELECT person_id,
+        MIN(event_date) AS first_met_date
+    FROM vcbo5u4zmet_events
+    GROUP BY person_id
+ ),
+dx_all AS (SELECT person_id,
+        MIN(event_date) AS first_dx_date
+    FROM vcbo5u4zdx_events
+    GROUP BY person_id
+ ),
+gap AS (SELECT ma.person_id,
+        CEIL(CAST(dx.first_dx_date AS DATE) - CAST(ma.first_met_date AS DATE)) AS gap_days
+    FROM met_all ma
+    JOIN dx_all dx
+      ON dx.person_id = ma.person_id
+      WHERE ma.first_met_date < dx.first_dx_date
+ ),
+med AS (SELECT MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(gap_days AS FLOAT) END) AS median_days
+    FROM (SELECT gap_days,
+            ROW_NUMBER() OVER (ORDER BY gap_days) AS rn,
+            COUNT(*)     OVER ()                  AS cnt
+        FROM gap
+     ) x
+ ),
+agg AS (SELECT COUNT(*)                                          AS n_total,
+        SUM(CASE WHEN gap_days <= 30  THEN 1 ELSE 0 END)  AS n_by_30,
+        SUM(CASE WHEN gap_days <= 45  THEN 1 ELSE 0 END)  AS n_by_45,
+        SUM(CASE WHEN gap_days <= 60  THEN 1 ELSE 0 END)  AS n_by_60,
+        SUM(CASE WHEN gap_days <= 90  THEN 1 ELSE 0 END)  AS n_by_90,
+        SUM(CASE WHEN gap_days <= 180 THEN 1 ELSE 0 END)  AS n_by_180,
+        SUM(CASE WHEN gap_days <= 365 THEN 1 ELSE 0 END)  AS n_by_365
+    FROM gap
+ )
+SELECT a.n_total AS n_patients_reaching_dx_total,
+    CASE WHEN a.n_by_30  > 0 AND a.n_by_30  <= @min_cell_count THEN -@min_cell_count ELSE a.n_by_30  END AS n_arrived_by_30d,
+    CASE WHEN a.n_by_45  > 0 AND a.n_by_45  <= @min_cell_count THEN -@min_cell_count ELSE a.n_by_45  END AS n_arrived_by_45d,
+    CASE WHEN a.n_by_60  > 0 AND a.n_by_60  <= @min_cell_count THEN -@min_cell_count ELSE a.n_by_60  END AS n_arrived_by_60d,
+    CASE WHEN a.n_by_90  > 0 AND a.n_by_90  <= @min_cell_count THEN -@min_cell_count ELSE a.n_by_90  END AS n_arrived_by_90d,
+    CASE WHEN a.n_by_180 > 0 AND a.n_by_180 <= @min_cell_count THEN -@min_cell_count ELSE a.n_by_180 END AS n_arrived_by_180d,
+    CASE WHEN a.n_by_365 > 0 AND a.n_by_365 <= @min_cell_count THEN -@min_cell_count ELSE a.n_by_365 END AS n_arrived_by_365d,
+    CASE WHEN a.n_total <= @min_cell_count THEN NULL ELSE m.median_days END AS median_days_met_to_dx
+FROM agg a
+CROSS JOIN med m
+ ;
+-- 24) H. Metastasis-to-treatment timing, part 1. Where each patient's CLOSEST
+--     antineoplastic treatment falls relative to the first Metastasis.
+--     Each patient who carries an anchor Metastasis (MET) code (and therefore also
+--     an anchor DX code) is placed in exactly one category by the side of the first
+--     MET on which their single CLOSEST antineoplastic (L01) drug_exposure record
+--     falls. "Closest" = the L01 record with the minimum absolute days-difference to
+--     the first MET, signed:
+--
+--       CLOSEST_L01_BEFORE_MET   closest L01 record is before the first MET   (days_diff < 0)
+--       CLOSEST_L01_ON_MET_DAY   closest L01 record is on the first MET date  (days_diff = 0, day 0)
+--       CLOSEST_L01_AFTER_MET    closest L01 record is after the first MET    (days_diff > 0)
+--       NO_L01_EVER              no antineoplastic drug_exposure record at all
+--
+--     days_diff = DATEDIFF(DAY, first_met_date, l01_event_date): negative = before,
+--     0 = same calendar day as the first MET (day 0, its own explicit category,
+--     never folded into "after"), positive = after. One value per patient. Ties in
+--     absolute distance are broken by earlier event_date, the framework's CLOSEST
+--     convention (ROW_NUMBER ... ORDER BY ABS(days_diff), event_date), so an
+--     equidistant tie resolves to the before record.
+--
+--     Denominator (n_patients_met_total, repeated on each row):
+--       all patients with >= 1 anchor MET measurement code AND >= 1 anchor DX code
+--       at this site (before + day0 + after + never = this total).
+--
+--     POPULATION. Built from #met_events (00_setup.sql, section F):
+--     @cdm_database_schema.measurement JOIN #met_concepts JOIN #anchor_person, so
+--     every patient carries an anchor DX code. The cohort is DX-anchored; a MET code
+--     is observed WITHIN that cohort, never as a separate entry point. There is no
+--     "MET-only, no DX" patient: the MET concept set is generic across cancer types,
+--     so a MET code without an anchor DX gives no evidence of the cancer of interest.
+--     #anchor_person carries no observation-period-at-index gate (that is #cohort);
+--     see the observation-period flag below. Identical DX-anchored population to
+--     Analysis D (chunks 20-23).
+--
+--     L01 SOURCE. Antineoplastic records come from #l01_events (00_setup.sql,
+--     section F): @cdm_database_schema.drug_exposure JOIN #l01_concepts JOIN
+--     #anchor_person. #l01_events is gated to the same DX anchor cohort as the MET
+--     population, so every MET patient's L01 records are present and none are missed.
+--
+--     JUDGMENT CALL / FLAG (observation period). Neither the MET population nor the
+--     L01 records are restricted to an observation period. The population is anchored
+--     on "has an anchor DX code" (#anchor_person), not "inside an observation period"
+--     (#cohort). Observation-period coverage is characterized separately in Analysis
+--     E (chunks 16-17). See the accompanying report for the reasoned recommendation.
+--
+--     Small-cell suppression: n_patients in (0, @min_cell_count] set to
+--     -@min_cell_count. n_patients_met_total is an aggregate denominator, not
+--     suppressed. A category with zero patients is absent (as in chunks 18-23).
+WITH met_all AS (SELECT person_id,
+        MIN(event_date) AS first_met_date
+    FROM vcbo5u4zmet_events
+    GROUP BY person_id
+ ),
+l01_all AS (SELECT person_id,
+        event_date
+    FROM vcbo5u4zl01_events
+ ),
+pair AS (SELECT ma.person_id,
+        CEIL(CAST(la.event_date AS DATE) - CAST(ma.first_met_date AS DATE)) AS days_diff,
+        la.event_date
+    FROM met_all ma
+    JOIN l01_all la
+      ON la.person_id = ma.person_id
+ ),
+closest AS (SELECT person_id,
+        days_diff,
+        ROW_NUMBER() OVER (
+            PARTITION BY person_id
+            ORDER BY ABS(days_diff), event_date
+        ) AS rn
+    FROM pair
+ ),
+classified AS (SELECT ma.person_id,
+        CASE
+            WHEN c.days_diff IS NULL THEN 'NO_L01_EVER'
+            WHEN c.days_diff < 0     THEN 'CLOSEST_L01_BEFORE_MET'
+            WHEN c.days_diff = 0     THEN 'CLOSEST_L01_ON_MET_DAY'
+            ELSE                          'CLOSEST_L01_AFTER_MET'
+        END AS placement_category
+    FROM met_all ma
+    LEFT JOIN (SELECT person_id, days_diff FROM closest   WHERE rn = 1 ) c
+      ON c.person_id = ma.person_id
+ ),
+totals AS (SELECT COUNT(*) AS n_patients_met_total FROM met_all
+ )
+SELECT c.placement_category,
+     CASE WHEN  COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count
+         ELSE COUNT(*)  END AS n_patients,
+    t.n_patients_met_total
+FROM classified c
+CROSS JOIN totals t
+GROUP BY c.placement_category, t.n_patients_met_total
+ORDER BY
+    CASE c.placement_category
+        WHEN 'CLOSEST_L01_BEFORE_MET' THEN 0
+        WHEN 'CLOSEST_L01_ON_MET_DAY' THEN 1
+        WHEN 'CLOSEST_L01_AFTER_MET'  THEN 2
+        WHEN 'NO_L01_EVER'            THEN 3
+        ELSE 9
+    END
+  ;
+-- 25) H. Metastasis-to-treatment timing (Part 1 support) <U+2014> reconciliation of the
+--     two treated-patient populations Part 2 uses, and the bilateral-treatment
+--     count referenced in the Part 1 caption.
+--     Part 2 deliberately reads its two cumulative curves over DIFFERENT
+--     denominators (AA's decision, 13 Jul 2026): the before-curve and the signed
+--     histogram are CLOSEST-based, while the after-curve is over EVERY patient with
+--     any antineoplastic (L01) record strictly after the first Metastasis. This
+--     chunk quantifies exactly how those populations relate, so the after-curve's
+--     superset construction is auditable rather than asserted. One row.
+--
+--     Over the treated MET patients (>= 1 L01 record), per-patient side flags are
+--     built from the signed L01-to-first-MET distances:
+--       has_before = any L01 record strictly before the first MET (days_diff < 0)
+--       has_day0   = any L01 record on the first MET date        (days_diff = 0)
+--       has_after  = any L01 record strictly after the first MET (days_diff > 0)
+--     and each treated patient's CLOSEST side (BEFORE / DAY0 / AFTER) is taken from
+--     the single closest record (same convention as chunk 24).
+--
+--     Columns (each a patient count over the treated subgroup):
+--       n_treated                   before + day0 + after treated patients
+--                                   (= chunk 24 before + day0 + after)
+--       n_closest_after             treated patients whose CLOSEST record is after
+--                                   the first MET (the histogram's after bars, and
+--                                   the old closest-after after-curve population)
+--       n_after_any                 treated patients with ANY strictly-after L01
+--                                   record (the Part 2 after-curve denominator);
+--                                   a SUPERSET of n_closest_after
+--       n_after_any_added           n_after_any - n_closest_after: patients added to
+--                                   the after-curve by re-basing it on any-after
+--                                   rather than closest-after (their closest record
+--                                   is before or on the MET day, but they also have
+--                                   a real after-MET record)
+--       n_bilateral                 treated patients with a record on BOTH sides
+--                                   (has_before = 1 AND has_after = 1)
+--       n_bilateral_closest_before  bilateral patients whose CLOSEST record is
+--                                   before the MET (collapsed to the before side by
+--                                   the closest-only view; these are the core of
+--                                   n_after_any_added)
+--       n_bilateral_closest_after   bilateral patients whose CLOSEST record is after
+--                                   the MET (already inside n_closest_after)
+--
+--     JUDGMENT CALL / FLAG (after = strictly after, day 0 excluded). The after-curve
+--     population is patients with any record with days_diff > 0. Day 0 is its own
+--     explicit category and belongs to NEITHER curve, per the locked design
+--     principle and the approved mock. The task prose phrased this as "on or after,"
+--     but the mock (source of truth) and the day-0-explicit rule make it strictly
+--     after; day-0 treatment is not counted toward the after-curve. Flagged rather
+--     than silently decided.
+--
+--     JUDGMENT CALL / FLAG (superset arithmetic). n_after_any_added collects
+--     every treated patient with an after-MET record whose closest record is NOT
+--     after: closest-before-with-after (= n_bilateral_closest_before) plus the
+--     residual closest-on-day-0-with-after. The mock modelled the added group as
+--     40 closest-before patients only and assumed no day-0-closest patient also has
+--     a later after-MET record; in real data that day-0 residual may be non-zero,
+--     so n_after_any is computed directly as "any strictly-after record" and will
+--     be >= the mock's 392 + 40 decomposition. n_after_any_added minus
+--     n_bilateral_closest_before is that day-0 residual.
+--
+--     Population, observation-period and L01-source notes: same as chunk 24
+--     (DX-anchored MET population from #met_events; L01 from #l01_events, gated to the
+--     same #anchor_person cohort; no observation-period gate). No change to 00_setup.sql.
+--
+--     Small-cell suppression: each count in (0, @min_cell_count] set to
+--     -@min_cell_count.
+WITH met_all AS (SELECT person_id,
+        MIN(event_date) AS first_met_date
+    FROM vcbo5u4zmet_events
+    GROUP BY person_id
+ ),
+l01_all AS (SELECT person_id,
+        event_date
+    FROM vcbo5u4zl01_events
+ ),
+pair AS (SELECT ma.person_id,
+        CEIL(CAST(la.event_date AS DATE) - CAST(ma.first_met_date AS DATE)) AS days_diff,
+        la.event_date
+    FROM met_all ma
+    JOIN l01_all la
+      ON la.person_id = ma.person_id
+ ),
+flags AS (SELECT person_id,
+        MAX(CASE WHEN days_diff < 0 THEN 1 ELSE 0 END) AS has_before,
+        MAX(CASE WHEN days_diff = 0 THEN 1 ELSE 0 END) AS has_day0,
+        MAX(CASE WHEN days_diff > 0 THEN 1 ELSE 0 END) AS has_after
+    FROM pair
+    GROUP BY person_id
+ ),
+closest AS (SELECT person_id,
+        days_diff,
+        ROW_NUMBER() OVER (
+            PARTITION BY person_id
+            ORDER BY ABS(days_diff), event_date
+        ) AS rn
+    FROM pair
+ ),
+closest_side AS (SELECT person_id,
+        CASE WHEN days_diff < 0 THEN 'BEFORE'
+             WHEN days_diff = 0 THEN 'DAY0'
+             ELSE                    'AFTER' END AS cside
+    FROM closest
+      WHERE rn = 1
+ ),
+combined AS (SELECT f.person_id,
+        f.has_before,
+        f.has_after,
+        cs.cside
+    FROM flags f
+    JOIN closest_side cs
+      ON cs.person_id = f.person_id
+ ),
+agg AS (SELECT COUNT(*)                                                                       AS n_treated,
+        SUM(CASE WHEN cside = 'AFTER' THEN 1 ELSE 0 END)                               AS n_closest_after,
+        SUM(has_after)                                                                 AS n_after_any,
+        SUM(CASE WHEN has_before = 1 AND has_after = 1 THEN 1 ELSE 0 END)              AS n_bilateral,
+        SUM(CASE WHEN has_before = 1 AND has_after = 1 AND cside = 'BEFORE' THEN 1 ELSE 0 END) AS n_bilateral_closest_before,
+        SUM(CASE WHEN has_before = 1 AND has_after = 1 AND cside = 'AFTER'  THEN 1 ELSE 0 END) AS n_bilateral_closest_after
+    FROM combined
+ )
+SELECT CASE WHEN n_treated                  > 0 AND n_treated                  <= @min_cell_count THEN -@min_cell_count ELSE n_treated                  END AS n_treated,
+    CASE WHEN n_closest_after            > 0 AND n_closest_after            <= @min_cell_count THEN -@min_cell_count ELSE n_closest_after            END AS n_closest_after,
+    CASE WHEN n_after_any                > 0 AND n_after_any                <= @min_cell_count THEN -@min_cell_count ELSE n_after_any                END AS n_after_any,
+    CASE WHEN (n_after_any - n_closest_after) > 0 AND (n_after_any - n_closest_after) <= @min_cell_count THEN -@min_cell_count ELSE (n_after_any - n_closest_after) END AS n_after_any_added,
+    CASE WHEN n_bilateral                > 0 AND n_bilateral                <= @min_cell_count THEN -@min_cell_count ELSE n_bilateral                END AS n_bilateral,
+    CASE WHEN n_bilateral_closest_before > 0 AND n_bilateral_closest_before <= @min_cell_count THEN -@min_cell_count ELSE n_bilateral_closest_before END AS n_bilateral_closest_before,
+    CASE WHEN n_bilateral_closest_after  > 0 AND n_bilateral_closest_after  <= @min_cell_count THEN -@min_cell_count ELSE n_bilateral_closest_after  END AS n_bilateral_closest_after
+FROM agg
+ ;
+-- 26) H. Metastasis-to-treatment timing (Part 2, histogram) <U+2014> the signed
+--     distribution of each treated patient's CLOSEST antineoplastic treatment
+--     relative to the first Metastasis.
+--     Over the treated MET patients (>= 1 L01 record), each patient is reduced to
+--     the single signed days_diff of their CLOSEST L01 record (same value and
+--     convention as chunk 24) and placed in one signed-day bin. Before and after
+--     are separate; day 0 is its own central bin. bin_order runs left to right
+--     along the signed axis (farthest before -> day 0 -> farthest after) so the
+--     report renders the bars directly.
+--
+--       bin_order  side    day_range_label   contents (signed days_diff)
+--          1       BEFORE   366+              days_diff <= -366
+--          2       BEFORE   181-365           -365 .. -181
+--          3       BEFORE   91-180            -180 .. -91
+--          4       BEFORE   61-90             -90 .. -61
+--          5       BEFORE   31-60             -60 .. -31
+--          6       BEFORE   1-30              -30 .. -1
+--          7       DAY0     Day 0             days_diff = 0
+--          8       AFTER    1-30              1 .. 30
+--          9       AFTER    31-60             31 .. 60
+--         10       AFTER    61-90             61 .. 90
+--         11       AFTER    91-180            91 .. 180
+--         12       AFTER    181-365           181 .. 365
+--         13       AFTER    366+              days_diff >= 366
+--
+--     The 366+ terminal bins carry everything beyond one year on each side. The bin
+--     share (n_patients / n_treated_total) is what the report plots.
+--
+--     NOTE (relationship to the after-curve, chunk 28). This histogram is entirely
+--     CLOSEST-based: the after bins (order 8-13) sum to the closest-after patients
+--     (chunk 25 n_closest_after), NOT to the after-curve population (n_after_any).
+--     The after-curve is intentionally over a broader population and is therefore
+--     NOT the cumulative of these after bars. The before bins (order 1-6) sum to the
+--     closest-before patients and DO agree with the before-curve (chunk 27).
+--
+--     Denominator (n_treated_total, repeated on each row):
+--       treated MET patients = before + day0 + after (= chunk 24 sum of the three
+--       treated categories; = chunk 25 n_treated).
+--
+--     Population, observation-period and L01-source notes: same as chunk 24
+--     (DX-anchored MET population from #met_events; L01 from #l01_events, gated to the
+--     same #anchor_person cohort; no observation-period gate). No change to 00_setup.sql.
+--
+--     Small-cell suppression: n_patients in (0, @min_cell_count] set to
+--     -@min_cell_count. n_treated_total is an aggregate denominator, not
+--     suppressed. A bin with zero patients is absent (as in chunks 18-25).
+WITH met_all AS (SELECT person_id,
+        MIN(event_date) AS first_met_date
+    FROM vcbo5u4zmet_events
+    GROUP BY person_id
+ ),
+l01_all AS (SELECT person_id,
+        event_date
+    FROM vcbo5u4zl01_events
+ ),
+pair AS (SELECT ma.person_id,
+        CEIL(CAST(la.event_date AS DATE) - CAST(ma.first_met_date AS DATE)) AS days_diff,
+        la.event_date
+    FROM met_all ma
+    JOIN l01_all la
+      ON la.person_id = ma.person_id
+ ),
+closest AS (SELECT person_id,
+        days_diff,
+        ROW_NUMBER() OVER (
+            PARTITION BY person_id
+            ORDER BY ABS(days_diff), event_date
+        ) AS rn
+    FROM pair
+ ),
+c1 AS (SELECT person_id, days_diff FROM closest   WHERE rn = 1
+ ),
+binned AS (SELECT person_id,
+        CASE
+            WHEN days_diff = 0                          THEN 7
+            WHEN days_diff <= -366                       THEN 1
+            WHEN days_diff <= -181                       THEN 2
+            WHEN days_diff <= -91                        THEN 3
+            WHEN days_diff <= -61                        THEN 4
+            WHEN days_diff <= -31                        THEN 5
+            WHEN days_diff <= -1                         THEN 6
+            WHEN days_diff <= 30                         THEN 8
+            WHEN days_diff <= 60                         THEN 9
+            WHEN days_diff <= 90                         THEN 10
+            WHEN days_diff <= 180                        THEN 11
+            WHEN days_diff <= 365                        THEN 12
+            ELSE                                             13
+        END AS bin_order
+    FROM c1
+ ),
+labelled AS (SELECT person_id,
+        bin_order,
+        CASE WHEN bin_order <= 6 THEN 'BEFORE'
+             WHEN bin_order = 7  THEN 'DAY0'
+             ELSE                     'AFTER' END AS side,
+        CASE bin_order
+            WHEN 1  THEN '366+'
+            WHEN 2  THEN '181-365'
+            WHEN 3  THEN '91-180'
+            WHEN 4  THEN '61-90'
+            WHEN 5  THEN '31-60'
+            WHEN 6  THEN '1-30'
+            WHEN 7  THEN 'Day 0'
+            WHEN 8  THEN '1-30'
+            WHEN 9  THEN '31-60'
+            WHEN 10 THEN '61-90'
+            WHEN 11 THEN '91-180'
+            WHEN 12 THEN '181-365'
+            ELSE         '366+'
+        END AS day_range_label
+    FROM binned
+ ),
+totals AS (SELECT COUNT(*) AS n_treated_total FROM c1
+ )
+SELECT b.bin_order,
+    b.side,
+    b.day_range_label,
+     CASE WHEN  COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count
+         ELSE COUNT(*)  END AS n_patients,
+    t.n_treated_total
+FROM labelled b
+CROSS JOIN totals t
+GROUP BY b.bin_order, b.side, b.day_range_label, t.n_treated_total
+ORDER BY b.bin_order
+  ;
+-- 27) H. Metastasis-to-treatment timing (Part 2, before-curve) <U+2014> cumulative reach
+--     of the CLOSEST-before treatment, over the closest-before patients.
+--     Over the patients whose CLOSEST antineoplastic (L01) record is strictly
+--     before the first Metastasis (chunk 24 CLOSEST_L01_BEFORE_MET), the number
+--     whose closest-before record sits WITHIN each day threshold before the first
+--     MET. Cumulative and monotonically non-decreasing across thresholds. Reads
+--     "how far back the nearest before-MET treatment sits":
+--
+--       n_within_30d_before, _60d, _90d, _180d, _365d
+--
+--     days_before = ABS(days_diff) of the closest record (all values >= 1 by
+--     construction; day 0 is a separate central category, not on this curve). The
+--     curve is CLOSEST-based, so it agrees with the histogram's before bars
+--     (chunk 26, bin_order 1-6). Patients whose closest-before treatment is more
+--     than 365 days before the MET are the earlier-than-one-year tail, derivable as
+--     n_before_total - n_within_365d_before.
+--
+--     median_days_before_closest: median days_before among the same patients, using
+--     the framework's ordered-set median convention (lower-middle value for even n,
+--     as in chunks 16-17, 23 and 00_setup.sql).
+--
+--     Denominator (n_before_total):
+--       closest-before patients (= chunk 24 CLOSEST_L01_BEFORE_MET n_patients).
+--
+--     NOTE (direction). This is the BEFORE curve. It reads leftward (backward in
+--     time) from the first MET and uses its own directional denominator; it is
+--     never combined with the after-curve into a symmetric window.
+--
+--     Population, observation-period and L01-source notes: same as chunk 24
+--     (DX-anchored MET population from #met_events; L01 from #l01_events, gated to the
+--     same #anchor_person cohort; no observation-period gate). No change to 00_setup.sql.
+--
+--     Small-cell suppression: each cumulative count in (0, @min_cell_count] set to
+--     -@min_cell_count; median set to NULL when its denominator is suppressed.
+--     n_before_total is an aggregate denominator, not suppressed.
+WITH met_all AS (SELECT person_id,
+        MIN(event_date) AS first_met_date
+    FROM vcbo5u4zmet_events
+    GROUP BY person_id
+ ),
+l01_all AS (SELECT person_id,
+        event_date
+    FROM vcbo5u4zl01_events
+ ),
+pair AS (SELECT ma.person_id,
+        CEIL(CAST(la.event_date AS DATE) - CAST(ma.first_met_date AS DATE)) AS days_diff,
+        la.event_date
+    FROM met_all ma
+    JOIN l01_all la
+      ON la.person_id = ma.person_id
+ ),
+closest AS (SELECT person_id,
+        days_diff,
+        ROW_NUMBER() OVER (
+            PARTITION BY person_id
+            ORDER BY ABS(days_diff), event_date
+        ) AS rn
+    FROM pair
+ ),
+before_closest AS (SELECT person_id,
+        ABS(days_diff) AS days_before
+    FROM closest
+      WHERE rn = 1
+      AND days_diff < 0
+ ),
+med AS (SELECT MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_before AS FLOAT) END) AS median_days
+    FROM (SELECT days_before,
+            ROW_NUMBER() OVER (ORDER BY days_before) AS rn,
+            COUNT(*)     OVER ()                     AS cnt
+        FROM before_closest
+     ) x
+ ),
+agg AS (SELECT COUNT(*)                                           AS n_total,
+        SUM(CASE WHEN days_before <= 30  THEN 1 ELSE 0 END) AS n_30,
+        SUM(CASE WHEN days_before <= 60  THEN 1 ELSE 0 END) AS n_60,
+        SUM(CASE WHEN days_before <= 90  THEN 1 ELSE 0 END) AS n_90,
+        SUM(CASE WHEN days_before <= 180 THEN 1 ELSE 0 END) AS n_180,
+        SUM(CASE WHEN days_before <= 365 THEN 1 ELSE 0 END) AS n_365
+    FROM before_closest
+ )
+SELECT a.n_total AS n_before_total,
+    CASE WHEN a.n_30  > 0 AND a.n_30  <= @min_cell_count THEN -@min_cell_count ELSE a.n_30  END AS n_within_30d_before,
+    CASE WHEN a.n_60  > 0 AND a.n_60  <= @min_cell_count THEN -@min_cell_count ELSE a.n_60  END AS n_within_60d_before,
+    CASE WHEN a.n_90  > 0 AND a.n_90  <= @min_cell_count THEN -@min_cell_count ELSE a.n_90  END AS n_within_90d_before,
+    CASE WHEN a.n_180 > 0 AND a.n_180 <= @min_cell_count THEN -@min_cell_count ELSE a.n_180 END AS n_within_180d_before,
+    CASE WHEN a.n_365 > 0 AND a.n_365 <= @min_cell_count THEN -@min_cell_count ELSE a.n_365 END AS n_within_365d_before,
+    CASE WHEN a.n_total <= @min_cell_count THEN NULL ELSE m.median_days END AS median_days_before_closest
+FROM agg a
+CROSS JOIN med m
+ ;
+-- 28) H. Metastasis-to-treatment timing (Part 2, after-curve) <U+2014> cumulative reach
+--     of the FIRST after-Metastasis treatment, over EVERY patient with any
+--     after-Metastasis treatment (the re-based after population, AA's decision
+--     13 Jul 2026).
+--     Over the patients who have ANY antineoplastic (L01) record strictly after the
+--     first Metastasis (days_diff > 0), timed by that patient's FIRST such record
+--     (the minimum positive days_diff), the number whose first after-MET treatment
+--     has arrived WITHIN each day threshold after the first MET. Cumulative and
+--     monotonically non-decreasing:
+--
+--       n_within_30d_after, _60d, _90d, _180d, _365d
+--
+--     This is the forward attribution window: for any forward window it reads the
+--     share of everyone eventually treated after the MET who is captured by that
+--     window. Patients whose first after-MET treatment is more than 365 days out
+--     are the later-than-one-year tail, derivable as
+--     n_after_any_total - n_within_365d_after.
+--
+--     median_days_after_first: median first-after-MET days among the same patients,
+--     framework ordered-set median convention (lower-middle for even n, as in
+--     chunks 16-17, 23, 27 and 00_setup.sql).
+--
+--     Denominator (n_after_any_total):
+--       patients with any strictly-after L01 record (= chunk 25 n_after_any). This
+--       is a SUPERSET of the closest-after patients (chunk 25 n_closest_after and
+--       the histogram after bars, chunk 26): it adds patients whose closest record
+--       is before or on the MET day but who also have a genuine after-MET record.
+--       Consequently this curve is NOT the cumulative of the histogram's after bars,
+--       by design.
+--
+--     JUDGMENT CALL / FLAG (population definition, differs from before-curve and
+--     histogram). Unlike the CLOSEST-based before-curve (chunk 27) and histogram
+--     (chunk 26), this after-curve is over the ANY-strictly-after population and is
+--     timed by each patient's FIRST after-MET record, not their closest record.
+--       - Day 0 is excluded (strictly after, days_diff > 0), consistent with the
+--         locked day-0-explicit principle; day-0 treatment is on neither curve. The
+--         task prose said "on or after," reconciled here to strictly after per the
+--         mock (source of truth) and the day-0 rule.
+--       - A patient with treatment ONLY before the MET and none strictly after
+--         correctly falls OUT of this curve (no positive days_diff, so absent from
+--         the WHERE days_diff > 0 set).
+--       - A closest-before patient who ALSO has an after-MET record is INCLUDED
+--         here (via their after record) while remaining on the before side of the
+--         histogram and before-curve; this is the intended superset behaviour.
+--
+--     Population, observation-period and L01-source notes: same as chunk 24
+--     (DX-anchored MET population from #met_events; L01 from #l01_events, gated to the
+--     same #anchor_person cohort; no observation-period gate). No change to 00_setup.sql.
+--
+--     Small-cell suppression: each cumulative count in (0, @min_cell_count] set to
+--     -@min_cell_count; median set to NULL when its denominator is suppressed.
+--     n_after_any_total is an aggregate denominator, not suppressed.
+WITH met_all AS (SELECT person_id,
+        MIN(event_date) AS first_met_date
+    FROM vcbo5u4zmet_events
+    GROUP BY person_id
+ ),
+l01_all AS (SELECT person_id,
+        event_date
+    FROM vcbo5u4zl01_events
+ ),
+pair AS (SELECT ma.person_id,
+        CEIL(CAST(la.event_date AS DATE) - CAST(ma.first_met_date AS DATE)) AS days_diff
+    FROM met_all ma
+    JOIN l01_all la
+      ON la.person_id = ma.person_id
+ ),
+after_first AS (SELECT person_id,
+        MIN(days_diff) AS first_after_days
+    FROM pair
+      WHERE days_diff > 0
+    GROUP BY person_id
+ ),
+med AS (SELECT MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(first_after_days AS FLOAT) END) AS median_days
+    FROM (SELECT first_after_days,
+            ROW_NUMBER() OVER (ORDER BY first_after_days) AS rn,
+            COUNT(*)     OVER ()                          AS cnt
+        FROM after_first
+     ) x
+ ),
+agg AS (SELECT COUNT(*)                                                AS n_total,
+        SUM(CASE WHEN first_after_days <= 30  THEN 1 ELSE 0 END) AS n_30,
+        SUM(CASE WHEN first_after_days <= 60  THEN 1 ELSE 0 END) AS n_60,
+        SUM(CASE WHEN first_after_days <= 90  THEN 1 ELSE 0 END) AS n_90,
+        SUM(CASE WHEN first_after_days <= 180 THEN 1 ELSE 0 END) AS n_180,
+        SUM(CASE WHEN first_after_days <= 365 THEN 1 ELSE 0 END) AS n_365
+    FROM after_first
+ )
+SELECT a.n_total AS n_after_any_total,
+    CASE WHEN a.n_30  > 0 AND a.n_30  <= @min_cell_count THEN -@min_cell_count ELSE a.n_30  END AS n_within_30d_after,
+    CASE WHEN a.n_60  > 0 AND a.n_60  <= @min_cell_count THEN -@min_cell_count ELSE a.n_60  END AS n_within_60d_after,
+    CASE WHEN a.n_90  > 0 AND a.n_90  <= @min_cell_count THEN -@min_cell_count ELSE a.n_90  END AS n_within_90d_after,
+    CASE WHEN a.n_180 > 0 AND a.n_180 <= @min_cell_count THEN -@min_cell_count ELSE a.n_180 END AS n_within_180d_after,
+    CASE WHEN a.n_365 > 0 AND a.n_365 <= @min_cell_count THEN -@min_cell_count ELSE a.n_365 END AS n_within_365d_after,
+    CASE WHEN a.n_total <= @min_cell_count THEN NULL ELSE m.median_days END AS median_days_after_first
+FROM agg a
+CROSS JOIN med m
+ ;
+-- 29) G. Drug Therapy procedure characterization, part 1a. Where each patient's
+--     antineoplastic treatment signal lives, ON OR AFTER the first Metastasis.
+--     Each patient who carries an anchor Metastasis (MET) code (and therefore also
+--     an anchor DX code) is placed in exactly one category by the source of their
+--     treatment signal on or after their first MET date:
+--
+--       DRUG_EXPOSURE_ON_OR_AFTER_MET  >= 1 antineoplastic (L01) drug_exposure
+--                                        record on or after the first MET
+--                                        (captured by the current L01 analysis,
+--                                        whether or not a procedure is also present)
+--       DTP_ONLY_ON_OR_AFTER_MET       no such drug_exposure, but >= 1 Drug Therapy
+--                                        procedure on or after the first MET
+--                                        (procedure-only; missed by the current
+--                                        L01 analysis)
+--       NEITHER_ON_OR_AFTER_MET        no treatment signal of either kind on or
+--                                        after the first MET (includes patients
+--                                        treated only BEFORE the first MET)
+--
+--     "On or after" = event_date >= first_met_date. Day 0 (a record on the first
+--     MET date) counts on the on-or-after side, its own explicit inclusion, never
+--     treated as before. The window is unbounded on the right (no end cap),
+--     confirmed with AA. The DTP_ONLY group is the completeness signal: these
+--     patients received metastatic-disease treatment yet look treatment-naive in
+--     the drug-level analysis.
+--
+--     WHY ON-OR-AFTER-MET AND NOT WHOLE-RECORD (design note). G exists to size
+--     procedure-only capture of metastatic-disease treatment specifically. An
+--     unanchored whole-record check would hide it: a patient with adjuvant
+--     drug_exposure years before ever developing metastatic disease, then only
+--     procedure codes near their metastatic treatment, would read as
+--     "drug_exposure present" and look fully captured. Scoping to on or after the
+--     first MET places that patient in DTP_ONLY where they belong. Treatment
+--     before the first MET is a different quantity and is held in NEITHER, the
+--     same convention Analysis H (chunk 24) uses for pre-MET treatment.
+--
+--     Denominator (n_patients_met_total, repeated on each row):
+--       all patients with >= 1 anchor MET measurement code AND >= 1 anchor DX code
+--       at this site (the three categories sum to this total). This is the same
+--       DX-anchored first-Metastasis cohort used in Analyses D and H.
+--
+--     POPULATION. The MET population is built from #met_events (00_setup.sql, section
+--     F): @cdm_database_schema.measurement JOIN #met_concepts JOIN #anchor_person, so
+--     every patient carries an anchor DX code. The cohort is DX-anchored; a MET code
+--     is observed WITHIN it, never as a separate entry point. A generic MET code
+--     without an anchor DX gives no evidence of the cancer of interest, so no
+--     "MET-only, no DX" patient exists. Identical DX-anchored population to Analyses
+--     D and H (chunks 20-28).
+--
+--     L01 AND DTP SOURCES. Antineoplastic drug_exposure records come from #l01_events
+--     (drug_exposure JOIN #l01_concepts JOIN #anchor_person, 00_setup.sql section F),
+--     gated to the same DX anchor cohort as the MET population. Drug Therapy
+--     procedures come from @cdm_database_schema.procedure_occurrence JOIN
+--     #dtp_concepts; there is no procedure event table in setup, so the join to the
+--     DX-anchored met_all restricts them to the same cohort. Both signals are
+--     therefore evaluated over exactly the DX-anchored MET patients.
+--
+--     JUDGMENT CALL / FLAG (observation period). Neither the MET population nor the
+--     treatment records are restricted to an observation period. The population is
+--     anchored on "has an anchor DX code" (#anchor_person), not "inside an
+--     observation period" (#cohort). Observation-period coverage is characterized
+--     separately in Analysis E (chunks 16-17). See the report for the recommendation.
+--
+--     Small-cell suppression: n_patients in (0, @min_cell_count] set to
+--     -@min_cell_count. n_patients_met_total is an aggregate denominator, not
+--     suppressed. A category with zero patients is absent (as in chunks 20-28).
+WITH met_all AS (SELECT person_id,
+        MIN(event_date) AS first_met_date
+    FROM vcbo5u4zmet_events
+    GROUP BY person_id
+ ),
+drugexp_flag AS (SELECT DISTINCT ma.person_id
+    FROM met_all ma
+    JOIN vcbo5u4zl01_events le
+      ON le.person_id = ma.person_id
+      WHERE le.event_date >= ma.first_met_date
+ ),
+dtp_flag AS (SELECT DISTINCT ma.person_id
+    FROM met_all ma
+    JOIN @cdm_database_schema.procedure_occurrence po
+      ON po.person_id = ma.person_id
+    JOIN vcbo5u4zdtp_concepts dtp
+      ON po.procedure_concept_id = dtp.concept_id
+      WHERE po.procedure_date >= ma.first_met_date
+ ),
+classified AS (SELECT ma.person_id,
+        CASE
+            WHEN d.person_id IS NOT NULL THEN 'DRUG_EXPOSURE_ON_OR_AFTER_MET'
+            WHEN p.person_id IS NOT NULL THEN 'DTP_ONLY_ON_OR_AFTER_MET'
+            ELSE                              'NEITHER_ON_OR_AFTER_MET'
+        END AS signal_source
+    FROM met_all ma
+    LEFT JOIN drugexp_flag d ON d.person_id = ma.person_id
+    LEFT JOIN dtp_flag     p ON p.person_id = ma.person_id
+ ),
+totals AS (SELECT COUNT(*) AS n_patients_met_total FROM met_all
+ )
+SELECT c.signal_source,
+     CASE WHEN  COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count
+         ELSE COUNT(*)  END AS n_patients,
+    t.n_patients_met_total
+FROM classified c
+CROSS JOIN totals t
+GROUP BY c.signal_source, t.n_patients_met_total
+ORDER BY
+    CASE c.signal_source
+        WHEN 'DRUG_EXPOSURE_ON_OR_AFTER_MET' THEN 0
+        WHEN 'DTP_ONLY_ON_OR_AFTER_MET'      THEN 1
+        WHEN 'NEITHER_ON_OR_AFTER_MET'       THEN 2
+        ELSE 9
+    END
+  ;
+-- 30) G. Drug Therapy procedure characterization, part 1b. Which Drug Therapy
+--     procedure concept drives the procedure-only group.
+--     Among the procedure-only patients defined in chunk 29 (a Drug Therapy
+--     procedure on or after the first Metastasis, but NO antineoplastic
+--     drug_exposure on or after the first Metastasis), how many carry each of the
+--     four Drug Therapy procedure roots:
+--
+--       root_concept_id 4273629  Chemotherapy
+--       root_concept_id 4295112  Immunological therapy
+--       root_concept_id 37158316 Targeted chemotherapy for cancer
+--       root_concept_id 4061650  Hormone therapy
+--
+--     A patient counts under every root they carry a procedure for (on or after
+--     the first MET), so the per-root counts OVERLAP and do NOT sum to the
+--     procedure-only total. Only procedures on or after the first MET are counted,
+--     consistent with the chunk-29 procedure-only definition.
+--
+--     Denominator (n_procedure_only_total, repeated on each row):
+--       the DTP_ONLY_ON_OR_AFTER_MET group of chunk 29 (procedure on or after MET,
+--       no drug_exposure on or after MET). Re-derived here from the same source
+--       logic so the two chunks stay consistent.
+--
+--     Population, observation-period and source notes: same as chunk 29 (DX-anchored
+--     MET population from #met_events; L01 from #l01_events, gated to #anchor_person;
+--     Drug Therapy procedures from procedure_occurrence + #dtp_concepts restricted to
+--     the same cohort by the join to met_all; no observation-period gate). Per-root
+--     n_patients in (0, @min_cell_count] set to -@min_cell_count; n_procedure_only_total
+--     is an aggregate denominator, not suppressed. A root carried by zero
+--     procedure-only patients is absent.
+WITH met_all AS (SELECT person_id,
+        MIN(event_date) AS first_met_date
+    FROM vcbo5u4zmet_events
+    GROUP BY person_id
+ ),
+drugexp_flag AS (SELECT DISTINCT ma.person_id
+    FROM met_all ma
+    JOIN vcbo5u4zl01_events le
+      ON le.person_id = ma.person_id
+      WHERE le.event_date >= ma.first_met_date
+ ),
+proc_on_after AS (SELECT DISTINCT
+        ma.person_id,
+        dtp.root_concept_id
+    FROM met_all ma
+    JOIN @cdm_database_schema.procedure_occurrence po
+      ON po.person_id = ma.person_id
+    JOIN vcbo5u4zdtp_concepts dtp
+      ON po.procedure_concept_id = dtp.concept_id
+      WHERE po.procedure_date >= ma.first_met_date
+ ),
+proc_only AS (SELECT p.person_id, p.root_concept_id
+    FROM proc_on_after p
+    LEFT JOIN drugexp_flag d ON d.person_id = p.person_id
+      WHERE d.person_id IS NULL
+ ),
+totals AS (SELECT COUNT(DISTINCT person_id) AS n_procedure_only_total FROM proc_only
+ )
+SELECT po.root_concept_id,
+     CASE WHEN  COUNT(DISTINCT po.person_id) > 0
+          AND COUNT(DISTINCT po.person_id) <= @min_cell_count THEN -@min_cell_count
+         ELSE COUNT(DISTINCT po.person_id)  END AS n_patients,
+    t.n_procedure_only_total
+FROM proc_only po
+CROSS JOIN totals t
+GROUP BY po.root_concept_id, t.n_procedure_only_total
+ORDER BY COUNT(DISTINCT po.person_id) DESC, po.root_concept_id
+  ;
+-- 31) G. Drug Therapy procedure characterization (Part 2) <U+2014> timing of the first
+--     Drug Therapy procedure relative to the first Metastasis, directional.
+--     For patients who carry BOTH an anchor Metastasis (MET) code and a Drug
+--     Therapy procedure (DTP), the gap in days from the first MET to the first DTP
+--     is placed in exactly one directional bucket. Before and after the MET are
+--     kept separate; day 0 is its own explicit category, never folded into after:
+--
+--       DTP_GT90D_BEFORE_MET     first DTP more than 90 days before the first MET
+--       DTP_1_90D_BEFORE_MET     first DTP 1 to 90 days before the first MET
+--       DTP_ON_MET_DAY           first DTP on the first MET date (day 0)
+--       DTP_1_90D_AFTER_MET      first DTP 1 to 90 days after the first MET
+--       DTP_91_365D_AFTER_MET    first DTP 91 to 365 days after the first MET
+--       DTP_GT365D_AFTER_MET     first DTP more than 365 days after the first MET
+--
+--     gap_days = DATEDIFF(DAY, first_met_date, first_dtp_date): negative = before,
+--     0 = day 0, positive = after. One value per patient (first MET vs first DTP).
+--
+--     Denominator (n_patients_both_total, repeated on each row):
+--       patients who carry both an anchor MET code and at least one Drug Therapy
+--       procedure, over the DX-anchored MET population. "Patients with both events"
+--       within the DX-anchored cohort.
+--
+--     Population and observation-period notes: same as chunk 29 (DX-anchored MET
+--     population from #met_events; Drug Therapy procedures from procedure_occurrence +
+--     #dtp_concepts, restricted to the same cohort by the inner join to met_all; no
+--     observation-period gate). The DTP here is any Drug Therapy procedure regardless
+--     of concept root; the per-concept view is in chunks 30 and 32.
+--
+--     Small-cell suppression: n_patients in (0, @min_cell_count] set to
+--     -@min_cell_count. n_patients_both_total is an aggregate denominator, not
+--     suppressed. A bucket with zero patients is absent (as in chunks 22, 24).
+WITH met_all AS (SELECT person_id,
+        MIN(event_date) AS first_met_date
+    FROM vcbo5u4zmet_events
+    GROUP BY person_id
+ ),
+dtp_all AS (SELECT po.person_id,
+        MIN(po.procedure_date) AS first_dtp_date
+    FROM @cdm_database_schema.procedure_occurrence po
+    JOIN vcbo5u4zdtp_concepts dtp
+      ON po.procedure_concept_id = dtp.concept_id
+    GROUP BY po.person_id
+ ),
+gap AS (SELECT ma.person_id,
+        CEIL(CAST(da.first_dtp_date AS DATE) - CAST(ma.first_met_date AS DATE)) AS gap_days
+    FROM met_all ma
+    JOIN dtp_all da
+      ON da.person_id = ma.person_id
+ ),
+bucketed AS (SELECT person_id,
+        CASE
+            WHEN gap_days < -90                  THEN 'DTP_GT90D_BEFORE_MET'
+            WHEN gap_days < 0                    THEN 'DTP_1_90D_BEFORE_MET'
+            WHEN gap_days = 0                    THEN 'DTP_ON_MET_DAY'
+            WHEN gap_days <= 90                  THEN 'DTP_1_90D_AFTER_MET'
+            WHEN gap_days <= 365                 THEN 'DTP_91_365D_AFTER_MET'
+            ELSE                                      'DTP_GT365D_AFTER_MET'
+        END AS timing_bucket,
+        CASE
+            WHEN gap_days < -90                  THEN 1
+            WHEN gap_days < 0                    THEN 2
+            WHEN gap_days = 0                    THEN 3
+            WHEN gap_days <= 90                  THEN 4
+            WHEN gap_days <= 365                 THEN 5
+            ELSE                                      6
+        END AS bucket_order
+    FROM gap
+ ),
+totals AS (SELECT COUNT(*) AS n_patients_both_total FROM bucketed
+ )
+SELECT b.timing_bucket,
+     CASE WHEN  COUNT(*) > 0 AND COUNT(*) <= @min_cell_count THEN -@min_cell_count
+         ELSE COUNT(*)  END AS n_patients,
+    t.n_patients_both_total
+FROM bucketed b
+CROSS JOIN totals t
+GROUP BY b.timing_bucket, t.n_patients_both_total
+ORDER BY MIN(b.bucket_order)
+  ;
+-- 32) G. Drug Therapy procedure characterization, part 3. Does an antineoplastic
+--     drug_exposure sit near the Drug Therapy procedure, per procedure concept.
+--     For patients who carry a Drug Therapy procedure (DTP) of a given concept root,
+--     the number who also have an antineoplastic (L01) drug_exposure record within a
+--     fixed window of the procedure date. Directional: a drug_exposure in the window
+--     BEFORE the procedure, ON the procedure day (day 0), and in the window AFTER the
+--     procedure are counted separately and never combined into one symmetric window.
+--     All candidate window widths are emitted in one row so the report / UI can read
+--     off any before/after pair:
+--
+--       n_patients_with_procedure   patients carrying this DTP concept root
+--                                    (the row denominator)
+--       n_drugexp_le{7,14,30,90}d_before
+--                                    of those, how many have an L01 record whose
+--                                    closest occurrence before a procedure of this
+--                                    root is within 7 / 14 / 30 / 90 days
+--       n_drugexp_on_day0            how many have an L01 record on a procedure day
+--       n_drugexp_le{7,14,30,90}d_after
+--                                    closest L01 after a procedure within 7/14/30/90 d
+--       n_drugexp_ever               how many have any L01 record at any time (context)
+--
+--     Timing is measured from EACH procedure of the root: a patient counts in the
+--     "within N days before" column if any of their L01 records falls 1..N days
+--     before any of their procedures of that root (via the closest such record).
+--     The before / day-0 / after columns can overlap for a patient, so they need not
+--     sum. A high share means the procedure is corroborated by the drug table and
+--     adds little new capture; a low share means the procedure is largely the only
+--     record that treatment happened for that concept.
+--
+--     Denominator (n_patients_with_procedure, per row):
+--       patients who carry a Drug Therapy procedure of this concept root WITHIN the
+--       DX-anchored cohort (they also carry an anchor DX code). Part 3 characterizes
+--       procedure/drug redundancy per concept root, across the cohort rather than
+--       only the metastatic subset, so its per-concept denominators exceed the MET
+--       count but are still bounded by the DX-anchored cohort.
+--
+--     JUDGMENT CALL / FLAG (DX-anchoring, changed in this revision). This chunk now
+--     restricts both the DTP procedures and the L01 records to the DX-anchored cohort
+--     (#anchor_person), the same entry point as every other analysis in the package.
+--     Previously it read procedure_occurrence and drug_exposure UNGATED over all
+--     persons, including patients with no anchor cancer DX at all. Under the corrected
+--     foundational principle (every patient in this analysis carries an anchor DX code
+--     by construction), a Drug Therapy procedure or L01 record in a patient with no
+--     anchor DX gives no evidence about the cancer of interest's coding, the same
+--     argument that governs the Metastasis population in Analyses D, G-part-1 and H.
+--     Restricting to #anchor_person makes G-part-3 consistent with that principle.
+--     Note this does change the per-concept denominators versus the earlier ungated
+--     output: they are now smaller (cohort-only). This chunk does NOT use the MET
+--     population; MET-scoping would be wrong for a general procedure/drug redundancy
+--     check, so the correct anchoring here is the DX cohort, not the MET subset. If
+--     the intent is instead a cohort-independent instrument check (redundancy of the
+--     procedure concept itself across the whole database), revert the three
+--     #anchor_person joins below; flagged for AA rather than assumed.
+--
+--     JUDGMENT CALL / FLAG (observation period). Not restricted to an observation
+--     period, consistent with the rest of Analyses D, G and H. Anchored on
+--     #anchor_person (has an anchor DX code), not #cohort (DX inside an observation
+--     period). See the report for the recommendation.
+--
+--     JUDGMENT CALL / FLAG (suppression of the per-concept denominator).
+--     n_patients_with_procedure is itself a per-concept patient count, so it is
+--     suppressed like the other per-concept cells (chunk 06 convention): a value in
+--     (0, @min_cell_count] is set to -@min_cell_count. When it is suppressed the
+--     report cannot form a share for that row, the intended disclosure-control
+--     behaviour. Every co-occurrence count is suppressed the same way. A root carried
+--     by zero patients is absent.
+WITH proc_carriers AS (SELECT DISTINCT
+        po.person_id,
+        dtp.root_concept_id
+    FROM @cdm_database_schema.procedure_occurrence po
+    JOIN vcbo5u4zanchor_person ap
+      ON ap.person_id = po.person_id
+    JOIN vcbo5u4zdtp_concepts dtp
+      ON po.procedure_concept_id = dtp.concept_id
+ ),
+proc_dates AS (SELECT DISTINCT
+        po.person_id,
+        dtp.root_concept_id,
+        po.procedure_date
+    FROM @cdm_database_schema.procedure_occurrence po
+    JOIN vcbo5u4zanchor_person ap
+      ON ap.person_id = po.person_id
+    JOIN vcbo5u4zdtp_concepts dtp
+      ON po.procedure_concept_id = dtp.concept_id
+ ),
+l01_dates AS (SELECT DISTINCT
+        person_id,
+        event_date AS l01_date
+    FROM vcbo5u4zl01_events
+ ),
+pairs AS (SELECT pd.person_id,
+        pd.root_concept_id,
+        CEIL(CAST(ld.l01_date AS DATE) - CAST(pd.procedure_date AS DATE)) AS gap_days
+    FROM proc_dates pd
+    JOIN l01_dates ld
+      ON ld.person_id = pd.person_id
+ ),
+per_patient AS (SELECT person_id,
+        root_concept_id,
+        MIN(CASE WHEN gap_days < 0 THEN -gap_days END) AS closest_before_days,
+        MAX(CASE WHEN gap_days = 0 THEN 1 ELSE 0 END)  AS has_day0,
+        MIN(CASE WHEN gap_days > 0 THEN gap_days END)  AS closest_after_days,
+        1                                              AS has_l01_ever
+    FROM pairs
+    GROUP BY person_id, root_concept_id
+ ),
+joined AS (SELECT c.person_id,
+        c.root_concept_id,
+        pp.closest_before_days,
+        pp.has_day0,
+        pp.closest_after_days,
+        pp.has_l01_ever
+    FROM proc_carriers c
+    LEFT JOIN per_patient pp
+      ON pp.person_id = c.person_id
+     AND pp.root_concept_id = c.root_concept_id
+ ),
+agg AS (SELECT root_concept_id,
+        COUNT(*)                                                          AS n_with_proc,
+        SUM(CASE WHEN closest_before_days <= 7   THEN 1 ELSE 0 END)        AS n_before_7d,
+        SUM(CASE WHEN closest_before_days <= 14  THEN 1 ELSE 0 END)        AS n_before_14d,
+        SUM(CASE WHEN closest_before_days <= 30  THEN 1 ELSE 0 END)        AS n_before_30d,
+        SUM(CASE WHEN closest_before_days <= 90  THEN 1 ELSE 0 END)        AS n_before_90d,
+        SUM(CASE WHEN has_day0 = 1               THEN 1 ELSE 0 END)        AS n_day0,
+        SUM(CASE WHEN closest_after_days <= 7    THEN 1 ELSE 0 END)        AS n_after_7d,
+        SUM(CASE WHEN closest_after_days <= 14   THEN 1 ELSE 0 END)        AS n_after_14d,
+        SUM(CASE WHEN closest_after_days <= 30   THEN 1 ELSE 0 END)        AS n_after_30d,
+        SUM(CASE WHEN closest_after_days <= 90   THEN 1 ELSE 0 END)        AS n_after_90d,
+        SUM(CASE WHEN has_l01_ever = 1           THEN 1 ELSE 0 END)        AS n_ever
+    FROM joined
+    GROUP BY root_concept_id
+ )
+SELECT a.root_concept_id,
+    CASE WHEN a.n_with_proc  > 0 AND a.n_with_proc  <= @min_cell_count THEN -@min_cell_count ELSE a.n_with_proc  END AS n_patients_with_procedure,
+    CASE WHEN a.n_before_7d  > 0 AND a.n_before_7d  <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_7d  END AS n_drugexp_le7d_before,
+    CASE WHEN a.n_before_14d > 0 AND a.n_before_14d <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_14d END AS n_drugexp_le14d_before,
+    CASE WHEN a.n_before_30d > 0 AND a.n_before_30d <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_30d END AS n_drugexp_le30d_before,
+    CASE WHEN a.n_before_90d > 0 AND a.n_before_90d <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_90d END AS n_drugexp_le90d_before,
+    CASE WHEN a.n_day0       > 0 AND a.n_day0       <= @min_cell_count THEN -@min_cell_count ELSE a.n_day0       END AS n_drugexp_on_day0,
+    CASE WHEN a.n_after_7d   > 0 AND a.n_after_7d   <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_7d   END AS n_drugexp_le7d_after,
+    CASE WHEN a.n_after_14d  > 0 AND a.n_after_14d  <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_14d  END AS n_drugexp_le14d_after,
+    CASE WHEN a.n_after_30d  > 0 AND a.n_after_30d  <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_30d  END AS n_drugexp_le30d_after,
+    CASE WHEN a.n_after_90d  > 0 AND a.n_after_90d  <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_90d  END AS n_drugexp_le90d_after,
+    CASE WHEN a.n_ever       > 0 AND a.n_ever       <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever       END AS n_drugexp_ever
+FROM agg a
+ORDER BY a.n_with_proc DESC, a.root_concept_id
+ ;
+-- 33) B. General cancer diagnosis (GDX) coding trajectory <U+2014> part 1, categorical
+--     trajectory breakdown. Every patient in the anchor cohort (INDEX = first
+--     specific Diagnosis, #cohort.index_date) is placed in exactly one category by
+--     where their General cancer diagnosis (broad / non-specific "any malignant
+--     neoplasm"-type ancestor) codes fall relative to that first specific Diagnosis:
+--
+--       NONE                          no general cancer diagnosis code anywhere
+--       GENERAL_BEFORE_ONLY           general code(s) only strictly before the
+--                                       first specific Diagnosis (days < 0):
+--                                       pre-diagnostic / workup coding
+--       GENERAL_BOTH_BEFORE_AND_AFTER general code(s) on both sides: at least one
+--                                       strictly before AND at least one at or
+--                                       after the first specific Diagnosis
+--       GENERAL_AFTER_ONLY            general code(s) only at or after the first
+--                                       specific Diagnosis (days >= 0): reversion
+--                                       to non-specific coding once specific
+--
+--     Purpose: exclusion-criteria safety. A phenotype that excludes "any malignant
+--     neoplasm" via general codes would drop the BEFORE_ONLY and BOTH patients,
+--     whose general code appears before their specific Diagnosis and is really the
+--     same disease being worked up. This chunk quantifies that population.
+--
+--     Denominator (n_cohort_total, repeated on each row):
+--       the full anchor cohort = every patient with a first specific Diagnosis
+--       inside an observation period (#cohort, the INDEX population).
+--
+--     JUDGMENT CALL / FLAG (day-0 convention in the four categories). The four
+--     categories use the same before(days < 0) / at-or-after(days >= 0) split as the
+--     approved V3 mock and chunk 06's ever_before / ever_after convention, so the
+--     category counts reconcile exactly to the validated HUS numbers (of 618
+--     patients with a general code: before-only 74 / both 186 / after-only 358). A
+--     general code falling exactly on the first-Diagnosis date (day 0) is therefore
+--     counted on the at-or-after side. To honour the framework's day-0-explicit
+--     principle WITHOUT changing those validated totals, the extra column
+--     n_general_at_day0 reports, within each category, how many patients carry a
+--     general code exactly at day 0. The fully day-0-separated timing (before / at
+--     day 0 / after as distinct masses) is delivered in chunks 34 (first-general
+--     timing CDF) and 35 (per-concept windowed counts). If a pure four-column
+--     breakdown is preferred, the n_general_at_day0 column can be dropped without
+--     affecting the category counts.
+--
+--     JUDGMENT CALL / FLAG (anchor). This trajectory is anchored to the first
+--     specific Diagnosis (INDEX) only, matching Analysis B's spec ("relative to the
+--     first specific DX") and the approved V3 mock. A first-Metastasis-anchored
+--     variant is not part of B; general-code prevalence around the first Metastasis
+--     is covered generically by chunk 06.
+--
+--     Population note. #gen_cancer_events is restricted to anchor-cohort persons in
+--     00_setup.sql; #cohort is the observation-period-gated DX cohort and is a
+--     subset of those persons, so the join is complete. General-code dates are not
+--     themselves restricted to an observation period, matching the mock ("anywhere
+--     in the record" relative to the first specific Diagnosis).
+--
+--     Small-cell suppression: n_patients and n_general_at_day0 in (0, @min_cell_count]
+--     set to -@min_cell_count. n_cohort_total is an aggregate denominator, not
+--     suppressed. A category with zero patients is absent.
+WITH gdx_flags AS (SELECT g.person_id,
+        MAX(CASE WHEN CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) <  0 THEN 1 ELSE 0 END) AS has_before,
+        MAX(CASE WHEN CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) =  0 THEN 1 ELSE 0 END) AS has_day0,
+        MAX(CASE WHEN CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) >  0 THEN 1 ELSE 0 END) AS has_after_strict
+    FROM vcbo5u4zgen_cancer_events g
+    JOIN vcbo5u4zcohort c
+      ON g.person_id = c.person_id
+    GROUP BY g.person_id
+ ),
+classified AS (SELECT c.person_id,
+        CASE
+            WHEN g.person_id IS NULL                                      THEN 'NONE'
+            WHEN g.has_before = 1 AND (g.has_day0 = 1 OR g.has_after_strict = 1) THEN 'GENERAL_BOTH_BEFORE_AND_AFTER'
+            WHEN g.has_before = 1                                         THEN 'GENERAL_BEFORE_ONLY'
+            ELSE                                                               'GENERAL_AFTER_ONLY'
+        END AS trajectory_category,
+        CASE WHEN g.has_day0 = 1 THEN 1 ELSE 0 END AS at_day0
+    FROM vcbo5u4zcohort c
+    LEFT JOIN gdx_flags g
+      ON g.person_id = c.person_id
+ ),
+totals AS (SELECT COUNT(*) AS n_cohort_total FROM vcbo5u4zcohort
+ )
+SELECT c.trajectory_category,
+     CASE WHEN  COUNT(*) > 0 AND COUNT(*) <= @min_cell_count
+         THEN -@min_cell_count ELSE COUNT(*)  END AS n_patients,
+    CASE WHEN SUM(c.at_day0) > 0 AND SUM(c.at_day0) <= @min_cell_count
+         THEN -@min_cell_count ELSE SUM(c.at_day0) END AS n_general_at_day0,
+    t.n_cohort_total
+FROM classified c
+CROSS JOIN totals t
+GROUP BY c.trajectory_category, t.n_cohort_total
+ORDER BY
+    CASE c.trajectory_category
+        WHEN 'NONE'                          THEN 0
+        WHEN 'GENERAL_BEFORE_ONLY'           THEN 1
+        WHEN 'GENERAL_BOTH_BEFORE_AND_AFTER' THEN 2
+        WHEN 'GENERAL_AFTER_ONLY'            THEN 3
+        ELSE 9
+    END
+  ;
+-- 34) B. General cancer diagnosis (GDX) coding trajectory <U+2014> part 2, timing of the
+--     FIRST general cancer diagnosis code relative to the first specific Diagnosis
+--     (INDEX = #cohort.index_date), directional and CDF-style, with day 0 explicit.
+--     Over the anchor-cohort patients who carry at least one general cancer
+--     diagnosis code, each patient contributes one signed gap:
+--
+--       signed_days = first_general_code_date - first_specific_diagnosis_date
+--
+--     negative = the first general code precedes the first specific Diagnosis
+--     (pre-diagnostic / workup coding); zero = same calendar day; positive = the
+--     first general code follows the first specific Diagnosis.
+--
+--     Three directional masses (mutually exclusive, sum to n_with_general_code):
+--       n_first_general_before   signed_days < 0
+--       n_first_general_day0     signed_days = 0   (explicit central category)
+--       n_first_general_after    signed_days > 0
+--
+--     Cumulative (CDF) reach on each side, counted outward from day 0 and
+--     monotonically non-decreasing across thresholds:
+--       before side (subset of n_first_general_before):
+--         n_first_general_within_30d_before   -30 <= signed_days <= -1
+--         _90d, _180d, _365d                  wider look-back windows
+--         tail earlier than 1 year before = n_first_general_before - within_365d_before
+--       after side (subset of n_first_general_after):
+--         n_first_general_within_30d_after     1 <= signed_days <= 30
+--         _90d, _180d, _365d                   wider follow-up windows
+--         tail later than 1 year after = n_first_general_after - within_365d_after
+--
+--     median_signed_days_first_general: median of signed_days over all patients with
+--     a general code (single value; positive means the first general code typically
+--     follows the first specific Diagnosis). Framework ordered-set median convention
+--     (lower-middle value for even n, as in chunks 16-17, 23, 27 and 00_setup.sql).
+--     Validation reference: the approved V3 mock reports a first-general-to-first-
+--     Diagnosis median of +11 days at HUS with a long pre-diagnostic (before) tail.
+--
+--     NOTE (direction). Before and after use their own outward-cumulative counts and
+--     are never combined into a symmetric window; day 0 is its own mass, not folded
+--     into the after side.
+--
+--     Denominator (n_with_general_code, repeated on the single row):
+--       anchor-cohort patients with >= 1 general cancer diagnosis code (the union of
+--       the three trajectory categories in chunk 33; validated HUS total = 618).
+--
+--     Population note. Uses #gen_cancer_summary.first_gen_cancer_date, the earliest
+--     general-code date per cohort patient (built in 00_setup.sql over
+--     #gen_cancer_events joined to #cohort). General-code dates are not restricted to
+--     an observation period, matching the mock.
+--
+--     Small-cell suppression: each directional/cumulative count in (0, @min_cell_count]
+--     set to -@min_cell_count; median set to NULL when its denominator
+--     (n_with_general_code) is suppressed. n_with_general_code is an aggregate
+--     denominator, not suppressed.
+WITH first_general AS (SELECT gs.person_id,
+        CEIL(CAST(gs.first_gen_cancer_date AS DATE) - CAST(c.index_date AS DATE)) AS signed_days
+    FROM vcbo5u4zgen_cancer_summary gs
+    JOIN vcbo5u4zcohort c
+      ON gs.person_id = c.person_id
+      WHERE gs.first_gen_cancer_date IS NOT NULL
+ ),
+med AS (SELECT MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(signed_days AS FLOAT) END) AS median_days
+    FROM (SELECT signed_days,
+            ROW_NUMBER() OVER (ORDER BY signed_days) AS rn,
+            COUNT(*)     OVER ()                     AS cnt
+        FROM first_general
+     ) x
+ ),
+agg AS (SELECT COUNT(*) AS n_total,
+        SUM(CASE WHEN signed_days <  0 THEN 1 ELSE 0 END) AS n_before,
+        SUM(CASE WHEN signed_days =  0 THEN 1 ELSE 0 END) AS n_day0,
+        SUM(CASE WHEN signed_days >  0 THEN 1 ELSE 0 END) AS n_after,
+        SUM(CASE WHEN signed_days >= -30  AND signed_days <= -1 THEN 1 ELSE 0 END) AS n_b30,
+        SUM(CASE WHEN signed_days >= -90  AND signed_days <= -1 THEN 1 ELSE 0 END) AS n_b90,
+        SUM(CASE WHEN signed_days >= -180 AND signed_days <= -1 THEN 1 ELSE 0 END) AS n_b180,
+        SUM(CASE WHEN signed_days >= -365 AND signed_days <= -1 THEN 1 ELSE 0 END) AS n_b365,
+        SUM(CASE WHEN signed_days >= 1   AND signed_days <= 30  THEN 1 ELSE 0 END) AS n_a30,
+        SUM(CASE WHEN signed_days >= 1   AND signed_days <= 90  THEN 1 ELSE 0 END) AS n_a90,
+        SUM(CASE WHEN signed_days >= 1   AND signed_days <= 180 THEN 1 ELSE 0 END) AS n_a180,
+        SUM(CASE WHEN signed_days >= 1   AND signed_days <= 365 THEN 1 ELSE 0 END) AS n_a365
+    FROM first_general
+ )
+SELECT a.n_total AS n_with_general_code,
+    CASE WHEN a.n_before > 0 AND a.n_before <= @min_cell_count THEN -@min_cell_count ELSE a.n_before END AS n_first_general_before,
+    CASE WHEN a.n_b30    > 0 AND a.n_b30    <= @min_cell_count THEN -@min_cell_count ELSE a.n_b30    END AS n_first_general_within_30d_before,
+    CASE WHEN a.n_b90    > 0 AND a.n_b90    <= @min_cell_count THEN -@min_cell_count ELSE a.n_b90    END AS n_first_general_within_90d_before,
+    CASE WHEN a.n_b180   > 0 AND a.n_b180   <= @min_cell_count THEN -@min_cell_count ELSE a.n_b180   END AS n_first_general_within_180d_before,
+    CASE WHEN a.n_b365   > 0 AND a.n_b365   <= @min_cell_count THEN -@min_cell_count ELSE a.n_b365   END AS n_first_general_within_365d_before,
+    CASE WHEN a.n_day0   > 0 AND a.n_day0   <= @min_cell_count THEN -@min_cell_count ELSE a.n_day0   END AS n_first_general_day0,
+    CASE WHEN a.n_after  > 0 AND a.n_after  <= @min_cell_count THEN -@min_cell_count ELSE a.n_after  END AS n_first_general_after,
+    CASE WHEN a.n_a30    > 0 AND a.n_a30    <= @min_cell_count THEN -@min_cell_count ELSE a.n_a30    END AS n_first_general_within_30d_after,
+    CASE WHEN a.n_a90    > 0 AND a.n_a90    <= @min_cell_count THEN -@min_cell_count ELSE a.n_a90    END AS n_first_general_within_90d_after,
+    CASE WHEN a.n_a180   > 0 AND a.n_a180   <= @min_cell_count THEN -@min_cell_count ELSE a.n_a180   END AS n_first_general_within_180d_after,
+    CASE WHEN a.n_a365   > 0 AND a.n_a365   <= @min_cell_count THEN -@min_cell_count ELSE a.n_a365   END AS n_first_general_within_365d_after,
+    CASE WHEN a.n_total <= @min_cell_count THEN NULL ELSE m.median_days END AS median_signed_days_first_general
+FROM agg a
+CROSS JOIN med m
+ ;
+-- 35) B. General cancer diagnosis (GDX) coding trajectory <U+2014> part 3, per-concept
+--     directional windowed counts. One row per general cancer diagnosis (broad /
+--     non-specific ancestor) concept carried by the anchor cohort, with the number
+--     of distinct cohort patients holding a code of that concept in each window
+--     relative to the first specific Diagnosis (INDEX = #cohort.index_date). All
+--     timing is directional with day 0 explicit:
+--
+--       days = general_code_date - first_specific_diagnosis_date
+--
+--     Columns (distinct patients holding >= 1 code of the concept in the region;
+--     the three regions overlap, so before + at day 0 + after can exceed n_patients
+--     because one patient may hold codes on more than one side):
+--       n_patients        any time (the concept's overall patient count)
+--       before side (strictly before, days < 0), cumulative outward from day 0:
+--         n_before_30d   -30 <= days <= -1
+--         n_before_90d, n_before_180d, n_before_365d
+--         n_ever_before  days < 0 (no upper look-back bound)
+--       n_at_day0         days = 0 (explicit central category)
+--       after side (strictly after, days > 0), cumulative outward from day 0:
+--         n_after_30d     1 <= days <= 30
+--         n_after_90d, n_after_180d, n_after_365d
+--         n_ever_after   days > 0 (no upper follow-up bound)
+--
+--     Purpose: exclusion-criteria safety at the concept level. Concepts carried
+--     mostly BEFORE the first specific Diagnosis (high n_ever_before) are the ones a
+--     naive "any malignant neoplasm" exclusion would wrongly remove; the report
+--     builds an adjustable capture window from these directional counts.
+--
+--     JUDGMENT CALL / FLAG (directional vs the mock's modelled split). The approved
+--     V3 mock supplied REAL HUS patient counts per concept (n_patients / ever, and
+--     ever-before / ever-after) but MODELLED the by-window before/after split from
+--     symmetric +/-30/90/180/365 counts because a directional windowed output did
+--     not yet exist. This chunk produces that directional output directly: the
+--     before and after windows are true strictly-before and strictly-after counts,
+--     not a modelled split of a symmetric window, and day 0 is its own separate
+--     mass. Two columns reconcile exactly to the mock's real counts: n_patients
+--     matches the mock "ever" (e.g. Malignant tumor of kidney 368, Primary malignant
+--     neoplasm of urinary system 57) and n_ever_before matches the mock ever-before
+--     (kidney 164, urinary system 14). n_ever_after here is strictly after (days > 0)
+--     with day 0 carved out into n_at_day0, so it is <= the mock's ever-after, which
+--     used days >= 0; this is the intended day-0-explicit correction.
+--
+--     JUDGMENT CALL / FLAG (concept coverage and the >10 filter). All general
+--     cancer diagnosis concepts present in the cohort are emitted, each cell
+--     small-cell suppressed, matching chunk 06's behaviour. The approved mock's
+--     "more than 10 patients" cut-off is an adjustable DISPLAY threshold applied by
+--     the report builder, not a hard filter here, so the report can raise or lower
+--     it without re-running SQL.
+--
+--     JUDGMENT CALL / FLAG (anchor). INDEX (first specific Diagnosis) only, matching
+--     Analysis B's spec and the approved mock. General-code prevalence around the
+--     first Metastasis is covered generically by chunk 06.
+--
+--     Denominator: n_patients per concept (on the row); the anchor-cohort total
+--     (chunk 33 n_cohort_total) is the population base for the report's
+--     percent-of-cohort figures.
+--
+--     Population note. #gen_cancer_events is restricted to anchor-cohort persons in
+--     00_setup.sql and joined to #cohort here; general-code dates are not restricted
+--     to an observation period, matching the mock.
+--
+--     Small-cell suppression: every count in (0, @min_cell_count] set to
+--     -@min_cell_count.
+WITH patient_concept AS (SELECT g.concept_id,
+        g.person_id,
+        MAX(CASE WHEN CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) >= -30  AND CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) <= -1 THEN 1 ELSE 0 END) AS in_before_30d,
+        MAX(CASE WHEN CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) >= -90  AND CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) <= -1 THEN 1 ELSE 0 END) AS in_before_90d,
+        MAX(CASE WHEN CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) >= -180 AND CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) <= -1 THEN 1 ELSE 0 END) AS in_before_180d,
+        MAX(CASE WHEN CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) >= -365 AND CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) <= -1 THEN 1 ELSE 0 END) AS in_before_365d,
+        MAX(CASE WHEN CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) <  0 THEN 1 ELSE 0 END) AS in_ever_before,
+        MAX(CASE WHEN CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) =  0 THEN 1 ELSE 0 END) AS in_day0,
+        MAX(CASE WHEN CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) >= 1 AND CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) <= 30  THEN 1 ELSE 0 END) AS in_after_30d,
+        MAX(CASE WHEN CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) >= 1 AND CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) <= 90  THEN 1 ELSE 0 END) AS in_after_90d,
+        MAX(CASE WHEN CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) >= 1 AND CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) <= 180 THEN 1 ELSE 0 END) AS in_after_180d,
+        MAX(CASE WHEN CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) >= 1 AND CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) <= 365 THEN 1 ELSE 0 END) AS in_after_365d,
+        MAX(CASE WHEN CEIL(CAST(g.event_date AS DATE) - CAST(c.index_date AS DATE)) >  0 THEN 1 ELSE 0 END) AS in_ever_after
+    FROM vcbo5u4zgen_cancer_events g
+    JOIN vcbo5u4zcohort c
+      ON g.person_id = c.person_id
+    GROUP BY g.concept_id, g.person_id
+ ),
+agg AS (SELECT concept_id,
+        COUNT(*)               AS n_patients,
+        SUM(in_before_30d)     AS n_before_30d,
+        SUM(in_before_90d)     AS n_before_90d,
+        SUM(in_before_180d)    AS n_before_180d,
+        SUM(in_before_365d)    AS n_before_365d,
+        SUM(in_ever_before)    AS n_ever_before,
+        SUM(in_day0)           AS n_at_day0,
+        SUM(in_after_30d)      AS n_after_30d,
+        SUM(in_after_90d)      AS n_after_90d,
+        SUM(in_after_180d)     AS n_after_180d,
+        SUM(in_after_365d)     AS n_after_365d,
+        SUM(in_ever_after)     AS n_ever_after
+    FROM patient_concept
+    GROUP BY concept_id
+ )
+SELECT a.concept_id,
+    CASE WHEN a.n_patients    > 0 AND a.n_patients    <= @min_cell_count THEN -@min_cell_count ELSE a.n_patients    END AS n_patients,
+    CASE WHEN a.n_before_30d  > 0 AND a.n_before_30d  <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_30d  END AS n_before_30d,
+    CASE WHEN a.n_before_90d  > 0 AND a.n_before_90d  <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_90d  END AS n_before_90d,
+    CASE WHEN a.n_before_180d > 0 AND a.n_before_180d <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_180d END AS n_before_180d,
+    CASE WHEN a.n_before_365d > 0 AND a.n_before_365d <= @min_cell_count THEN -@min_cell_count ELSE a.n_before_365d END AS n_before_365d,
+    CASE WHEN a.n_ever_before > 0 AND a.n_ever_before <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_before END AS n_ever_before,
+    CASE WHEN a.n_at_day0     > 0 AND a.n_at_day0     <= @min_cell_count THEN -@min_cell_count ELSE a.n_at_day0     END AS n_at_day0,
+    CASE WHEN a.n_after_30d   > 0 AND a.n_after_30d   <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_30d   END AS n_after_30d,
+    CASE WHEN a.n_after_90d   > 0 AND a.n_after_90d   <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_90d   END AS n_after_90d,
+    CASE WHEN a.n_after_180d  > 0 AND a.n_after_180d  <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_180d  END AS n_after_180d,
+    CASE WHEN a.n_after_365d  > 0 AND a.n_after_365d  <= @min_cell_count THEN -@min_cell_count ELSE a.n_after_365d  END AS n_after_365d,
+    CASE WHEN a.n_ever_after  > 0 AND a.n_ever_after  <= @min_cell_count THEN -@min_cell_count ELSE a.n_ever_after  END AS n_ever_after
+FROM agg a
+ORDER BY
+    a.n_patients DESC,
+    a.concept_id
+ ;
 

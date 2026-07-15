@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : pdw
--- Translated     : 2026-05-07 12:40:11 BST
+-- Translated     : 2026-07-15 15:36:58 CEST
 -- Source file    : sql/sql_server/chunks/01_population_prevalence.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R

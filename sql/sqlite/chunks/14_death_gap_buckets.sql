@@ -2,13 +2,13 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : sqlite
--- Translated     : 2026-05-07 12:40:24 BST
+-- Translated     : 2026-07-15 15:37:32 CEST
 -- Source file    : sql/sql_server/chunks/14_death_gap_buckets.sql
--- DO NOT EDIT — edit the sql_server source and re-run
+-- DO NOT EDIT <e2><80><94> edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
 -- ============================================================
 
--- 14) Death date vs observation period — bucketed gap histogram
+-- 14) Death date vs observation period <U+2014> bucketed gap histogram
 --     Restricted to patients where death_date > obs_period_end_date.
 --     Exported for both INDEX (all DX cohort) and FIRST_MET (MET subgroup)
 --     so that each can be shown as a separate figure in the report.

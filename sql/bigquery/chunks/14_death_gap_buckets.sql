@@ -2,9 +2,9 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-07 12:40:20 BST
+-- Translated     : 2026-07-15 15:37:23 CEST
 -- Source file    : sql/sql_server/chunks/14_death_gap_buckets.sql
--- DO NOT EDIT — edit the sql_server source and re-run
+-- DO NOT EDIT <e2><80><94> edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
 -- ============================================================
 -- WARNING: This dialect (bigquery) does not support native session
@@ -13,7 +13,7 @@
 --   Without it, #temp table references become permanent tables and
 --   may cause permission errors or name collisions.
 
--- 14) Death date vs observation period — bucketed gap histogram
+-- 14) Death date vs observation period <U+2014> bucketed gap histogram
 --     Restricted to patients where death_date > obs_period_end_date.
 --     Exported for both INDEX (all DX cohort) and FIRST_MET (MET subgroup)
 --     so that each can be shown as a separate figure in the report.
@@ -22,7 +22,7 @@ with patient_obs as (
         min(observation_period_start_date) as first_obs_start,
         max(observation_period_end_date)   as last_obs_end
      from @cdm_database_schema.observation_period
-    where person_id in (select person_id from a9of9doxcohort)
+    where person_id in (select person_id from vcbo5u4zcohort)
      group by  1 ),
 death_obs_gaps as (
     select
@@ -33,9 +33,9 @@ death_obs_gaps as (
                 then DATE_DIFF(IF(SAFE_CAST(dos.death_date  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(dos.death_date  AS STRING)),SAFE_CAST(dos.death_date  AS DATE)), IF(SAFE_CAST(po.last_obs_end  AS DATE) IS NULL,PARSE_DATE('%Y%m%d', cast(po.last_obs_end  AS STRING)),SAFE_CAST(po.last_obs_end  AS DATE)), DAY)
             else null
         end as gap_death_after_obs
-    from a9of9doxcohort c
-    inner join a9of9doxdeath_obs_status dos on dos.person_id = c.person_id
-    left join a9of9doxmet_summary ms        on ms.person_id  = c.person_id
+    from vcbo5u4zcohort c
+    inner join vcbo5u4zdeath_obs_status dos on dos.person_id = c.person_id
+    left join vcbo5u4zmet_summary ms        on ms.person_id  = c.person_id
     left join patient_obs po         on po.person_id  = c.person_id
 ),
 bucketed as (

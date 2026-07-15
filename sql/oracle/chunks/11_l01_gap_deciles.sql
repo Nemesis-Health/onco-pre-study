@@ -2,9 +2,9 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : oracle
--- Translated     : 2026-05-07 12:40:10 BST
+-- Translated     : 2026-07-15 15:36:52 CEST
 -- Source file    : sql/sql_server/chunks/11_l01_gap_deciles.sql
--- DO NOT EDIT — edit the sql_server source and re-run
+-- DO NOT EDIT <e2><80><94> edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
 -- ============================================================
 -- WARNING: This dialect (oracle) does not support native session
@@ -13,7 +13,7 @@
 --   Without it, #temp table references become permanent tables and
 --   may cause permission errors or name collisions.
 
--- 11) L01 consecutive record gap distribution — decile summary
+-- 11) L01 consecutive record gap distribution <U+2014> decile summary
 --     Intermediate tables #l01_event_days and #l01_consecutive_gaps are
 --     built in 00_setup.sql (section L).
 --
@@ -35,7 +35,7 @@ SELECT subgroup,
 FROM (SELECT subgroup, person_id, gap_days,
         ROW_NUMBER() OVER (PARTITION BY subgroup ORDER BY gap_days) AS rn,
         COUNT(*)     OVER (PARTITION BY subgroup)                   AS cnt
-    FROM a9of9doxl01_consecutive_gaps
+    FROM vcbo5u4zl01_consecutive_gaps
  ) x
 GROUP BY subgroup
 ORDER BY subgroup

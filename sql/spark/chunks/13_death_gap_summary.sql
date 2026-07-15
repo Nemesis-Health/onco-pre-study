@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : spark
--- Translated     : 2026-05-07 12:40:21 BST
+-- Translated     : 2026-07-15 15:37:26 CEST
 -- Source file    : sql/sql_server/chunks/13_death_gap_summary.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -19,7 +19,7 @@ WITH patient_obs AS (
  MIN(observation_period_start_date) AS first_obs_start,
  MAX(observation_period_end_date) AS last_obs_end
  FROM @cdm_database_schema.observation_period
- WHERE person_id IN (SELECT person_id FROM a9of9doxcohort)
+ WHERE person_id IN (SELECT person_id FROM vcbo5u4zcohort)
  GROUP BY person_id
 ),
 death_obs_gaps AS (
@@ -40,9 +40,9 @@ death_obs_gaps AS (
  THEN 1
  ELSE 0
  END AS death_before_obs
- FROM a9of9doxcohort c
- INNER JOIN a9of9doxdeath_obs_status dos ON dos.person_id = c.person_id
- LEFT JOIN a9of9doxmet_summary ms ON ms.person_id = c.person_id
+ FROM vcbo5u4zcohort c
+ INNER JOIN vcbo5u4zdeath_obs_status dos ON dos.person_id = c.person_id
+ LEFT JOIN vcbo5u4zmet_summary ms ON ms.person_id = c.person_id
  LEFT JOIN patient_obs po ON po.person_id = c.person_id
 )
 SELECT
@@ -58,10 +58,10 @@ FROM (
  'INDEX' AS anchor_event,
  SUM(CASE WHEN death_before_obs = 1 THEN 1 ELSE 0 END) AS n_death_before_obs,
  SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) AS n_death_after_obs,
- MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 4.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS DOUBLE) END) AS lq_gap_days,
- MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 2.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS DOUBLE) END) AS median_gap_days,
- MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 4.0 * rn >= 3 * non_null_cnt THEN CAST(gap_death_after_obs AS DOUBLE) END) AS uq_gap_days,
- MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 10.0 * rn >= 9 * non_null_cnt THEN CAST(gap_death_after_obs AS DOUBLE) END) AS p90_gap_days
+ MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 4.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT) END) AS lq_gap_days,
+ MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 2.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT) END) AS median_gap_days,
+ MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 4.0 * rn >= 3 * non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT) END) AS uq_gap_days,
+ MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 10.0 * rn >= 9 * non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT) END) AS p90_gap_days
  FROM (
  SELECT death_before_obs, gap_death_after_obs,
  ROW_NUMBER() OVER (ORDER BY gap_death_after_obs) AS rn,
@@ -74,10 +74,10 @@ FROM (
  'FIRST_MET' AS anchor_event,
  SUM(CASE WHEN death_before_obs = 1 THEN 1 ELSE 0 END) AS n_death_before_obs,
  SUM(CASE WHEN gap_death_after_obs IS NOT NULL THEN 1 ELSE 0 END) AS n_death_after_obs,
- MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 4.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS DOUBLE) END) AS lq_gap_days,
- MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 2.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS DOUBLE) END) AS median_gap_days,
- MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 4.0 * rn >= 3 * non_null_cnt THEN CAST(gap_death_after_obs AS DOUBLE) END) AS uq_gap_days,
- MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 10.0 * rn >= 9 * non_null_cnt THEN CAST(gap_death_after_obs AS DOUBLE) END) AS p90_gap_days
+ MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 4.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT) END) AS lq_gap_days,
+ MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 2.0 * rn >= non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT) END) AS median_gap_days,
+ MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 4.0 * rn >= 3 * non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT) END) AS uq_gap_days,
+ MIN(CASE WHEN gap_death_after_obs IS NOT NULL AND 10.0 * rn >= 9 * non_null_cnt THEN CAST(gap_death_after_obs AS FLOAT) END) AS p90_gap_days
  FROM (
  SELECT death_before_obs, gap_death_after_obs,
  ROW_NUMBER() OVER (ORDER BY gap_death_after_obs) AS rn,

@@ -2,16 +2,16 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : redshift
--- Translated     : 2026-05-07 12:40:24 BST
+-- Translated     : 2026-07-15 15:37:35 CEST
 -- Source file    : sql/sql_server/chunks/13_death_gap_summary.sql
--- DO NOT EDIT — edit the sql_server source and re-run
+-- DO NOT EDIT <e2><80><94> edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
 -- ============================================================
 
--- 13) Death date vs observation period alignment — summary counts
+-- 13) Death date vs observation period alignment <U+2014> summary counts
 --     For patients in the DX cohort (and the FIRST_MET subgroup), reports:
 --       - n_death_before_obs : death_date < first observation_period_start
---                              (data quality error — rare but important)
+--                              (data quality error <U+2014> rare but important)
 --       - n_death_after_obs  : death_date > last  observation_period_end
 --                              (gap distribution summarized in chunk 14)
 --       - lq/median/uq/p90 percentiles of the post-obs gap (days).

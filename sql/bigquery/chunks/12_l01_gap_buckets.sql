@@ -2,9 +2,9 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-07 12:40:20 BST
+-- Translated     : 2026-07-15 15:37:23 CEST
 -- Source file    : sql/sql_server/chunks/12_l01_gap_buckets.sql
--- DO NOT EDIT — edit the sql_server source and re-run
+-- DO NOT EDIT <e2><80><94> edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
 -- ============================================================
 -- WARNING: This dialect (bigquery) does not support native session
@@ -13,7 +13,7 @@
 --   Without it, #temp table references become permanent tables and
 --   may cause permission errors or name collisions.
 
--- 12) L01 consecutive record gap distribution — bucketed histogram
+-- 12) L01 consecutive record gap distribution <U+2014> bucketed histogram
 --     Intermediate table #l01_consecutive_gaps is built in 00_setup.sql
 --     (section L).  Same subgroups as chunk 11 (ALL_L01, MET_L01).
 --
@@ -29,7 +29,7 @@
         else 'ge365d'
     end as gap_bucket,
     case when count(*) > 0 and count(*) <= @min_cell_count then -@min_cell_count else count(*) end as n_gaps
-   from a9of9doxl01_consecutive_gaps
+   from vcbo5u4zl01_consecutive_gaps
   group by  1, 2   order by  1, min(case
         when gap_days <  30  then 1
         when gap_days <  60  then 2

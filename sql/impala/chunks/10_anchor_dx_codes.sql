@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : impala
--- Translated     : 2026-05-07 12:40:16 BST
+-- Translated     : 2026-07-15 15:37:03 CEST
 -- Source file    : sql/sql_server/chunks/10_anchor_dx_codes.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -20,7 +20,7 @@ WITH dx_days AS (
         person_id,
         event_date,
         concept_id
-    FROM a9of9doxdx_events
+    FROM vcbo5u4zdx_events
 )
 SELECT
     s.concept_id,

@@ -2,9 +2,9 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-07 12:40:20 BST
+-- Translated     : 2026-07-15 15:37:23 CEST
 -- Source file    : sql/sql_server/chunks/13_death_gap_summary.sql
--- DO NOT EDIT — edit the sql_server source and re-run
+-- DO NOT EDIT <e2><80><94> edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
 -- ============================================================
 -- WARNING: This dialect (bigquery) does not support native session
@@ -13,10 +13,10 @@
 --   Without it, #temp table references become permanent tables and
 --   may cause permission errors or name collisions.
 
--- 13) Death date vs observation period alignment — summary counts
+-- 13) Death date vs observation period alignment <U+2014> summary counts
 --     For patients in the DX cohort (and the FIRST_MET subgroup), reports:
 --       - n_death_before_obs : death_date < first observation_period_start
---                              (data quality error — rare but important)
+--                              (data quality error <U+2014> rare but important)
 --       - n_death_after_obs  : death_date > last  observation_period_end
 --                              (gap distribution summarized in chunk 14)
 --       - lq/median/uq/p90 percentiles of the post-obs gap (days).
@@ -29,7 +29,7 @@ with patient_obs as (
         min(observation_period_start_date) as first_obs_start,
         max(observation_period_end_date)   as last_obs_end
      from @cdm_database_schema.observation_period
-    where person_id in (select person_id from a9of9doxcohort)
+    where person_id in (select person_id from vcbo5u4zcohort)
      group by  1 ),
 death_obs_gaps as (
     select
@@ -49,9 +49,9 @@ death_obs_gaps as (
                 then 1
             else 0
         end as death_before_obs
-    from a9of9doxcohort c
-    inner join a9of9doxdeath_obs_status dos on dos.person_id = c.person_id
-    left join a9of9doxmet_summary ms on ms.person_id = c.person_id
+    from vcbo5u4zcohort c
+    inner join vcbo5u4zdeath_obs_status dos on dos.person_id = c.person_id
+    left join vcbo5u4zmet_summary ms on ms.person_id = c.person_id
     left join patient_obs po  on po.person_id  = c.person_id
 )
 select
