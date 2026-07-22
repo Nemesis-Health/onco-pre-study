@@ -2,16 +2,16 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : iris
--- Translated     : 2026-05-07 12:40:29 BST
+-- Translated     : 2026-07-15 15:37:54 CEST
 -- Source file    : sql/sql_server/chunks/13_death_gap_summary.sql
--- DO NOT EDIT — edit the sql_server source and re-run
+-- DO NOT EDIT <e2><80><94> edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
 -- ============================================================
 
--- 13) Death date vs observation period alignment — summary counts
+-- 13) Death date vs observation period alignment <U+2014> summary counts
 --     For patients in the DX cohort (and the FIRST_MET subgroup), reports:
 --       - n_death_before_obs : death_date < first observation_period_start
---                              (data quality error — rare but important)
+--                              (data quality error <U+2014> rare but important)
 --       - n_death_after_obs  : death_date > last  observation_period_end
 --                              (gap distribution summarized in chunk 14)
 --       - lq/median/uq/p90 percentiles of the post-obs gap (days).
@@ -25,7 +25,7 @@ WITH patient_obs AS (
         MIN(observation_period_start_date) AS first_obs_start,
         MAX(observation_period_end_date)   AS last_obs_end
     FROM @cdm_database_schema.observation_period
-    WHERE person_id IN (SELECT person_id FROM a9of9doxcohort)
+    WHERE person_id IN (SELECT person_id FROM vcbo5u4zcohort)
     GROUP BY person_id
 ),
 death_obs_gaps AS (
@@ -46,9 +46,9 @@ death_obs_gaps AS (
                 THEN 1
             ELSE 0
         END AS death_before_obs
-    FROM a9of9doxcohort c
-    INNER JOIN a9of9doxdeath_obs_status dos ON dos.person_id = c.person_id
-    LEFT JOIN a9of9doxmet_summary ms ON ms.person_id = c.person_id
+    FROM vcbo5u4zcohort c
+    INNER JOIN vcbo5u4zdeath_obs_status dos ON dos.person_id = c.person_id
+    LEFT JOIN vcbo5u4zmet_summary ms ON ms.person_id = c.person_id
     LEFT JOIN patient_obs po  ON po.person_id  = c.person_id
 )
 SELECT

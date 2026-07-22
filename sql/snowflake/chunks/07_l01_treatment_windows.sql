@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : snowflake
--- Translated     : 2026-05-07 12:40:28 BST
+-- Translated     : 2026-07-15 15:37:50 CEST
 -- Source file    : sql/sql_server/chunks/07_l01_treatment_windows.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -31,7 +31,7 @@ WITH window_bounds  AS (SELECT  CAST('INDEX' as TEXT) AS anchor_event,
         c.person_id,
         c.index_date AS anchor_date,
         w.window_index
-    FROM a9of9doxcohort c
+    FROM vcbo5u4zcohort c
     CROSS JOIN (
         SELECT -12 AS window_index UNION ALL SELECT -11 UNION ALL SELECT -10
         UNION ALL SELECT -9  UNION ALL SELECT -8  UNION ALL SELECT -7
@@ -60,7 +60,7 @@ WITH window_bounds  AS (SELECT  CAST('INDEX' as TEXT) AS anchor_event,
         ms.person_id,
         ms.first_met_date AS anchor_date,
         w.window_index
-    FROM a9of9doxmet_summary ms
+    FROM vcbo5u4zmet_summary ms
     CROSS JOIN (
         SELECT -6  AS window_index UNION ALL SELECT -5  UNION ALL SELECT -4
         UNION ALL SELECT -3  UNION ALL SELECT -2  UNION ALL SELECT -1
@@ -90,7 +90,7 @@ window_l01 AS (
             END
         ) AS has_l01_in_window
     FROM window_bounds wb
-    LEFT JOIN a9of9doxl01_events le
+    LEFT JOIN vcbo5u4zl01_events le
       ON wb.person_id = le.person_id
     GROUP BY wb.anchor_event, wb.person_id, wb.window_index, wb.anchor_date
 ),

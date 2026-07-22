@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : spark
--- Translated     : 2026-05-07 12:40:21 BST
+-- Translated     : 2026-07-15 15:37:26 CEST
 -- Source file    : sql/sql_server/chunks/09_demographics.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -16,14 +16,14 @@
 WITH anchor_persons  AS (SELECT  CAST('INDEX' as STRING) AS anchor_event,
  c.person_id,
  c.index_date AS anchor_date
- FROM a9of9doxpatient_char c
+ FROM vcbo5u4zpatient_char c
  WHERE c.index_date IS NOT NULL
  UNION ALL
  SELECT
  'FIRST_MET' AS anchor_event,
  c.person_id,
  c.first_met_date AS anchor_date
- FROM a9of9doxpatient_char c
+ FROM vcbo5u4zpatient_char c
  WHERE c.first_met_date IS NOT NULL
 ),
 base AS (
@@ -68,8 +68,8 @@ FROM (
  COUNT(*) AS n_patients,
  SUM(CASE WHEN gender_concept_id = 8507 THEN 1 ELSE 0 END) AS n_male,
  SUM(CASE WHEN gender_concept_id = 8532 THEN 1 ELSE 0 END) AS n_female,
- CAST(100.0 * SUM(CASE WHEN gender_concept_id = 8507 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS DOUBLE) AS pct_male,
- CAST(100.0 * SUM(CASE WHEN gender_concept_id = 8532 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS DOUBLE) AS pct_female
+ CAST(100.0 * SUM(CASE WHEN gender_concept_id = 8507 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS FLOAT) AS pct_male,
+ CAST(100.0 * SUM(CASE WHEN gender_concept_id = 8532 THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0) AS FLOAT) AS pct_female
  FROM ages
  WHERE age_years IS NOT NULL
  GROUP BY anchor_event
@@ -77,9 +77,9 @@ FROM (
 JOIN (
  SELECT
  anchor_event,
- MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(age_years AS DOUBLE) END) AS age_lq_years,
- MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(age_years AS DOUBLE) END) AS age_median_years,
- MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(age_years AS DOUBLE) END) AS age_uq_years
+ MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(age_years AS FLOAT) END) AS age_lq_years,
+ MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(age_years AS FLOAT) END) AS age_median_years,
+ MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(age_years AS FLOAT) END) AS age_uq_years
  FROM (
  SELECT anchor_event, age_years,
  ROW_NUMBER() OVER (PARTITION BY anchor_event ORDER BY age_years) AS rn,

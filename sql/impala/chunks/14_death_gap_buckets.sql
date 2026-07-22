@@ -2,9 +2,9 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : impala
--- Translated     : 2026-05-07 12:40:16 BST
+-- Translated     : 2026-07-15 15:37:03 CEST
 -- Source file    : sql/sql_server/chunks/14_death_gap_buckets.sql
--- DO NOT EDIT — edit the sql_server source and re-run
+-- DO NOT EDIT <e2><80><94> edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
 -- ============================================================
 -- WARNING: This dialect (impala) does not support native session
@@ -13,7 +13,7 @@
 --   Without it, #temp table references become permanent tables and
 --   may cause permission errors or name collisions.
 
--- 14) Death date vs observation period — bucketed gap histogram
+-- 14) Death date vs observation period <U+2014> bucketed gap histogram
 --     Restricted to patients where death_date > obs_period_end_date.
 --     Exported for both INDEX (all DX cohort) and FIRST_MET (MET subgroup)
 --     so that each can be shown as a separate figure in the report.
@@ -23,7 +23,7 @@ WITH patient_obs AS (
         MIN(observation_period_start_date) AS first_obs_start,
         MAX(observation_period_end_date)   AS last_obs_end
     FROM @cdm_database_schema.observation_period
-    WHERE person_id IN (SELECT person_id FROM a9of9doxcohort)
+    WHERE person_id IN (SELECT person_id FROM vcbo5u4zcohort)
     GROUP BY person_id
 ),
 death_obs_gaps AS (
@@ -35,9 +35,9 @@ death_obs_gaps AS (
                 THEN DATEDIFF(CASE TYPEOF(dos.death_date ) WHEN 'TIMESTAMP' THEN CAST(dos.death_date  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(dos.death_date  AS STRING), 1, 4), SUBSTR(CAST(dos.death_date  AS STRING), 5, 2), SUBSTR(CAST(dos.death_date  AS STRING), 7, 2)), 'UTC') END, CASE TYPEOF(po.last_obs_end ) WHEN 'TIMESTAMP' THEN CAST(po.last_obs_end  AS TIMESTAMP) ELSE TO_UTC_TIMESTAMP(CONCAT_WS('-', SUBSTR(CAST(po.last_obs_end  AS STRING), 1, 4), SUBSTR(CAST(po.last_obs_end  AS STRING), 5, 2), SUBSTR(CAST(po.last_obs_end  AS STRING), 7, 2)), 'UTC') END)
             ELSE NULL
         END AS gap_death_after_obs
-    FROM a9of9doxcohort c
-    INNER JOIN a9of9doxdeath_obs_status dos ON dos.person_id = c.person_id
-    LEFT JOIN a9of9doxmet_summary ms        ON ms.person_id  = c.person_id
+    FROM vcbo5u4zcohort c
+    INNER JOIN vcbo5u4zdeath_obs_status dos ON dos.person_id = c.person_id
+    LEFT JOIN vcbo5u4zmet_summary ms        ON ms.person_id  = c.person_id
     LEFT JOIN patient_obs po         ON po.person_id  = c.person_id
 ),
 bucketed AS (

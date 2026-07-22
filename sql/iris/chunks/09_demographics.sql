@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : iris
--- Translated     : 2026-05-07 12:40:29 BST
+-- Translated     : 2026-07-15 15:37:54 CEST
 -- Source file    : sql/sql_server/chunks/09_demographics.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -15,14 +15,14 @@ WITH anchor_persons AS (
         'INDEX' AS anchor_event,
         c.person_id,
         c.index_date AS anchor_date
-    FROM a9of9doxpatient_char c
+    FROM vcbo5u4zpatient_char c
     WHERE c.index_date IS NOT NULL
     UNION ALL
     SELECT
         'FIRST_MET' AS anchor_event,
         c.person_id,
         c.first_met_date AS anchor_date
-    FROM a9of9doxpatient_char c
+    FROM vcbo5u4zpatient_char c
     WHERE c.first_met_date IS NOT NULL
 ),
 base AS (

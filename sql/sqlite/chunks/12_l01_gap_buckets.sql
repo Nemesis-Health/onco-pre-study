@@ -2,13 +2,13 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : sqlite
--- Translated     : 2026-05-07 12:40:24 BST
+-- Translated     : 2026-07-15 15:37:32 CEST
 -- Source file    : sql/sql_server/chunks/12_l01_gap_buckets.sql
--- DO NOT EDIT — edit the sql_server source and re-run
+-- DO NOT EDIT <e2><80><94> edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
 -- ============================================================
 
--- 12) L01 consecutive record gap distribution — bucketed histogram
+-- 12) L01 consecutive record gap distribution <U+2014> bucketed histogram
 --     Intermediate table #l01_consecutive_gaps is built in 00_setup.sql
 --     (section L).  Same subgroups as chunk 11 (ALL_L01, MET_L01).
 --

@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-07 12:40:20 BST
+-- Translated     : 2026-07-15 15:37:22 CEST
 -- Source file    : sql/sql_server/chunks/02_code_counts.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -32,22 +32,22 @@
     case when x.n_patients <= @min_cell_count then null else coalesce(ts.median_days_first,   tba.median_days_first)   end as median_days,
     case when x.n_patients <= @min_cell_count then null else coalesce(ts.uq_days_first,       tba.uq_days_first)       end as uq_days
  from (
-    select 'all'    as time_window, anchor_event, event_family, concept_id, n_records, n_patients from a9of9doxevent_code_counts
+    select 'all'    as time_window, anchor_event, event_family, concept_id, n_records, n_patients from vcbo5u4zevent_code_counts
     union all
-    select 'before' as time_window, anchor_event, event_family, concept_id, n_records, n_patients from a9of9doxevent_code_counts_before_after         where time_relative = 'BEFORE'
+    select 'before' as time_window, anchor_event, event_family, concept_id, n_records, n_patients from vcbo5u4zevent_code_counts_before_after         where time_relative = 'BEFORE'
     union all
-    select 'after'  as time_window, anchor_event, event_family, concept_id, n_records, n_patients from a9of9doxevent_code_counts_before_after         where time_relative = 'AFTER'
+    select 'after'  as time_window, anchor_event, event_family, concept_id, n_records, n_patients from vcbo5u4zevent_code_counts_before_after         where time_relative = 'AFTER'
     union all
-    select 'before' as time_window, anchor_event, event_family, concept_id, n_records, n_patients from a9of9doxevent_code_counts_before_after_first_met where time_relative = 'BEFORE'
+    select 'before' as time_window, anchor_event, event_family, concept_id, n_records, n_patients from vcbo5u4zevent_code_counts_before_after_first_met where time_relative = 'BEFORE'
     union all
-    select 'after'  as time_window, anchor_event, event_family, concept_id, n_records, n_patients from a9of9doxevent_code_counts_before_after_first_met where time_relative = 'AFTER'
+    select 'after'  as time_window, anchor_event, event_family, concept_id, n_records, n_patients from vcbo5u4zevent_code_counts_before_after_first_met where time_relative = 'AFTER'
 ) x
-left join a9of9doxevent_code_timing_summary ts
+left join vcbo5u4zevent_code_timing_summary ts
   on x.time_window = 'all'
  and x.anchor_event = ts.anchor_event
  and x.event_family = ts.event_family
  and x.concept_id   = ts.concept_id
-left join a9of9doxevent_code_timing_before_after_summary tba
+left join vcbo5u4zevent_code_timing_before_after_summary tba
   on x.time_window != 'all'
  and x.anchor_event = tba.anchor_event
  and x.event_family = tba.event_family

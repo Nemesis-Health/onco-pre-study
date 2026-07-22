@@ -2,9 +2,9 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : netezza
--- Translated     : 2026-05-07 12:40:17 BST
+-- Translated     : 2026-07-15 15:37:07 CEST
 -- Source file    : sql/sql_server/chunks/05_timing_by_year.sql
--- DO NOT EDIT — edit the sql_server source and re-run
+-- DO NOT EDIT <e2><80><94> edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
 -- ============================================================
 -- WARNING: This dialect (netezza) does not support native session
@@ -17,7 +17,7 @@
 --    Same structure as chunk 04 (final_timing_pairwise.csv) but grouped by year.
 --    Year is anchored on the from_event: DX-anchored pairs use YEAR(index_date),
 --    MET-anchored pairs use YEAR(first_met_date).
---    Used for year-over-year plots and for the per-year columns in the §06 stability matrix.
+--    Used for year-over-year plots and for the per-year columns in the <U+00A7>06 stability matrix.
 --    Small-cell suppression applied.
 SELECT
     x.timing_type,

@@ -2,9 +2,9 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : pdw
--- Translated     : 2026-05-07 12:40:11 BST
+-- Translated     : 2026-07-15 15:36:58 CEST
 -- Source file    : sql/sql_server/chunks/12_l01_gap_buckets.sql
--- DO NOT EDIT — edit the sql_server source and re-run
+-- DO NOT EDIT <e2><80><94> edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
 -- ============================================================
 -- WARNING: This dialect (pdw) does not support native session
@@ -13,7 +13,7 @@
 --   Without it, #temp table references become permanent tables and
 --   may cause permission errors or name collisions.
 
--- 12) L01 consecutive record gap distribution — bucketed histogram
+-- 12) L01 consecutive record gap distribution <U+2014> bucketed histogram
 --     Intermediate table #l01_consecutive_gaps is built in 00_setup.sql
 --     (section L).  Same subgroups as chunk 11 (ALL_L01, MET_L01).
 --

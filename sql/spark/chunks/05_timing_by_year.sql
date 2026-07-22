@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : spark
--- Translated     : 2026-05-07 12:40:21 BST
+-- Translated     : 2026-07-15 15:37:26 CEST
 -- Source file    : sql/sql_server/chunks/05_timing_by_year.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -30,17 +30,17 @@ FROM (
  from_event,
  to_event,
  COUNT(*) AS n_patients_with_pair,
- MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(days_diff AS DOUBLE) END) AS p25_days,
- MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_diff AS DOUBLE) END) AS p50_days,
- MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS DOUBLE) END) AS p75_days
+ MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS p25_days,
+ MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS p50_days,
+ MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS FLOAT) END) AS p75_days
  FROM (
  SELECT p.from_event, p.to_event, p.days_diff,
  CASE WHEN p.from_event = 'MET' THEN YEAR(ms.first_met_date) ELSE YEAR(pc.index_date) END AS index_year_int,
  ROW_NUMBER() OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN YEAR(ms.first_met_date) ELSE YEAR(pc.index_date) END, p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
  COUNT(*) OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN YEAR(ms.first_met_date) ELSE YEAR(pc.index_date) END, p.from_event, p.to_event) AS cnt
- FROM a9of9doxpatient_timing_pairs p
- JOIN a9of9doxpatient_char pc ON p.person_id = pc.person_id
- LEFT JOIN a9of9doxmet_summary ms ON p.person_id = ms.person_id
+ FROM vcbo5u4zpatient_timing_pairs p
+ JOIN vcbo5u4zpatient_char pc ON p.person_id = pc.person_id
+ LEFT JOIN vcbo5u4zmet_summary ms ON p.person_id = ms.person_id
  ) y
  GROUP BY index_year_int, from_event, to_event
  UNION ALL
@@ -51,17 +51,17 @@ FROM (
  from_event,
  to_event,
  COUNT(*) AS n_patients_with_pair,
- MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(days_diff AS DOUBLE) END) AS p25_days,
- MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_diff AS DOUBLE) END) AS p50_days,
- MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS DOUBLE) END) AS p75_days
+ MIN(CASE WHEN 4.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS p25_days,
+ MIN(CASE WHEN 2.0 * rn >= cnt THEN CAST(days_diff AS FLOAT) END) AS p50_days,
+ MIN(CASE WHEN 4.0 * rn >= 3 * cnt THEN CAST(days_diff AS FLOAT) END) AS p75_days
  FROM (
  SELECT p.from_event, p.to_event, p.days_diff,
  CASE WHEN p.from_event = 'MET' THEN YEAR(ms.first_met_date) ELSE YEAR(pc.index_date) END AS index_year_int,
  ROW_NUMBER() OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN YEAR(ms.first_met_date) ELSE YEAR(pc.index_date) END, p.from_event, p.to_event ORDER BY p.days_diff) AS rn,
  COUNT(*) OVER (PARTITION BY CASE WHEN p.from_event = 'MET' THEN YEAR(ms.first_met_date) ELSE YEAR(pc.index_date) END, p.from_event, p.to_event) AS cnt
- FROM a9of9doxpatient_timing_pairs_first_to_closest_after p
- JOIN a9of9doxpatient_char pc ON p.person_id = pc.person_id
- LEFT JOIN a9of9doxmet_summary ms ON p.person_id = ms.person_id
+ FROM vcbo5u4zpatient_timing_pairs_first_to_closest_after p
+ JOIN vcbo5u4zpatient_char pc ON p.person_id = pc.person_id
+ LEFT JOIN vcbo5u4zmet_summary ms ON p.person_id = ms.person_id
  ) y
  GROUP BY index_year_int, from_event, to_event
 ) x

@@ -2,7 +2,7 @@
 -- AUTO-TRANSLATED by SqlRender
 -- Source dialect : sql server
 -- Target dialect : bigquery
--- Translated     : 2026-05-07 12:40:20 BST
+-- Translated     : 2026-07-15 15:37:22 CEST
 -- Source file    : sql/sql_server/chunks/03_directionality_buckets.sql
 -- DO NOT EDIT — edit the sql_server source and re-run
 --   scripts/translate_sql_dialects.R
@@ -45,7 +45,7 @@ with dx_met_base as (
             when days_dx_to_met <= 365   then 'AFTER_91_365'
             else 'AFTER_GT365'
         end as direction
-    from a9of9doxpatient_char
+    from vcbo5u4zpatient_char
 ),
 dx_l01_base as (
     select
@@ -60,7 +60,7 @@ dx_l01_base as (
             when days_dx_to_l01 <= 365   then 'AFTER_91_365'
             else 'AFTER_GT365'
         end as direction
-    from a9of9doxpatient_char
+    from vcbo5u4zpatient_char
 ),
 met_l01_base as (
     select
@@ -75,7 +75,7 @@ met_l01_base as (
             when days_met_to_l01 <= 365  then 'AFTER_91_365'
             else 'AFTER_GT365'
         end as direction
-    from a9of9doxpatient_char
+    from vcbo5u4zpatient_char
     where first_met_date is not null
 )
  select x.pair,
